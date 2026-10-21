@@ -4,7 +4,7 @@
 
 **Do primeiro código aos seus próprios projetos.**
 
-Uma plataforma gratuita para aprender programação passo a passo: aulas progressivas, exercícios, quizzes, jogos, treino diário no estilo Duolingo, ranking, laboratório de código e projetos guiados. Sem plano pago — todo o conteúdo é aberto.
+Uma plataforma gratuita para aprender programação passo a passo: aulas progressivas, exercícios, quizzes, jogos, desafios de código, **Batalha de Código multiplayer**, treino diário no estilo Duolingo, ranking, perfis, laboratório e projetos de portfólio. Sem plano pago — todo o conteúdo é aberto.
 
 **Acesse:** https://rqstack.github.io/programacao-do-zero/
 
@@ -20,16 +20,20 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 
 - **Trilhas** com aulas que seguem sempre a mesma estrutura: objetivo, por que importa, conceitos, exemplo prático, código explicado, erros comuns, resumo, exercício e quiz.
 - **Quizzes** de revisão por aula e um desafio final por trilha, com explicação em cada resposta.
-- **9 jogos**: desafio de lógica, caça aos bugs, monte o código, quiz relâmpago, memória, desafio SQL, missões full stack, corrida de digitação e seletor CSS.
+- **9 jogos**: robô programador, caça aos bugs, monte o código, chuva de código, memória, construtor SQL, missões full stack, corrida de digitação e seletor CSS ao vivo.
+- **Desafios de código**: escolha JavaScript, TypeScript, Python ou SQL e a dificuldade; o site sorteia um problema e testa sua solução com casos gerados na hora, tudo no navegador (Web Worker isolado, Pyodide e sql.js).
+- **Batalha de Código (multiplayer)**: duas pessoas reais, o mesmo problema e o mesmo tempo; vence quem enviar primeiro uma solução correta, corrigida no servidor em sandbox (Judge0) com testes ocultos. Java, JavaScript, Python e C. Seis arenas, troféus, temporadas e ranking próprio. Detalhes em [docs/BATALHA.md](docs/BATALHA.md).
 - **Laboratório** para escrever HTML, CSS e JavaScript e ver o resultado na hora, isolado em um `iframe` com sandbox.
-- **Projetos guiados**, do primeiro site ao Tarefas+ com API, React, banco de dados, login e IA.
+- **Projetos guiados** (19), do primeiro site a projetos de portfólio para vagas (loja, API com autenticação, agendamento, kanban em tempo real...), cada um com dicas de como apresentar no currículo e no LinkedIn.
+- **Videoaulas gratuitas** recentes (até 1 ano) do YouTube indicadas em cada trilha.
 - **Treino diário estilo Duolingo**: 10 perguntas, 3 vidas, revisão das perguntas erradas, meta diária de XP e ofensiva (dias seguidos).
 - **Níveis com títulos**, de *Dev Bebê* a *Dev Lendário*, além de conquistas.
 - **Login com Google (opcional)**: o XP passa a contar no **ranking geral** e na **liga da semana**, e o progresso sincroniza entre aparelhos. Sem login, tudo fica salvo no navegador.
+- **Perfil público** com GitHub, LinkedIn e site, **adicionar colegas** e **liga dos amigos**.
 
 ## Tecnologias
 
-Next.js 16 (App Router, exportação estática) · React 19 · TypeScript estrito · Tailwind CSS 4 · Supabase (Auth + PostgreSQL) · Zod · GSAP · Vitest · PGlite · ESLint.
+Next.js 16 (App Router, exportação estática) · React 19 · TypeScript estrito · Tailwind CSS 4 · Supabase (Auth, PostgreSQL, Edge Functions, pg_cron) · Judge0 (execução isolada de código) · Zod · GSAP · Vitest · PGlite · ESLint.
 
 O site é estático e hospedado de graça no GitHub Pages. O login e o ranking usam o plano gratuito do Supabase, com todas as regras de segurança no próprio banco (RLS e funções). Configuração passo a passo: [docs/CONFIGURACAO.md](docs/CONFIGURACAO.md).
 
@@ -50,6 +54,8 @@ Outros comandos:
 | --- | --- |
 | `npm test` | Roda os testes: progresso, correção de quizzes e jogos, validação do conteúdo e da sintaxe dos códigos, e as regras de segurança do banco (RLS, XP e ranking) em um Postgres real embutido |
 | `npm run db:seed` | Gera `supabase/seed.sql` com as atividades que valem XP |
+| `npm run battle:config` | Gera o SQL de arenas, regras, temporadas e desafios da Batalha a partir do código |
+| `npm run battle:validate` | Roda cada desafio da Batalha no Judge0 nas 4 linguagens (solução aceita, código inicial recusado) |
 | `npm run deploy` | Gera o site, confere os links e publica no GitHub Pages |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript |
@@ -78,7 +84,7 @@ content/            conteúdo educacional
 src/app/            páginas
 src/components/     interface
 src/lib/            regras: progresso, XP, treino, correção de quizzes, motor dos jogos e login
-supabase/           migrations do banco e seed das atividades
+supabase/           migrations do banco, seeds e a Edge Function da Batalha (functions/)
 tests/              testes automatizados
 ```
 

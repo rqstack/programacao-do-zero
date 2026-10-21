@@ -14,3 +14,6 @@ next-env.d.ts
 .claude/
 out-old-*/
 .next-old-*/
+
+# Banco privado da Batalha de Código (soluções e geradores de testes ocultos)
+supabase/functions/_shared/battle-bank.ts

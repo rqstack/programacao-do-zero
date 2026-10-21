@@ -30,7 +30,7 @@ grant execute on function auth.uid() to anon, authenticated, service_role;
 const ROOT = path.resolve(__dirname, "../..");
 export const SEED_FILE = path.join(ROOT, "supabase", "seed.sql");
 
-export async function createTestDb(options: { seed?: boolean } = {}) {
+export async function createTestDb(options: { seed?: boolean; battle?: boolean } = {}) {
   const db = new PGlite();
   await db.exec(BOOTSTRAP);
   const dir = path.join(ROOT, "supabase", "migrations");
@@ -42,6 +42,10 @@ export async function createTestDb(options: { seed?: boolean } = {}) {
     }
   }
   if (options.seed) await db.exec(readFileSync(SEED_FILE, "utf8"));
+  if (options.battle) {
+    await db.exec(readFileSync(path.join(ROOT, "supabase", "battle-config.sql"), "utf8"));
+    await db.exec(readFileSync(path.join(ROOT, "supabase", "battle-challenges.sql"), "utf8"));
+  }
   return db;
 }
 

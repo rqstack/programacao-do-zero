@@ -9,6 +9,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
       "@content": path.resolve(__dirname, "content"),
+      "@battle": path.resolve(__dirname, "supabase/functions/_shared"),
     },
   },
   test: {

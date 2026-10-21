@@ -12,7 +12,9 @@
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "deploy": "node scripts/deploy-pages.mjs",
-    "db:seed": "tsx scripts/generate-xp-sources.ts"
+    "db:seed": "tsx scripts/generate-xp-sources.ts",
+    "battle:config": "tsx scripts/generate-battle-config.mts",
+    "battle:validate": "tsx scripts/battle-validate.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
