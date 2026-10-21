@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { minimumBlocks, robotAnswer, robotPayload, robotSolution, runRobot, type RobotPayload, type RobotRun } from "./robot";
+import { runQuery, sameResult, sqlQuery, sqlTable, toSql, type SqlQuery, type SqlResult, type SqlTable } from "./sql-mini";
 
 /**
  * Motor de jogos: valida os dados de cada rodada e corrige as respostas.
@@ -54,12 +56,40 @@ const typingPayload = z.object({
 const typingSolution = z.object({});
 const typingAnswer = z.object({ typed: z.string().max(800) });
 
+const rainPayload = z.object({
+  statement: z.string().min(1).max(200),
+  code: z.string().max(200).optional(),
+  codeLang: z.string().max(20).optional(),
+});
+const rainSolution = z.object({ truth: z.boolean() });
+const rainAnswer = z.object({ value: z.boolean().nullable() });
+
+const cssPayload = z.object({
+  prompt: z.string().min(1).max(500),
+  /** HTML do mini-site; os alvos têm o atributo data-alvo. */
+  html: z.string().min(10).max(2000),
+});
+const cssSolution = z.object({ selector: z.string().min(1).max(120) });
+/** A correspondência é calculada no navegador (DOMParser); o motor recebe o resultado. */
+const cssAnswer = z.object({ selector: z.string().max(120), hit: z.boolean() });
+
+const sqlPayload = z.object({
+  prompt: z.string().min(1).max(500),
+  tables: z.array(sqlTable).min(1).max(2),
+});
+const sqlSolution = z.object({ query: sqlQuery });
+const sqlAnswer = z.object({ query: sqlQuery });
+
 export const roundSchemas = {
   choice: { payload: choicePayload, solution: choiceSolution, answer: choiceAnswer },
   bug_hunt: { payload: bugPayload, solution: bugSolution, answer: bugAnswer },
   code_order: { payload: orderPayload, solution: orderSolution, answer: orderAnswer },
   memory: { payload: memoryPayload, solution: memorySolution, answer: memoryAnswer },
   typing: { payload: typingPayload, solution: typingSolution, answer: typingAnswer },
+  robot: { payload: robotPayload, solution: robotSolution, answer: robotAnswer },
+  rain: { payload: rainPayload, solution: rainSolution, answer: rainAnswer },
+  css_live: { payload: cssPayload, solution: cssSolution, answer: cssAnswer },
+  sql_builder: { payload: sqlPayload, solution: sqlSolution, answer: sqlAnswer },
 } as const;
 
 export type ChoicePayload = z.infer<typeof choicePayload>;
@@ -67,6 +97,10 @@ export type BugPayload = z.infer<typeof bugPayload>;
 export type OrderPayload = z.infer<typeof orderPayload>;
 export type MemoryPayload = z.infer<typeof memoryPayload>;
 export type TypingPayload = z.infer<typeof typingPayload>;
+export type RainPayload = z.infer<typeof rainPayload>;
+export type CssPayload = z.infer<typeof cssPayload>;
+export type SqlPayload = z.infer<typeof sqlPayload>;
+export type { RobotPayload, SqlQuery, SqlResult, SqlTable };
 
 export type RoundFamily = keyof typeof roundSchemas;
 
@@ -80,6 +114,16 @@ export function familyOf(kind: GameKind): RoundFamily {
       return "memory";
     case "typing":
       return "typing";
+    case "logic":
+      return "robot";
+    case "lightning":
+      return "rain";
+    case "css":
+      return "css_live";
+    case "sql":
+      return "sql_builder";
+    case "fullstack":
+      return "code_order";
     default:
       return "choice";
   }
@@ -104,8 +148,26 @@ export function validateRound(kind: GameKind, payload: unknown, solution: unknow
     const ids = (p.data as OrderPayload).blocks.map((b) => b.id);
     const order = (s.data as { order: string[] }).order;
     if (!isPermutation(order, ids)) return { ok: false, error: "a ordem correta precisa usar todos os blocos uma vez" };
-  } else if (family === "typing") {
+  } else if (family === "typing" || family === "rain") {
     return { ok: true };
+  } else if (family === "robot") {
+    const pl = p.data as RobotPayload;
+    const all = pl.grid.join("");
+    if (all.split("S").length - 1 !== 1 || all.split("G").length - 1 !== 1) return { ok: false, error: "o labirinto precisa de exatamente um S e um G" };
+    if (new Set(pl.grid.map((r) => r.length)).size !== 1) return { ok: false, error: "todas as linhas do labirinto precisam ter o mesmo tamanho" };
+    const min = minimumBlocks(pl);
+    const par = (s.data as { par: number }).par;
+    if (min === null) return { ok: false, error: "o labirinto não tem solução" };
+    if (par !== min) return { ok: false, error: `o par deveria ser ${min} (menor solução)` };
+    if (min > pl.maxBlocks) return { ok: false, error: "a menor solução usa mais blocos que o permitido" };
+  } else if (family === "css_live") {
+    const pl = p.data as CssPayload;
+    if (!pl.html.includes("data-alvo")) return { ok: false, error: "marque os alvos com data-alvo" };
+    if (/data-alvo/.test((s.data as { selector: string }).selector)) return { ok: false, error: "o seletor-gabarito não pode usar data-alvo" };
+  } else if (family === "sql_builder") {
+    const run = runQuery((p.data as SqlPayload).tables, (s.data as { query: SqlQuery }).query);
+    if (!run.ok) return { ok: false, error: `consulta-gabarito inválida: ${run.error}` };
+    if (run.result.rows.length === 0) return { ok: false, error: "a consulta-gabarito não devolve linhas" };
   } else {
     const ids = (p.data as MemoryPayload).cards.map((c) => c.id);
     const flat = (s.data as { pairs: [string, string][] }).pairs.flat();
@@ -137,6 +199,19 @@ export type RoundFeedback =
   | { kind: "bug_hunt"; correct: boolean; correctLine: number; explanation: string }
   | { kind: "code_order"; correct: boolean; correctOrder: string[]; explanation: string }
   | { kind: "typing"; correct: boolean; accuracy: number; errors: number; explanation: string }
+  | { kind: "robot"; correct: boolean; run: RobotRun; blocks: number; par: number; explanation: string }
+  | { kind: "rain"; correct: boolean; truth: boolean; timedOut: boolean; explanation: string }
+  | { kind: "css_live"; correct: boolean; reference: string; explanation: string }
+  | {
+      kind: "sql_builder";
+      correct: boolean;
+      sql: string;
+      expectedSql: string;
+      result: SqlResult | null;
+      expected: SqlResult;
+      error: string | null;
+      explanation: string;
+    }
   | {
       kind: "memory";
       match: boolean;
@@ -214,6 +289,61 @@ export function gradeRound(
       correctDelta: correct ? 1 : 0,
       feedback: { kind: "typing", correct, accuracy, errors, explanation: round.explanation },
     };
+  }
+
+  if (family === "robot") {
+    const parsed = robotAnswer.safeParse(answer);
+    const pl = round.payload as RobotPayload;
+    if (!parsed.success || parsed.data.program.length > pl.maxBlocks) return { ok: false, error: "invalid_answer" };
+    const run = runRobot(pl, parsed.data.program);
+    const par = (round.solution as { par: number }).par;
+    const blocks = parsed.data.program.length;
+    const correct = run.outcome === "goal";
+    // Chegar com o menor número de blocos vale tudo; com blocos a mais, 70%.
+    const points = correct ? (blocks <= par ? round.points : Math.round(round.points * 0.7)) : 0;
+    return {
+      ok: true,
+      state: { done: true, correct, points },
+      pointsDelta: points,
+      correctDelta: correct ? 1 : 0,
+      feedback: { kind: "robot", correct, run, blocks, par, explanation: round.explanation },
+    };
+  }
+
+  if (family === "rain") {
+    const parsed = rainAnswer.safeParse(answer);
+    if (!parsed.success) return { ok: false, error: "invalid_answer" };
+    const truth = (round.solution as { truth: boolean }).truth;
+    const correct = parsed.data.value === truth;
+    return finish(round, correct, { kind: "rain", correct, truth, timedOut: parsed.data.value === null, explanation: round.explanation });
+  }
+
+  if (family === "css_live") {
+    const parsed = cssAnswer.safeParse(answer);
+    if (!parsed.success || /data-alvo/.test(parsed.data.selector)) return { ok: false, error: "invalid_answer" };
+    const reference = (round.solution as { selector: string }).selector;
+    return finish(round, parsed.data.hit, { kind: "css_live", correct: parsed.data.hit, reference, explanation: round.explanation });
+  }
+
+  if (family === "sql_builder") {
+    const parsed = sqlAnswer.safeParse(answer);
+    if (!parsed.success) return { ok: false, error: "invalid_answer" };
+    const tables = (round.payload as SqlPayload).tables;
+    const ref = (round.solution as { query: SqlQuery }).query;
+    const expected = runQuery(tables, ref);
+    if (!expected.ok) return { ok: false, error: "invalid_round" };
+    const mine = runQuery(tables, parsed.data.query);
+    const correct = mine.ok && sameResult(mine.result, expected.result, ref.orderBy !== null || ref.limit !== null);
+    return finish(round, correct, {
+      kind: "sql_builder",
+      correct,
+      sql: toSql(parsed.data.query),
+      expectedSql: toSql(ref),
+      result: mine.ok ? mine.result : null,
+      expected: expected.result,
+      error: mine.ok ? null : mine.error,
+      explanation: round.explanation,
+    });
   }
 
   if (family === "choice") {

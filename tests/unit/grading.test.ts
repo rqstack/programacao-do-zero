@@ -53,18 +53,16 @@ describe("níveis e conquistas", () => {
 describe("motor de jogos", () => {
   const choice = { payload: { prompt: "?", options: ["1", "2"] }, solution: { index: 1 }, points: 10, explanation: "porque" };
 
-  it("escolha: corrige e impede resposta dupla", () => {
-    const r = gradeRound("logic", choice, null, { index: 1 });
-    expect(r.ok && r.pointsDelta).toBe(10);
+  it("impede responder a mesma rodada duas vezes", () => {
+    const rain = { payload: { statement: "x" }, solution: { truth: false }, points: 5, explanation: "" };
+    const r = gradeRound("lightning", rain, null, { value: false });
+    expect(r.ok && r.pointsDelta).toBe(5);
     if (!r.ok) throw new Error();
-    expect(gradeRound("logic", choice, r.state, { index: 1 })).toEqual({ ok: false, error: "already_answered" });
-  });
-  it("escolha: índice fora das opções é inválido", () => {
-    expect(gradeRound("sql", choice, null, { index: 5 })).toEqual({ ok: false, error: "invalid_answer" });
-    expect(gradeRound("sql", choice, null, { index: 1, points: 999 }).ok).toBe(true);
+    expect(gradeRound("lightning", rain, r.state, { value: false })).toEqual({ ok: false, error: "already_answered" });
   });
   it("pontuação nunca vem do cliente", () => {
-    const r = gradeRound("lightning", choice, null, { index: 0, score: 1000 });
+    const rain = { payload: { statement: "x" }, solution: { truth: true }, points: 5, explanation: "" };
+    const r = gradeRound("lightning", rain, null, { value: false, score: 1000 });
     expect(r.ok && r.pointsDelta).toBe(0);
   });
   it("caça aos bugs por linha", () => {
@@ -105,7 +103,7 @@ describe("motor de jogos", () => {
     expect(hit2.state).toEqual({ done: true, correct: true, points: 13 });
   });
   it("valida rodadas cadastradas", () => {
-    expect(validateRound("logic", { prompt: "?", options: ["a", "b"] }, { index: 2 }).ok).toBe(false);
+    expect(validateRound("logic", { prompt: "?", options: ["a", "b"] }, { index: 1 }).ok).toBe(false);
     expect(validateRound("memory", { prompt: "?", cards: [{ id: "a", text: "1" }, { id: "b", text: "2" }, { id: "c", text: "3" }, { id: "d", text: "4" }] }, { pairs: [["a", "b"], ["a", "c"]] }).ok).toBe(false);
   });
   it("embaralhamento determinístico", () => {

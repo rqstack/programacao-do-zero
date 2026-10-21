@@ -63,6 +63,8 @@ export interface SeedGame {
   description: string;
   rules: string;
   timeLimitSeconds?: number;
+  /** Vidas da partida (erros custam uma); sem vidas a partida termina. */
+  lives?: number;
   rounds: SeedGameRound[];
 }
 
