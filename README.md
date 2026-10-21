@@ -1,3 +1,5 @@
+<p align="center"><img src="public/logo.png" alt="Logo da Programação do Zero" width="120"></p>
+
 # Programação do Zero
 
 **Do primeiro código aos seus próprios projetos.**

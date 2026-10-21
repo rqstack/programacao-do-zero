@@ -11,6 +11,7 @@ const repoName = path.basename(repoUrl).replace(/\.git$/, "");
 
 // Em pastas sincronizadas (OneDrive), a pasta out/ antiga pode ficar travada: renomeá-la funciona.
 if (existsSync("out")) renameSync("out", `out-old-${Date.now()}`);
+if (existsSync(".next")) renameSync(".next", `.next-old-${Date.now()}`);
 
 const basePath = `/${repoName}`;
 run("npm run build", { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: basePath, MSYS_NO_PATHCONV: "1" } });

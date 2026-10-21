@@ -10,6 +10,8 @@ const sans = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-schibsted
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap" });
 
 export const metadata: Metadata = {
+  // Origem pública do site (o subcaminho do GitHub Pages é somado pelo Next).
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_ORIGIN || "https://rqstack.github.io"),
   title: {
     default: "Programação do Zero — Do primeiro código aos seus próprios projetos",
     template: "%s · Programação do Zero",
