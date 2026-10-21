@@ -1,0 +1,232 @@
+import type { SeedCourse } from "../../schema";
+
+export const course: SeedCourse = {
+  slug: "typescript",
+  title: "TypeScript: JavaScript com tipos",
+  description: "Encontre erros antes de rodar o código: tipos, inferência, interfaces, uniões, generics, configuração estrita e validação de dados externos.",
+  category: "web",
+  level: "intermediario",
+  modules: [
+    {
+      title: "Fundamentos de tipos",
+      lessons: [
+        {
+          slug: "por-que-typescript",
+          title: "Por que TypeScript",
+          objective: "Entender o que o TypeScript verifica, como ele vira JavaScript e por que os tipos não existem em tempo de execução.",
+          summary: "Erros encontrados enquanto você escreve, não quando o usuário clica.",
+          minutes: 12,
+          exercise: {
+            prompt: "Qual tipo do TypeScript desliga a verificação e deve ser evitado?",
+            hint: "Significa \"qualquer\".",
+            accepted: ["any"],
+            explanation: "`any` aceita tudo sem verificar. Prefira `unknown`, que obriga a checar o tipo antes de usar.",
+          },
+          quiz: [
+            {
+              kind: "true_false",
+              prompt: "Os tipos do TypeScript validam automaticamente os dados que chegam de uma API em tempo de execução.",
+              options: ["Verdadeiro", "Falso"],
+              correct: 1,
+              explanation: "Os tipos somem na compilação. Dados externos precisam de validação no código.",
+            },
+            {
+              prompt: "O navegador executa arquivos .ts diretamente?",
+              options: ["Não, o TypeScript é compilado para JavaScript", "Sim, todos os navegadores", "Só o Chrome", "Só no celular"],
+              correct: 0,
+              explanation: "Ferramentas como tsc, Vite e Next.js geram JavaScript a partir do TypeScript.",
+            },
+            {
+              lang: "ts",
+              kind: "code_reading",
+              prompt: "O que acontece com esta chamada?",
+              code: "function dobro(n: number): number {\n  return n * 2;\n}\ndobro(\"4\");",
+              options: ["Erro de tipo antes de executar", "Devolve 8", "Devolve \"44\"", "Devolve NaN"],
+              correct: 0,
+              explanation: "\"4\" é string e o parâmetro exige number: o TypeScript acusa o erro na hora.",
+            },
+          ],
+        },
+        {
+          slug: "tipos-basicos-e-inferencia",
+          title: "Tipos básicos e inferência",
+          objective: "Usar tipos primitivos, arrays, tuplas e unknown, e saber quando a inferência dispensa anotações.",
+          summary: "Anote parâmetros e dados externos; deixe o resto com a inferência.",
+          minutes: 13,
+          exercise: {
+            prompt: "Qual é o tipo inferido de `const notas = [8, 9, 7];`? Escreva o tipo.",
+            hint: "Uma lista de números.",
+            accepted: ["number[]", "Array<number>"],
+            explanation: "O TypeScript infere `number[]` a partir dos valores.",
+          },
+          quiz: [
+            {
+              prompt: "Onde vale mais a pena anotar tipos explicitamente?",
+              options: ["Parâmetros de função e dados vindos de fora", "Em toda variável", "Só em comentários", "Em lugar nenhum"],
+              correct: 0,
+              explanation: "Dentro das funções a inferência costuma bastar.",
+            },
+            {
+              prompt: "Qual a diferença entre unknown e any?",
+              options: ["unknown obriga a verificar o tipo antes de usar; any não verifica nada", "Nenhuma", "any é mais seguro", "unknown só aceita números"],
+              correct: 0,
+              explanation: "unknown mantém a segurança; any a desliga.",
+            },
+            {
+              lang: "ts",
+              prompt: "Que tipo descreve `[\"Ana\", 30]` como tupla de nome e idade?",
+              options: ["[string, number]", "string[]", "number[]", "any"],
+              correct: 0,
+              explanation: "Tuplas fixam a quantidade e o tipo de cada posição.",
+            },
+          ],
+        },
+        {
+          slug: "interfaces-e-types",
+          title: "Objetos com interface e type",
+          objective: "Descrever formatos de objetos com propriedades opcionais e somente leitura e combinar tipos.",
+          summary: "Autocompletar, menos erros de digitação e código autodocumentado.",
+          minutes: 14,
+          exercise: {
+            prompt: "Qual símbolo torna uma propriedade opcional em uma interface? Exemplo: `telefone_: string`",
+            hint: "É um sinal de pontuação.",
+            accepted: ["?"],
+            explanation: "`telefone?: string` significa que a propriedade pode não existir.",
+          },
+          quiz: [
+            {
+              lang: "ts",
+              kind: "find_bug",
+              prompt: "Por que o TypeScript acusa erro aqui?",
+              code: "interface Produto {\n  nome: string;\n  descricao?: string;\n}\nconst p: Produto = { nome: \"Lápis\" };\nconsole.log(p.descricao.length);",
+              options: ["descricao pode ser undefined", "nome está faltando", "length não existe em strings", "Produto não pode ter ?"],
+              correct: 0,
+              explanation: "Propriedades opcionais podem não existir. Use p.descricao?.length.",
+            },
+            {
+              prompt: "O que `readonly` faz em uma propriedade?",
+              options: ["Impede que ela seja alterada depois de criada", "Esconde a propriedade", "Torna a propriedade opcional", "Converte para string"],
+              correct: 0,
+              explanation: "readonly é útil para ids e dados que não devem mudar.",
+            },
+            {
+              prompt: "Para que serve Record<string, number>?",
+              options: ["Descrever um objeto usado como dicionário de texto para número", "Gravar dados no disco", "Criar um array", "Converter números em texto"],
+              correct: 0,
+              explanation: "Record descreve objetos com chaves e valores de tipos definidos.",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Tipos avançados no dia a dia",
+      lessons: [
+        {
+          slug: "unioes-e-estreitamento",
+          title: "Uniões, tipos literais e estreitamento",
+          objective: "Modelar estados possíveis com uniões discriminadas e garantir, com never, que todos foram tratados.",
+          summary: "Carregando, sucesso ou erro — e o compilador conferindo cada caso.",
+          minutes: 16,
+          exercise: {
+            prompt: "Qual tipo especial, usado no default de um switch, faz o TypeScript acusar casos esquecidos?",
+            hint: "Significa \"nunca\".",
+            accepted: ["never"],
+            explanation: "Se sobrar algum caso, ele não pode ser atribuído a `never` e o código não compila.",
+          },
+          quiz: [
+            {
+              lang: "ts",
+              prompt: "Qual declaração impede erros como status = \"pagoo\"?",
+              options: ["status: \"pendente\" | \"pago\" | \"cancelado\"", "status: string", "status: any", "status: unknown"],
+              correct: 0,
+              explanation: "Tipos literais aceitam apenas os valores listados.",
+            },
+            {
+              prompt: "O que é estreitamento (narrowing)?",
+              options: ["O TypeScript deduzir um tipo mais específico depois de uma verificação", "Diminuir o tamanho do código", "Remover tipos", "Converter tipos com as"],
+              correct: 0,
+              explanation: "Após `typeof x === \"string\"`, x é tratado como string naquele bloco.",
+            },
+            {
+              prompt: "Em uma união discriminada, o que é o discriminante?",
+              options: ["A propriedade comum que identifica cada caso, como status", "O primeiro caso", "Um comentário", "O tipo any"],
+              correct: 0,
+              explanation: "Testar o discriminante libera as propriedades específicas de cada caso.",
+            },
+          ],
+        },
+        {
+          slug: "generics",
+          title: "Generics",
+          objective: "Escrever funções e tipos reutilizáveis que preservam o tipo dos dados, com restrições e utilitários como Omit.",
+          summary: "A mesma função para qualquer tipo, sem virar any.",
+          minutes: 15,
+          exercise: {
+            prompt: "Qual utilitário cria um tipo a partir de outro removendo propriedades? Exemplo: ___<Usuario, \"senha\">",
+            hint: "Significa \"omitir\".",
+            accepted: ["Omit"],
+            explanation: "`Omit<Usuario, \"senha\">` é o tipo Usuario sem a senha.",
+          },
+          quiz: [
+            {
+              lang: "ts",
+              kind: "code_reading",
+              prompt: "Qual é o tipo de `x`?",
+              code: "function primeiro<T>(lista: T[]): T | undefined {\n  return lista[0];\n}\nconst x = primeiro([\"a\", \"b\"]);",
+              options: ["string | undefined", "any", "string[]", "unknown"],
+              correct: 0,
+              explanation: "T é inferido como string a partir do argumento.",
+            },
+            {
+              prompt: "Para que serve `T extends { id: number }`?",
+              options: ["Exigir que o tipo T tenha uma propriedade id numérica", "Herdar uma classe", "Converter T em número", "Tornar id opcional"],
+              correct: 0,
+              explanation: "A restrição libera o acesso a item.id dentro da função.",
+            },
+            {
+              prompt: "Qual destes usa generics?",
+              options: ["Promise<string>", "string", "number[] só", "void"],
+              correct: 0,
+              explanation: "Promise<T> descreve o tipo do valor que a Promise vai entregar.",
+            },
+          ],
+        },
+        {
+          slug: "typescript-na-pratica",
+          title: "TypeScript na prática: strict e validação",
+          objective: "Configurar um projeto em modo estrito e validar dados externos com Zod, sem confiar em asserções com as.",
+          summary: "Configuração que ajuda de verdade e dados checados na porta de entrada.",
+          minutes: 15,
+          exercise: {
+            prompt: "Qual opção do tsconfig.json liga as verificações mais importantes do TypeScript? Escreva só o nome.",
+            hint: "Significa \"estrito\".",
+            accepted: ["strict", "\"strict\""],
+            explanation: "`\"strict\": true` deve estar ligado em todo projeto novo.",
+          },
+          quiz: [
+            {
+              lang: "ts",
+              prompt: "Qual é o problema de `const dados = (await r.json()) as Tarefa[];`?",
+              options: ["as não verifica nada; só convence o compilador", "await não funciona com json", "Tarefa[] não é um tipo", "Nenhum"],
+              correct: 0,
+              explanation: "Se a API devolver outro formato, o erro aparece longe da causa. Valide com Zod.",
+            },
+            {
+              prompt: "O que `z.infer<typeof Tarefa>` faz?",
+              options: ["Gera o tipo TypeScript a partir do schema Zod", "Valida os dados", "Busca dados da API", "Converte para JSON"],
+              correct: 0,
+              explanation: "Uma única definição serve como validação e como tipo.",
+            },
+            {
+              prompt: "Com noUncheckedIndexedAccess ligado, qual é o tipo de `lista[0]` se lista é string[]?",
+              options: ["string | undefined", "string", "any", "never"],
+              correct: 0,
+              explanation: "O índice pode não existir, então o TypeScript inclui undefined.",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
