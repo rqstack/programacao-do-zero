@@ -58,7 +58,7 @@ export interface SeedGameRound {
 
 export interface SeedGame {
   slug: string;
-  kind: "logic" | "bug_hunt" | "code_order" | "lightning" | "memory" | "sql" | "fullstack";
+  kind: "logic" | "bug_hunt" | "code_order" | "lightning" | "memory" | "sql" | "fullstack" | "typing" | "css";
   title: string;
   description: string;
   rules: string;

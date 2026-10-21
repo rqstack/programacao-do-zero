@@ -1,11 +1,10 @@
 import { z } from "zod";
 
 /**
- * Motor de jogos: valida os dados de cada rodada e corrige respostas NO SERVIDOR.
- * O cliente recebe apenas o `payload` (sem gabarito) e envia respostas; a pontuação
- * é sempre calculada aqui.
+ * Motor de jogos: valida os dados de cada rodada e corrige as respostas.
+ * Funções puras, usadas pelas páginas de jogos e pelos testes de conteúdo.
  */
-export const GAME_KINDS = ["logic", "bug_hunt", "code_order", "lightning", "memory", "sql", "fullstack"] as const;
+export const GAME_KINDS = ["logic", "bug_hunt", "code_order", "lightning", "memory", "sql", "fullstack", "typing", "css"] as const;
 export type GameKind = (typeof GAME_KINDS)[number];
 
 const tableSchema = z.object({
@@ -17,6 +16,7 @@ const tableSchema = z.object({
 const choicePayload = z.object({
   prompt: z.string().min(1).max(2000),
   code: z.string().max(4000).optional(),
+  codeLang: z.string().max(20).optional(),
   tables: z.array(tableSchema).max(3).optional(),
   options: z.array(z.string().min(1).max(600)).min(2).max(6),
 });
@@ -46,17 +46,27 @@ const memoryPayload = z.object({
 const memorySolution = z.object({ pairs: z.array(z.tuple([blockId, blockId])).min(2).max(8) });
 const memoryAnswer = z.object({ a: blockId, b: blockId });
 
+const typingPayload = z.object({
+  prompt: z.string().min(1).max(500),
+  language: z.string().min(1).max(20),
+  text: z.string().min(5).max(400),
+});
+const typingSolution = z.object({});
+const typingAnswer = z.object({ typed: z.string().max(800) });
+
 export const roundSchemas = {
   choice: { payload: choicePayload, solution: choiceSolution, answer: choiceAnswer },
   bug_hunt: { payload: bugPayload, solution: bugSolution, answer: bugAnswer },
   code_order: { payload: orderPayload, solution: orderSolution, answer: orderAnswer },
   memory: { payload: memoryPayload, solution: memorySolution, answer: memoryAnswer },
+  typing: { payload: typingPayload, solution: typingSolution, answer: typingAnswer },
 } as const;
 
 export type ChoicePayload = z.infer<typeof choicePayload>;
 export type BugPayload = z.infer<typeof bugPayload>;
 export type OrderPayload = z.infer<typeof orderPayload>;
 export type MemoryPayload = z.infer<typeof memoryPayload>;
+export type TypingPayload = z.infer<typeof typingPayload>;
 
 export type RoundFamily = keyof typeof roundSchemas;
 
@@ -68,6 +78,8 @@ export function familyOf(kind: GameKind): RoundFamily {
       return "code_order";
     case "memory":
       return "memory";
+    case "typing":
+      return "typing";
     default:
       return "choice";
   }
@@ -92,6 +104,8 @@ export function validateRound(kind: GameKind, payload: unknown, solution: unknow
     const ids = (p.data as OrderPayload).blocks.map((b) => b.id);
     const order = (s.data as { order: string[] }).order;
     if (!isPermutation(order, ids)) return { ok: false, error: "a ordem correta precisa usar todos os blocos uma vez" };
+  } else if (family === "typing") {
+    return { ok: true };
   } else {
     const ids = (p.data as MemoryPayload).cards.map((c) => c.id);
     const flat = (s.data as { pairs: [string, string][] }).pairs.flat();
@@ -122,6 +136,7 @@ export type RoundFeedback =
   | { kind: "choice"; correct: boolean; correctIndex: number; explanation: string }
   | { kind: "bug_hunt"; correct: boolean; correctLine: number; explanation: string }
   | { kind: "code_order"; correct: boolean; correctOrder: string[]; explanation: string }
+  | { kind: "typing"; correct: boolean; accuracy: number; errors: number; explanation: string }
   | {
       kind: "memory";
       match: boolean;
@@ -185,6 +200,22 @@ export function gradeRound(
     };
   }
 
+  if (family === "typing") {
+    const parsed = typingAnswer.safeParse(answer);
+    if (!parsed.success) return { ok: false, error: "invalid_answer" };
+    const accuracy = typingAccuracy((round.payload as TypingPayload).text, parsed.data.typed);
+    const correct = accuracy >= TYPING_MIN_ACCURACY;
+    const points = Math.round(round.points * accuracy);
+    const errors = Math.round((1 - accuracy) * (round.payload as TypingPayload).text.length);
+    return {
+      ok: true,
+      state: { done: true, correct, points },
+      pointsDelta: points,
+      correctDelta: correct ? 1 : 0,
+      feedback: { kind: "typing", correct, accuracy, errors, explanation: round.explanation },
+    };
+  }
+
   if (family === "choice") {
     const parsed = choiceAnswer.safeParse(answer);
     const options = (round.payload as ChoicePayload).options;
@@ -209,6 +240,18 @@ export function gradeRound(
   const correctOrder = (round.solution as { order: string[] }).order;
   const correct = parsed.data.order.every((id, i) => id === correctOrder[i]);
   return finish(round, correct, { kind: "code_order", correct, correctOrder, explanation: round.explanation });
+}
+
+/** Precisão mínima para uma rodada de digitação contar como acerto. */
+export const TYPING_MIN_ACCURACY = 0.95;
+
+/** Fração de caracteres digitados corretamente, na posição certa (sobras contam como erro). */
+export function typingAccuracy(expected: string, typed: string): number {
+  const total = Math.max(expected.length, typed.length);
+  if (total === 0) return 1;
+  let right = 0;
+  for (let i = 0; i < Math.min(expected.length, typed.length); i++) if (expected[i] === typed[i]) right++;
+  return right / total;
 }
 
 function finish(round: RoundDefinition, correct: boolean, feedback: RoundFeedback): GradeOutcome {
