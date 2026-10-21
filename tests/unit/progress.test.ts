@@ -103,3 +103,15 @@ describe("níveis", () => {
     expect(levelFromXp(175).progress).toBeCloseTo(0.5);
   });
 });
+
+describe("títulos de nível", () => {
+  it("começa em Dev Bebê e sobe", async () => {
+    const { levelTitle } = await import("@/lib/gamification/rules");
+    expect(levelTitle(1)).toBe("Dev Bebê");
+    expect(levelTitle(2)).toBe("Dev Engatinhando");
+    expect(levelTitle(6)).toBe("Dev Júnior");
+    expect(levelTitle(11)).toBe("Dev Lendário");
+    expect(levelTitle(13)).toBe("Dev Lendário ★★");
+    expect(levelTitle(0)).toBe("Dev Bebê");
+  });
+});

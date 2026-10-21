@@ -35,10 +35,26 @@ export function levelFromXp(totalXp: number): LevelInfo {
   return { level, totalXp: xp, levelStartXp, nextLevelXp, progress: (xp - levelStartXp) / (nextLevelXp - levelStartXp) };
 }
 
-const LEVEL_TITLES = ["Primeiro passo", "Curioso", "Aprendiz", "Praticante", "Construtor", "Desenvolvedor", "Arquiteto", "Mentor"];
+/** Título de cada nível: do "Dev Bebê" ao "Dev Lendário". */
+export const LEVEL_TITLES = [
+  "Dev Bebê",
+  "Dev Engatinhando",
+  "Dev Curioso",
+  "Dev Aprendiz",
+  "Dev Estagiário",
+  "Dev Júnior",
+  "Dev Pleno",
+  "Dev Sênior",
+  "Dev Tech Lead",
+  "Dev Arquiteto",
+  "Dev Lendário",
+] as const;
 
+/** Do nível 11 em diante o título é "Dev Lendário", com uma estrela a mais a cada nível. */
 export function levelTitle(level: number): string {
-  return LEVEL_TITLES[Math.min(level, LEVEL_TITLES.length) - 1] ?? LEVEL_TITLES[0]!;
+  const n = Math.max(1, Math.floor(level));
+  if (n <= LEVEL_TITLES.length) return LEVEL_TITLES[n - 1]!;
+  return `Dev Lendário ${"★".repeat(Math.min(n - LEVEL_TITLES.length, 10))}`;
 }
 
 export interface LearnerStats {
