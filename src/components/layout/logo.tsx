@@ -23,7 +23,7 @@ export function Logo() {
   return (
     <Link href="/" className="group flex items-center gap-2.5 rounded-md" aria-label="Programação do Zero, página inicial">
       <LogoMark />
-      <span className="flex flex-col leading-none">
+      <span className="flex flex-col leading-none max-[400px]:sr-only">
         <span className="text-[1.02rem] font-bold tracking-tight">programação</span>
         <span className="font-mono text-[0.72rem] text-muted">
           do zero<span className="caret ml-px text-amber">_</span>

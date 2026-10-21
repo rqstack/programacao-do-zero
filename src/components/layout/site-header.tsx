@@ -72,7 +72,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-ink/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4 sm:gap-6 sm:px-6">
         <Logo />
         <nav aria-label="Principal" className="hidden flex-1 xl:block">
           <ul className="flex items-center gap-1">

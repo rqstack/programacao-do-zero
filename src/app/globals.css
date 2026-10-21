@@ -67,6 +67,10 @@
   code, kbd, pre, samp {
     font-family: var(--font-mono);
   }
+  /* Itens de grid podem encolher: código longo rola dentro da própria caixa em vez de alargar a página. */
+  :where(.grid) > * {
+    min-width: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
