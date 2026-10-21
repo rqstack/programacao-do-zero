@@ -1,0 +1,245 @@
+"use client";
+
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { Download, Flame, Lock, RotateCcw, Trophy, Upload } from "lucide-react";
+import { ACHIEVEMENTS, levelFromXp, levelTitle } from "@/lib/gamification/rules";
+import { historyOf, streaks, totalXp } from "@/lib/progress/model";
+import { exportProgress, importProgress, resetProgress, useHydrated, useProgress } from "@/lib/progress/store";
+import { Alert, Button, cx, EmptyState, ProgressBar } from "@/components/ui/primitives";
+import { ContinueCard, type LessonOrderItem } from "./continue-card";
+
+interface CourseSummary {
+  slug: string;
+  title: string;
+  lessonSlugs: string[];
+}
+
+const KIND_LABEL: Record<string, string> = {
+  lesson: "Aula",
+  exercise: "Exercício",
+  quiz: "Quiz",
+  game: "Jogo",
+  project: "Projeto",
+};
+
+export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]; order: LessonOrderItem[] }) {
+  const progress = useProgress();
+  const hydrated = useHydrated();
+  const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  if (!hydrated) {
+    return <p className="text-muted">Carregando seu progresso salvo neste navegador…</p>;
+  }
+
+  const xp = totalXp(progress);
+  const level = levelFromXp(xp);
+  const { current, best } = streaks(progress.days, new Date());
+  const history = historyOf(progress);
+  const lessonsDone = Object.keys(progress.lessons).length;
+  const stats = [
+    { label: "Aulas concluídas", value: lessonsDone },
+    { label: "Exercícios resolvidos", value: Object.values(progress.exercises).filter((e) => e === "solved").length },
+    { label: "Quizzes aprovados", value: Object.values(progress.quizzes).filter((q) => q.passed).length },
+    { label: "Jogos concluídos", value: Object.values(progress.games).filter((g) => g.completed).length },
+    { label: "Projetos concluídos", value: Object.values(progress.projects).filter((p) => p.completedAt).length },
+  ];
+
+  function download() {
+    const blob = new Blob([exportProgress()], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `programacao-do-zero-progresso-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 2_000_000) {
+      setMessage({ tone: "error", text: "Arquivo grande demais para ser um backup de progresso." });
+      return;
+    }
+    const ok = importProgress(await file.text());
+    setMessage(ok ? { tone: "success", text: "Progresso importado." } : { tone: "error", text: "Esse arquivo não é um backup válido da Programação do Zero." });
+  }
+
+  return (
+    <div className="space-y-12">
+      {/* Nível */}
+      <section aria-labelledby="nivel" className="grid gap-6 rounded-[var(--radius-lg)] border border-line bg-navy/60 p-6 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <h2 id="nivel" className="sr-only">
+            Nível
+          </h2>
+          <p className="font-mono text-sm text-amber">Nível {level.level}</p>
+          <p className="mt-1 text-3xl font-bold">{levelTitle(level.level)}</p>
+          <p className="mt-2 text-sm text-muted">
+            {xp} XP · faltam {level.nextLevelXp - xp} XP para o nível {level.level + 1}
+          </p>
+          <ProgressBar value={level.progress} label={`Progresso até o nível ${level.level + 1}`} className="mt-4 max-w-md" />
+        </div>
+        <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-line px-4 py-3">
+          <Flame aria-hidden className={cx("size-7", current > 0 ? "text-amber" : "text-subtle")} />
+          <div>
+            <p className="text-xl font-bold">
+              {current} dia{current === 1 ? "" : "s"}
+            </p>
+            <p className="text-xs text-muted">sequência atual · recorde {best}</p>
+          </div>
+        </div>
+      </section>
+
+      {lessonsDone === 0 && history.length === 0 ? (
+        <EmptyState title="Seu progresso começa na primeira aula" action={<ContinueCard order={order} />}>
+          Conclua aulas, resolva exercícios, passe nos quizzes e jogue para ganhar XP. Tudo fica salvo neste navegador, sem cadastro.
+        </EmptyState>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3">
+          <ContinueCard order={order} />
+        </div>
+      )}
+
+      {/* Números */}
+      <section aria-labelledby="numeros">
+        <h2 id="numeros" className="text-xl font-semibold">
+          Atividades
+        </h2>
+        <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {stats.map((s) => (
+            <div key={s.label} className="rounded-[var(--radius-md)] border border-line p-4">
+              <dt className="text-xs text-muted">{s.label}</dt>
+              <dd className="mt-1 font-mono text-2xl font-bold">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* Trilhas */}
+      <section aria-labelledby="trilhas-progresso">
+        <h2 id="trilhas-progresso" className="text-xl font-semibold">
+          Trilhas
+        </h2>
+        <ul className="mt-4 space-y-3">
+          {courses.map((c) => {
+            const done = c.lessonSlugs.filter((s) => progress.lessons[s]).length;
+            return (
+              <li key={c.slug}>
+                <Link href={`/trilhas/${c.slug}`} className="block rounded-[var(--radius-md)] border border-line p-4 hover:border-muted">
+                  <span className="flex items-baseline justify-between gap-3">
+                    <span className="font-medium">{c.title}</span>
+                    <span className="font-mono text-xs text-amber">
+                      {done}/{c.lessonSlugs.length}
+                    </span>
+                  </span>
+                  <ProgressBar value={c.lessonSlugs.length ? done / c.lessonSlugs.length : 0} label={`Progresso em ${c.title}`} className="mt-3" />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* Conquistas */}
+      <section aria-labelledby="conquistas">
+        <h2 id="conquistas" className="text-xl font-semibold">
+          Conquistas{" "}
+          <span className="font-mono text-sm text-muted">
+            {Object.keys(progress.achievements).length}/{ACHIEVEMENTS.length}
+          </span>
+        </h2>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {ACHIEVEMENTS.map((a) => {
+            const at = progress.achievements[a.slug];
+            return (
+              <li key={a.slug} className={cx("flex items-start gap-3 rounded-[var(--radius-md)] border p-4", at ? "border-amber/40 bg-amber/5" : "border-line opacity-70")}>
+                {at ? <Trophy aria-hidden className="mt-0.5 size-5 shrink-0 text-amber" /> : <Lock aria-hidden className="mt-0.5 size-5 shrink-0 text-subtle" />}
+                <div>
+                  <p className="font-semibold">{a.title}</p>
+                  <p className="text-sm text-muted">{a.description}</p>
+                  <p className="mt-1 text-xs text-subtle">{at ? `Conquistada em ${new Date(at).toLocaleDateString("pt-BR")}` : "Ainda não conquistada"}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* Histórico */}
+      <section aria-labelledby="historico">
+        <h2 id="historico" className="text-xl font-semibold">
+          Histórico
+        </h2>
+        {history.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">Nenhuma atividade com XP ainda.</p>
+        ) : (
+          <ol className="mt-4 divide-y divide-line rounded-[var(--radius-md)] border border-line">
+            {history.slice(0, 50).map((h) => (
+              <li key={h.key} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-sm">
+                <span>
+                  <span className="mr-2 font-mono text-xs text-subtle">{KIND_LABEL[h.kind] ?? h.kind}</span>
+                  {h.label}
+                </span>
+                <span className="flex items-center gap-3 font-mono text-xs">
+                  <span className="text-subtle">{new Date(h.at).toLocaleDateString("pt-BR")}</span>
+                  <span className="text-amber">+{h.amount} XP</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      {/* Dados */}
+      <section id="dados" aria-labelledby="dados-titulo" className="rounded-[var(--radius-lg)] border border-line p-6">
+        <h2 id="dados-titulo" className="text-xl font-semibold">
+          Seus dados
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted">
+          O progresso fica só neste navegador. Limpar os dados do navegador apaga o progresso; faça um backup para levá-lo a outro aparelho.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button variant="secondary" onClick={download}>
+            <Download aria-hidden className="size-4" /> Exportar backup
+          </Button>
+          <Button variant="secondary" onClick={() => fileRef.current?.click()}>
+            <Upload aria-hidden className="size-4" /> Importar backup
+          </Button>
+          <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-hidden onChange={onImport} />
+          {!confirmReset ? (
+            <Button variant="danger" onClick={() => setConfirmReset(true)}>
+              <RotateCcw aria-hidden className="size-4" /> Zerar progresso
+            </Button>
+          ) : (
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-[#ffd6d6]">Isso apaga todo o progresso deste navegador.</span>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  resetProgress();
+                  setConfirmReset(false);
+                  setMessage({ tone: "success", text: "Progresso zerado." });
+                }}
+              >
+                Sim, zerar
+              </Button>
+              <Button variant="ghost" onClick={() => setConfirmReset(false)}>
+                Cancelar
+              </Button>
+            </span>
+          )}
+        </div>
+        {message && (
+          <Alert tone={message.tone} className="mt-4">
+            {message.text}
+          </Alert>
+        )}
+      </section>
+    </div>
+  );
+}
