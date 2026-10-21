@@ -2,7 +2,9 @@
 
 **Do primeiro código aos seus próprios projetos.**
 
-Uma plataforma gratuita para aprender programação passo a passo: aulas progressivas, exercícios, quizzes, jogos, um laboratório de código e projetos guiados. Sem cadastro, sem plano pago — todo o conteúdo é aberto.
+Uma plataforma gratuita para aprender programação passo a passo: aulas progressivas, exercícios, quizzes, jogos, treino diário no estilo Duolingo, ranking, laboratório de código e projetos guiados. Sem plano pago — todo o conteúdo é aberto.
+
+**Acesse:** https://rqstack.github.io/programacao-do-zero/
 
 > ### 🤖 Um projeto de vibe coding
 >
@@ -19,13 +21,15 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 - **9 jogos**: desafio de lógica, caça aos bugs, monte o código, quiz relâmpago, memória, desafio SQL, missões full stack, corrida de digitação e seletor CSS.
 - **Laboratório** para escrever HTML, CSS e JavaScript e ver o resultado na hora, isolado em um `iframe` com sandbox.
 - **Projetos guiados**, do primeiro site ao Tarefas+ com API, React, banco de dados, login e IA.
-- **Progresso, XP, níveis, conquistas e sequência de dias**, salvos só no navegador (`localStorage`), com backup para exportar e importar.
+- **Treino diário estilo Duolingo**: 10 perguntas, 3 vidas, revisão das perguntas erradas, meta diária de XP e ofensiva (dias seguidos).
+- **Níveis com títulos**, de *Dev Bebê* a *Dev Lendário*, além de conquistas.
+- **Login com Google (opcional)**: o XP passa a contar no **ranking geral** e na **liga da semana**, e o progresso sincroniza entre aparelhos. Sem login, tudo fica salvo no navegador.
 
 ## Tecnologias
 
-Next.js 16 (App Router, exportação estática) · React 19 · TypeScript estrito · Tailwind CSS 4 · Zod · GSAP · Vitest · ESLint.
+Next.js 16 (App Router, exportação estática) · React 19 · TypeScript estrito · Tailwind CSS 4 · Supabase (Auth + PostgreSQL) · Zod · GSAP · Vitest · PGlite · ESLint.
 
-O site é 100% estático: não há servidor, banco de dados nem coleta de dados.
+O site é estático e hospedado de graça no GitHub Pages. O login e o ranking usam o plano gratuito do Supabase, com todas as regras de segurança no próprio banco (RLS e funções). Configuração passo a passo: [docs/CONFIGURACAO.md](docs/CONFIGURACAO.md).
 
 ## Rodando localmente
 
@@ -42,7 +46,9 @@ Outros comandos:
 
 | Comando | O que faz |
 | --- | --- |
-| `npm test` | Roda os testes (regras de progresso, correção de quizzes e jogos, validação de todo o conteúdo e da sintaxe dos códigos das aulas) |
+| `npm test` | Roda os testes: progresso, correção de quizzes e jogos, validação do conteúdo e da sintaxe dos códigos, e as regras de segurança do banco (RLS, XP e ranking) em um Postgres real embutido |
+| `npm run db:seed` | Gera `supabase/seed.sql` com as atividades que valem XP |
+| `npm run deploy` | Gera o site, confere os links e publica no GitHub Pages |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript |
 | `npm run build` | Gera o site estático na pasta `out/` |
@@ -69,7 +75,8 @@ content/            conteúdo educacional
   projects.ts       projetos guiados (texto em content/projetos/*.md)
 src/app/            páginas
 src/components/     interface
-src/lib/            regras: progresso, XP, correção de quizzes e motor dos jogos
+src/lib/            regras: progresso, XP, treino, correção de quizzes, motor dos jogos e login
+supabase/           migrations do banco e seed das atividades
 tests/              testes automatizados
 ```
 
