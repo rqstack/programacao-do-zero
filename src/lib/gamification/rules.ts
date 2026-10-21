@@ -71,35 +71,79 @@ export interface LearnerStats {
   lessonsCompleted: number;
   exercisesSolved: number;
   quizzesPassed: number;
+  /** Quizzes com 100% em alguma tentativa. */
+  perfectQuizzes: number;
   gamesCompleted: number;
+  /** Jogos com pontuação máxima em alguma partida. */
+  perfectGames: number;
   projectsCompleted: number;
   bestStreak: number;
+  /** Dias com treino diário concluído. */
+  practiceDays: number;
+  /** Dias em que a meta diária de XP foi cumprida. */
+  goalDays: number;
 }
+
+/** Raridade, como os troféus de videogame: bronze → prata → ouro → platina. */
+export type Rarity = "bronze" | "prata" | "ouro" | "platina";
 
 export interface AchievementDefinition {
   slug: string;
   title: string;
   description: string;
+  /** Nome do ícone (mapeado para um ícone Lucide na interface). */
+  icon: string;
+  rarity: Rarity;
   earned: (s: LearnerStats) => boolean;
 }
 
-export const ACHIEVEMENTS: readonly AchievementDefinition[] = [
-  { slug: "primeira-aula", title: "Primeiro passo", description: "Concluiu a primeira aula.", earned: (s) => s.lessonsCompleted >= 1 },
-  { slug: "dez-aulas", title: "Ritmo de estudo", description: "Concluiu 10 aulas.", earned: (s) => s.lessonsCompleted >= 10 },
-  { slug: "trinta-aulas", title: "Base sólida", description: "Concluiu 30 aulas.", earned: (s) => s.lessonsCompleted >= 30 },
-  { slug: "cem-aulas", title: "Maratonista", description: "Concluiu 100 aulas.", earned: (s) => s.lessonsCompleted >= 100 },
-  { slug: "primeiro-exercicio", title: "Mão na massa", description: "Resolveu um exercício sem ver a solução.", earned: (s) => s.exercisesSolved >= 1 },
-  { slug: "dez-exercicios", title: "Prática constante", description: "Resolveu 10 exercícios sem ver a solução.", earned: (s) => s.exercisesSolved >= 10 },
-  { slug: "primeiro-quiz", title: "Revisão em dia", description: "Passou no primeiro quiz.", earned: (s) => s.quizzesPassed >= 1 },
-  { slug: "dez-quizzes", title: "Memória afiada", description: "Passou em 10 quizzes.", earned: (s) => s.quizzesPassed >= 10 },
-  { slug: "primeiro-jogo", title: "Jogador", description: "Concluiu um jogo com pelo menos 60% de acertos.", earned: (s) => s.gamesCompleted >= 1 },
-  { slug: "cinco-jogos", title: "Mestre dos desafios", description: "Concluiu 5 jogos diferentes.", earned: (s) => s.gamesCompleted >= 5 },
-  { slug: "primeiro-projeto", title: "Construtor", description: "Concluiu o primeiro projeto guiado.", earned: (s) => s.projectsCompleted >= 1 },
-  { slug: "tres-dias", title: "Constância", description: "Estudou 3 dias seguidos.", earned: (s) => s.bestStreak >= 3 },
-  { slug: "sete-dias", title: "Hábito formado", description: "Estudou 7 dias seguidos.", earned: (s) => s.bestStreak >= 7 },
-  { slug: "nivel-5", title: "Nível 5", description: "Alcançou o nível 5.", earned: (s) => levelFromXp(s.totalXp).level >= 5 },
+const lvl = (s: LearnerStats) => levelFromXp(s.totalXp).level;
+
+const BASE_ACHIEVEMENTS: readonly AchievementDefinition[] = [
+  { slug: "primeira-aula", title: "Primeiro passo", description: "Concluiu a primeira aula.", icon: "footprints", rarity: "bronze", earned: (s) => s.lessonsCompleted >= 1 },
+  { slug: "dez-aulas", title: "Ritmo de estudo", description: "Concluiu 10 aulas.", icon: "book-open", rarity: "prata", earned: (s) => s.lessonsCompleted >= 10 },
+  { slug: "trinta-aulas", title: "Base sólida", description: "Concluiu 30 aulas.", icon: "library", rarity: "ouro", earned: (s) => s.lessonsCompleted >= 30 },
+  { slug: "cem-aulas", title: "Maratonista", description: "Concluiu 100 aulas.", icon: "medal", rarity: "ouro", earned: (s) => s.lessonsCompleted >= 100 },
+  { slug: "primeiro-exercicio", title: "Mão na massa", description: "Resolveu um exercício sem ver a solução.", icon: "hammer", rarity: "bronze", earned: (s) => s.exercisesSolved >= 1 },
+  { slug: "dez-exercicios", title: "Prática constante", description: "Resolveu 10 exercícios sem ver a solução.", icon: "wrench", rarity: "prata", earned: (s) => s.exercisesSolved >= 10 },
+  { slug: "cinquenta-exercicios", title: "Mestre da prática", description: "Resolveu 50 exercícios sem ver a solução.", icon: "cog", rarity: "ouro", earned: (s) => s.exercisesSolved >= 50 },
+  { slug: "primeiro-quiz", title: "Revisão em dia", description: "Passou no primeiro quiz.", icon: "clipboard-check", rarity: "bronze", earned: (s) => s.quizzesPassed >= 1 },
+  { slug: "dez-quizzes", title: "Memória afiada", description: "Passou em 10 quizzes.", icon: "brain", rarity: "prata", earned: (s) => s.quizzesPassed >= 10 },
+  { slug: "quiz-perfeito", title: "Gabaritou", description: "Acertou 100% de um quiz.", icon: "target", rarity: "prata", earned: (s) => s.perfectQuizzes >= 1 },
+  { slug: "dez-perfeitos", title: "Perfeccionista", description: "Acertou 100% em 10 quizzes.", icon: "crosshair", rarity: "ouro", earned: (s) => s.perfectQuizzes >= 10 },
+  { slug: "primeiro-jogo", title: "Jogador", description: "Concluiu um jogo com pelo menos 60% de acertos.", icon: "gamepad", rarity: "bronze", earned: (s) => s.gamesCompleted >= 1 },
+  { slug: "cinco-jogos", title: "Mestre dos desafios", description: "Concluiu 5 jogos diferentes.", icon: "joystick", rarity: "prata", earned: (s) => s.gamesCompleted >= 5 },
+  { slug: "todos-os-jogos", title: "Zerou!", description: "Concluiu os 9 jogos.", icon: "trophy", rarity: "ouro", earned: (s) => s.gamesCompleted >= 9 },
+  { slug: "jogo-perfeito", title: "Sem errar nada", description: "Fez a pontuação máxima em um jogo.", icon: "sparkles", rarity: "prata", earned: (s) => s.perfectGames >= 1 },
+  { slug: "primeiro-treino", title: "Aquecimento", description: "Concluiu o primeiro treino diário.", icon: "dumbbell", rarity: "bronze", earned: (s) => s.practiceDays >= 1 },
+  { slug: "sete-treinos", title: "Treino em dia", description: "Concluiu o treino diário em 7 dias.", icon: "activity", rarity: "prata", earned: (s) => s.practiceDays >= 7 },
+  { slug: "meta-cumprida", title: "Meta batida", description: "Cumpriu a meta diária de XP.", icon: "circle-check", rarity: "bronze", earned: (s) => s.goalDays >= 1 },
+  { slug: "sete-metas", title: "Disciplina", description: "Cumpriu a meta diária em 7 dias.", icon: "calendar-check", rarity: "ouro", earned: (s) => s.goalDays >= 7 },
+  { slug: "tres-dias", title: "Constância", description: "Estudou 3 dias seguidos.", icon: "flame", rarity: "bronze", earned: (s) => s.bestStreak >= 3 },
+  { slug: "sete-dias", title: "Hábito formado", description: "Estudou 7 dias seguidos.", icon: "flame", rarity: "prata", earned: (s) => s.bestStreak >= 7 },
+  { slug: "trinta-dias", title: "Imparável", description: "Estudou 30 dias seguidos.", icon: "zap", rarity: "ouro", earned: (s) => s.bestStreak >= 30 },
+  { slug: "primeiro-projeto", title: "Construtor", description: "Concluiu o primeiro projeto guiado.", icon: "rocket", rarity: "prata", earned: (s) => s.projectsCompleted >= 1 },
+  { slug: "cinco-projetos", title: "Portfólio em construção", description: "Concluiu 5 projetos guiados.", icon: "briefcase", rarity: "ouro", earned: (s) => s.projectsCompleted >= 5 },
+  { slug: "nivel-3", title: "Dev Curioso", description: "Alcançou o nível 3.", icon: "star", rarity: "bronze", earned: (s) => lvl(s) >= 3 },
+  { slug: "nivel-5", title: "Dev Estagiário", description: "Alcançou o nível 5.", icon: "award", rarity: "prata", earned: (s) => lvl(s) >= 5 },
+  { slug: "nivel-10", title: "Dev Arquiteto", description: "Alcançou o nível 10.", icon: "crown", rarity: "ouro", earned: (s) => lvl(s) >= 10 },
 ];
 
+/** A platina é concedida quando todos os outros troféus foram conquistados. */
+export const PLATINUM: AchievementDefinition = {
+  slug: "platina",
+  title: "Programação do Zero",
+  description: "Conquistou todos os outros troféus.",
+  icon: "gem",
+  rarity: "platina",
+  earned: () => false,
+};
+
+export const ACHIEVEMENTS: readonly AchievementDefinition[] = [...BASE_ACHIEVEMENTS, PLATINUM];
+
 export function evaluateAchievements(stats: LearnerStats, alreadyEarned: ReadonlySet<string>): AchievementDefinition[] {
-  return ACHIEVEMENTS.filter((a) => !alreadyEarned.has(a.slug) && a.earned(stats));
+  const fresh = BASE_ACHIEVEMENTS.filter((a) => !alreadyEarned.has(a.slug) && a.earned(stats));
+  const all = new Set([...alreadyEarned, ...fresh.map((a) => a.slug)]);
+  if (!alreadyEarned.has(PLATINUM.slug) && BASE_ACHIEVEMENTS.every((a) => all.has(a.slug))) fresh.push(PLATINUM);
+  return fresh;
 }

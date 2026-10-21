@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { Download, Dumbbell, Flame, Lock, RotateCcw, Target, Trophy, Upload } from "lucide-react";
-import { ACHIEVEMENTS, DAILY_GOALS, levelFromXp, levelTitle } from "@/lib/gamification/rules";
+import { Download, Dumbbell, Flame, RotateCcw, Target, Upload } from "lucide-react";
+import { DAILY_GOALS, levelFromXp, levelTitle } from "@/lib/gamification/rules";
 import { dailyXp, historyOf, streaks, totalXp } from "@/lib/progress/model";
 import { dispatchProgress, exportProgress, importProgress, resetProgress, useHydrated, useProgress } from "@/lib/progress/store";
 import { Alert, Button, cx, EmptyState, ProgressBar } from "@/components/ui/primitives";
 import { AccountSection } from "@/components/auth/account-section";
 import { ContinueCard, type LessonOrderItem } from "./continue-card";
+import { TrophyCase } from "./trophy-case";
 
 interface CourseSummary {
   slug: string;
@@ -182,30 +183,7 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
         </ul>
       </section>
 
-      {/* Conquistas */}
-      <section aria-labelledby="conquistas">
-        <h2 id="conquistas" className="text-xl font-semibold">
-          Conquistas{" "}
-          <span className="font-mono text-sm text-muted">
-            {Object.keys(progress.achievements).length}/{ACHIEVEMENTS.length}
-          </span>
-        </h2>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {ACHIEVEMENTS.map((a) => {
-            const at = progress.achievements[a.slug];
-            return (
-              <li key={a.slug} className={cx("flex items-start gap-3 rounded-[var(--radius-md)] border p-4", at ? "border-amber/40 bg-amber/5" : "border-line opacity-70")}>
-                {at ? <Trophy aria-hidden className="mt-0.5 size-5 shrink-0 text-amber" /> : <Lock aria-hidden className="mt-0.5 size-5 shrink-0 text-subtle" />}
-                <div>
-                  <p className="font-semibold">{a.title}</p>
-                  <p className="text-sm text-muted">{a.description}</p>
-                  <p className="mt-1 text-xs text-subtle">{at ? `Conquistada em ${new Date(at).toLocaleDateString("pt-BR")}` : "Ainda não conquistada"}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      <TrophyCase progress={progress} />
 
       {/* Histórico */}
       <section aria-labelledby="historico">

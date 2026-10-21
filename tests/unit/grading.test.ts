@@ -44,7 +44,7 @@ describe("níveis e conquistas", () => {
     expect(levelFromXp(175).progress).toBeCloseTo(0.5);
   });
   it("só concede conquistas ainda não obtidas", () => {
-    const stats = { totalXp: 20, lessonsCompleted: 1, exercisesSolved: 0, quizzesPassed: 0, gamesCompleted: 0, projectsCompleted: 0, bestStreak: 0 };
+    const stats = { totalXp: 20, lessonsCompleted: 1, exercisesSolved: 0, quizzesPassed: 0, gamesCompleted: 0, projectsCompleted: 0, bestStreak: 0, perfectQuizzes: 0, perfectGames: 0, practiceDays: 0, goalDays: 0 };
     expect(evaluateAchievements(stats, new Set()).map((a) => a.slug)).toEqual(["primeira-aula"]);
     expect(evaluateAchievements(stats, new Set(["primeira-aula"]))).toEqual([]);
   });

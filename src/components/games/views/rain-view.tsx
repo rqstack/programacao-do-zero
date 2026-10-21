@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
+import { InlineMd } from "@/components/content/inline-md";
 import { cx } from "@/components/ui/primitives";
 import type { RainPayload, RoundFeedback } from "@/lib/games/engine";
 
@@ -88,7 +89,7 @@ export function RainView({
             <p className={cx("mt-2 text-sm font-bold", result.correct ? "text-ok" : "text-bad")}>
               {timedOut ? "Caiu! " : result.correct ? "Isso! " : "Ops! "}
               <span className="font-normal text-muted">
-                {result.truth ? "É verdadeiro." : "É falso."} {result.explanation}
+                {result.truth ? "É verdadeiro." : "É falso."} <InlineMd text={result.explanation} />
               </span>
             </p>
           )}

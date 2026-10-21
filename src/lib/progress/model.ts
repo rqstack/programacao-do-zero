@@ -100,14 +100,24 @@ export function streaks(days: readonly string[], now: Date): { current: number; 
 }
 
 export function statsOf(state: ProgressState, now: Date): LearnerStats {
+  // XP por dia (fuso local) para contar os dias em que a meta foi cumprida.
+  const perDay = new Map<string, number>();
+  for (const e of Object.values(state.xp)) {
+    const d = localDay(new Date(e.at));
+    perDay.set(d, (perDay.get(d) ?? 0) + e.amount);
+  }
   return {
     totalXp: totalXp(state),
     lessonsCompleted: Object.keys(state.lessons).length,
     exercisesSolved: Object.values(state.exercises).filter((e) => e === "solved").length,
     quizzesPassed: Object.values(state.quizzes).filter((q) => q.passed).length,
+    perfectQuizzes: Object.values(state.quizzes).filter((q) => q.best >= 100).length,
     gamesCompleted: Object.values(state.games).filter((g) => g.completed).length,
+    perfectGames: Object.values(state.games).filter((g) => g.max > 0 && g.best >= g.max).length,
     projectsCompleted: Object.values(state.projects).filter((p) => p.completedAt).length,
     bestStreak: streaks(state.days, now).best,
+    practiceDays: Object.keys(state.xp).filter((k) => k.startsWith("practice:")).length,
+    goalDays: [...perDay.values()].filter((xp) => xp >= state.settings.dailyGoal).length,
   };
 }
 

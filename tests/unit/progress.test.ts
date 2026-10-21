@@ -11,7 +11,7 @@ describe("progresso local", () => {
     const a = applyProgress(s, { type: "lesson/complete", slug: "x", title: "X" }, day("2026-10-20T12:00:00"));
     s = a.state;
     expect(a.reward.xp).toBe(20);
-    expect(a.reward.achievements.map((x) => x.slug)).toEqual(["primeira-aula"]);
+    expect(a.reward.achievements.map((x) => x.slug)).toEqual(["primeira-aula", "meta-cumprida"]);
     const b = applyProgress(s, { type: "lesson/complete", slug: "x", title: "X" }, day("2026-10-20T13:00:00"));
     expect(b.reward.xp).toBe(0);
     expect(totalXp(b.state)).toBe(20);
@@ -143,5 +143,18 @@ describe("mesclagem de progresso (aparelho + conta)", () => {
     expect(mergeProgress(m, remote)).toEqual(m);
     expect(mergeProgress(m, local)).toEqual(m);
     expect(mergeProgress(remote, local)).toEqual(m);
+  });
+});
+
+describe("troféus", () => {
+  it("platina só vem com todos os outros", async () => {
+    const { ACHIEVEMENTS, evaluateAchievements } = await import("@/lib/gamification/rules");
+    const all = { totalXp: 99999, lessonsCompleted: 200, exercisesSolved: 200, quizzesPassed: 200, perfectQuizzes: 20, gamesCompleted: 9, perfectGames: 9, projectsCompleted: 11, bestStreak: 40, practiceDays: 30, goalDays: 30 };
+    const fresh = evaluateAchievements(all, new Set());
+    expect(fresh.map((a) => a.slug)).toContain("platina");
+    expect(fresh.length).toBe(ACHIEVEMENTS.length);
+    const almost = evaluateAchievements({ ...all, bestStreak: 10 }, new Set());
+    expect(almost.map((a) => a.slug)).not.toContain("platina");
+    expect(new Set(ACHIEVEMENTS.map((a) => a.slug)).size).toBe(ACHIEVEMENTS.length);
   });
 });
