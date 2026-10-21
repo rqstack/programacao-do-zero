@@ -1,7 +1,7 @@
 // Gera o site estático e publica a pasta out/ na branch gh-pages do GitHub.
 // Uso: npm run deploy   (requer permissão de push no repositório "origin")
 import { execSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync, cpSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -9,7 +9,12 @@ const run = (cmd, opts = {}) => execSync(cmd, { stdio: "inherit", ...opts });
 const repoUrl = execSync("git remote get-url origin").toString().trim();
 const repoName = path.basename(repoUrl).replace(/\.git$/, "");
 
-run("npm run build", { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: `/${repoName}`, MSYS_NO_PATHCONV: "1" } });
+// Em pastas sincronizadas (OneDrive), a pasta out/ antiga pode ficar travada: renomeá-la funciona.
+if (existsSync("out")) renameSync("out", `out-old-${Date.now()}`);
+
+const basePath = `/${repoName}`;
+run("npm run build", { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: basePath, MSYS_NO_PATHCONV: "1" } });
+run(`node scripts/check-links.mjs ${basePath}`, { env: { ...process.env, MSYS_NO_PATHCONV: "1" } });
 
 // O GitHub Pages ignora pastas que começam com "_" (como _next) sem este arquivo.
 writeFileSync("out/.nojekyll", "");
