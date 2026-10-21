@@ -136,3 +136,28 @@ describe("exclusão de conta", () => {
     await denied(() => asRole(db, "anon", null, (tx) => tx.query("select public.delete_my_account()")));
   });
 });
+
+describe("treino diário e liga semanal", () => {
+  const DANI = "aaaaaaaa-0000-4000-8000-000000000004";
+  const today = async () =>
+    (await db.query<{ d: string }>("select to_char((now() at time zone 'America/Sao_Paulo')::date, 'YYYY-MM-DD') as d")).rows[0]!.d;
+
+  it("aceita o treino de hoje uma vez e recusa datas antigas ou futuras", async () => {
+    await createUser(db, DANI, { full_name: "Dani" });
+    const d = await today();
+    const first = await award(DANI, [`practice:${d}`]);
+    expect(first).toBe(15);
+    expect(await award(DANI, [`practice:${d}`])).toBe(15);
+    expect(await award(DANI, ["practice:2020-01-01", "practice:2999-01-01", "practice:2026-13-45"])).toBe(15);
+  });
+
+  it("a liga semanal só soma XP desde segunda-feira", async () => {
+    const lesson = xpSources().find((s) => s.key.startsWith("lesson:"))!;
+    await award(DANI, [lesson.key]);
+    await db.query("update public.xp_events set created_at = public.week_start() - interval '1 day' where user_id = $1 and source_key = $2", [DANI, lesson.key]);
+    const rows = await asRole(db, "anon", null, (tx) => tx.query<{ display_name: string; xp: number }>("select display_name, xp from public.get_weekly_leaderboard(10)"));
+    expect(rows.rows.find((r) => r.display_name === "Dani")?.xp).toBe(15);
+    const all = await asRole(db, "anon", null, (tx) => tx.query<{ display_name: string; xp: number }>("select display_name, xp from public.get_leaderboard(10)"));
+    expect(all.rows.find((r) => r.display_name === "Dani")?.xp).toBe(15 + lesson.amount);
+  });
+});
