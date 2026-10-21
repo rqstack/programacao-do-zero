@@ -118,5 +118,5 @@ export function CompleteLessonButton({ slug, title }: { slug: string; title: str
 }
 
 export function LessonQuiz({ slug, title, questions }: { slug: string; title: string; questions: SeedQuestion[] }) {
-  return <QuizRunner slug={`revisao-${slug}`} title={`Revisão: ${title}`} questions={questions} compact />;
+  return <QuizRunner slug={`revisao-${slug}`} title={`Revisão: ${title}`} questions={questions} questionIds={questions.map((_, i) => `${slug}#${i}`)} compact />;
 }

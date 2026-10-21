@@ -127,6 +127,8 @@ export interface QuizView {
   courseTitle: string;
   lessonSlug: string | null;
   questions: SeedQuestion[];
+  /** "aula#indice" de cada pergunta (para a revisão do treino). */
+  questionIds: string[];
   passPercent: number;
 }
 
@@ -142,6 +144,7 @@ const QUIZZES: QuizView[] = courses.flatMap((seed, ci) => {
     courseTitle: course.title,
     lessonSlug: l.slug,
     questions: l.quiz,
+    questionIds: l.quiz.map((_, i) => `${l.slug}#${i}`),
     passPercent: 70,
   }));
   // Desafio final: a primeira pergunta de cada aula da trilha.
@@ -153,7 +156,8 @@ const QUIZZES: QuizView[] = courses.flatMap((seed, ci) => {
     courseSlug: course.slug,
     courseTitle: course.title,
     lessonSlug: null,
-    questions: lessons.map((l) => l.quiz[0]!).filter(Boolean),
+    questions: lessons.map((l) => l.quiz[0]!),
+    questionIds: lessons.map((l) => `${l.slug}#0`),
     passPercent: 70,
   };
   return [final, ...perLesson];
@@ -165,6 +169,13 @@ export function allQuizzes(): QuizView[] {
 
 export function getQuiz(slug: string): QuizView | null {
   return QUIZZES.find((q) => q.slug === slug) ?? null;
+}
+
+/** Todas as perguntas, para o treino diário. */
+export function questionBank(): Array<{ id: string; lessonSlug: string; lessonTitle: string; question: SeedQuestion }> {
+  return courses.flatMap((c) =>
+    c.modules.flatMap((m) => m.lessons.flatMap((l) => l.quiz.map((question, i) => ({ id: `${l.slug}#${i}`, lessonSlug: l.slug, lessonTitle: l.title, question })))),
+  );
 }
 
 /* ------------------------------ Jogos e projetos ----------------------------- */

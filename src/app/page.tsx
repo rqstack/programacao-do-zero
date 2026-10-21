@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, FlaskConical, Gamepad2, Hammer } from "lucide-react";
+import { ArrowRight, Dumbbell, Flame, FlaskConical, Gamepad2, Hammer, Trophy } from "lucide-react";
+import { LEVEL_TITLES } from "@/lib/gamification/rules";
 import { DemoQuiz } from "@/components/home/demo-quiz";
 import { FirstCode } from "@/components/home/first-code";
 import { ContinueCard } from "@/components/progress/continue-card";
@@ -15,12 +16,16 @@ const STEPS = [
 
 const FAQ = [
   {
-    q: "Preciso pagar ou criar conta?",
-    a: "Não. Todo o conteúdo e todas as funções são gratuitos e abertos. Não existe cadastro.",
+    q: "Preciso pagar?",
+    a: "Não. Todo o conteúdo e todas as funções são gratuitos.",
+  },
+  {
+    q: "Preciso criar conta?",
+    a: "Para estudar, não. Para o seu XP contar no ranking e na liga da semana, entre com sua conta Google — o progresso que você já tem é levado junto.",
   },
   {
     q: "Onde fica salvo meu progresso?",
-    a: "No seu navegador (armazenamento local). Nada é enviado para servidores. Na página Meu progresso você pode exportar um arquivo de backup e importá-lo em outro aparelho.",
+    a: "Sem login, no seu navegador. Com login, também na sua conta, para continuar em qualquer aparelho. Você pode apagar a conta quando quiser.",
   },
   {
     q: "Nunca programei. Consigo acompanhar?",
@@ -56,7 +61,7 @@ export default function HomePage() {
         <Container className="relative grid gap-12 py-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:py-24">
           <div>
             <p className="font-mono text-sm text-amber">
-              {lessons.length} aulas · {quizCount} quizzes · {games.length} jogos · grátis, sem cadastro
+              {lessons.length} aulas · {quizCount} quizzes · {games.length} jogos · grátis
             </p>
             <h1 className="mt-5 text-[2.6rem] font-bold leading-[1.04] sm:text-6xl">Do primeiro código aos seus próprios projetos.</h1>
             <p className="mt-6 max-w-xl text-lg text-muted">
@@ -95,6 +100,32 @@ export default function HomePage() {
               </li>
             ))}
           </ol>
+        </Container>
+      </section>
+
+      {/* Hábito diário */}
+      <section aria-labelledby="todo-dia" className="pb-20">
+        <Container className="grid gap-4 md:grid-cols-3">
+          <h2 id="todo-dia" className="sr-only">
+            Estude um pouco todo dia
+          </h2>
+          <Link href="/treino" className="group rounded-[var(--radius-lg)] border border-line bg-navy/60 p-6 hover:border-electric">
+            <Dumbbell aria-hidden className="size-6 text-electric-hi" />
+            <p className="mt-4 text-lg font-semibold group-hover:text-electric-hi">Treino diário</p>
+            <p className="mt-1 text-sm text-muted">10 perguntas, 3 vidas. O que você errou volta até você acertar.</p>
+          </Link>
+          <Link href="/progresso" className="group rounded-[var(--radius-lg)] border border-line bg-navy/60 p-6 hover:border-amber/60">
+            <Flame aria-hidden className="size-6 text-amber" />
+            <p className="mt-4 text-lg font-semibold">Ofensiva e meta do dia</p>
+            <p className="mt-1 text-sm text-muted">Escolha quanto XP quer fazer por dia e não deixe a chama apagar.</p>
+          </Link>
+          <Link href="/ranking" className="group rounded-[var(--radius-lg)] border border-line bg-navy/60 p-6 hover:border-amber/60">
+            <Trophy aria-hidden className="size-6 text-amber" />
+            <p className="mt-4 text-lg font-semibold">Liga da semana</p>
+            <p className="mt-1 text-sm text-muted">
+              Entre com o Google e suba de {LEVEL_TITLES[0]} até {LEVEL_TITLES[LEVEL_TITLES.length - 1]}. A liga recomeça toda segunda.
+            </p>
+          </Link>
         </Container>
       </section>
 

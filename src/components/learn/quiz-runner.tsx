@@ -23,12 +23,14 @@ export function QuizRunner({
   questions,
   passPercent = 70,
   compact = false,
+  questionIds,
 }: {
   slug: string;
   title: string;
   questions: SeedQuestion[];
   passPercent?: number;
   compact?: boolean;
+  questionIds?: string[];
 }) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -47,7 +49,10 @@ export function QuizRunner({
   function submit() {
     const g = gradeQuiz(gradable, answers, passPercent);
     setSubmitted(true);
-    dispatchProgress({ type: "quiz/result", slug, title, percent: g.percent, passed: g.passed });
+    const ids = questionIds ?? [];
+    const wrongIds = g.results.filter((r) => !r.correct).map((r) => ids[Number(r.questionId)]).filter((x): x is string => Boolean(x));
+    const rightIds = g.results.filter((r) => r.correct).map((r) => ids[Number(r.questionId)]).filter((x): x is string => Boolean(x));
+    dispatchProgress({ type: "quiz/result", slug, title, percent: g.percent, passed: g.passed, wrongIds, rightIds });
   }
 
   function retry() {

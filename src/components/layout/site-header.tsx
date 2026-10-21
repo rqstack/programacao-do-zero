@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
-import { Menu, X } from "lucide-react";
+import { Flame, Menu, X } from "lucide-react";
 import { levelFromXp } from "@/lib/gamification/rules";
-import { totalXp } from "@/lib/progress/model";
+import { dailyXp, streaks, totalXp } from "@/lib/progress/model";
 import { useHydrated, useProgress } from "@/lib/progress/store";
 import { cx } from "@/components/ui/primitives";
 import { AccountButton } from "@/components/auth/account-button";
@@ -25,22 +25,42 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function XpChip({ compact = false }: { compact?: boolean }) {
+/** Anel da meta diária ao redor do número do nível. */
+function GoalRing({ value, level }: { value: number; level: number | null }) {
+  const r = 15;
+  const c = 2 * Math.PI * r;
+  const v = Math.max(0, Math.min(1, value));
+  return (
+    <span className="relative grid size-9 place-items-center">
+      <svg viewBox="0 0 36 36" className="absolute inset-0 size-9 -rotate-90" aria-hidden>
+        <circle cx="18" cy="18" r={r} fill="none" stroke="#1e2c49" strokeWidth="3" />
+        <circle cx="18" cy="18" r={r} fill="none" stroke={v >= 1 ? "#34d399" : "#ffb547"} strokeWidth="3" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - v)} />
+      </svg>
+      <span className="font-mono text-xs font-bold text-amber">{level ?? "·"}</span>
+    </span>
+  );
+}
+
+function XpChip() {
   const progress = useProgress();
   const hydrated = useHydrated();
+  const now = new Date();
   const level = levelFromXp(totalXp(progress));
+  const today = dailyXp(progress, now);
+  const goal = progress.settings.dailyGoal;
+  const { current } = streaks(progress.days, now);
+  const label = hydrated
+    ? `Meu progresso: nível ${level.level}, ${level.totalXp} XP, ${today} de ${goal} XP hoje, ofensiva de ${current} dia${current === 1 ? "" : "s"}`
+    : "Meu progresso";
   return (
-    <Link
-      href="/progresso"
-      className="group flex min-h-10 items-center gap-2 rounded-full border border-line-strong py-1 pl-1 pr-3 text-sm hover:border-amber/60"
-      aria-label={hydrated ? `Meu progresso: nível ${level.level}, ${level.totalXp} XP` : "Meu progresso"}
-    >
-      <span aria-hidden className="grid size-8 place-items-center rounded-full bg-amber/15 font-mono text-xs font-bold text-amber">
-        {hydrated ? level.level : "·"}
+    <Link href="/progresso" className="group flex min-h-10 items-center gap-2 rounded-full border border-line-strong py-0.5 pl-0.5 pr-3 text-sm hover:border-amber/60" aria-label={label}>
+      <GoalRing value={hydrated ? today / goal : 0} level={hydrated ? level.level : null} />
+      <span aria-hidden className={cx("flex items-center gap-0.5 font-mono text-xs", hydrated && current > 0 ? "text-amber" : "text-subtle")}>
+        <Flame className="size-4" /> {hydrated ? current : 0}
       </span>
-      {!compact && (
-        <span className="font-mono text-xs text-muted group-hover:text-fg">{hydrated ? `${level.totalXp} XP` : "Progresso"}</span>
-      )}
+      <span aria-hidden className="hidden font-mono text-xs text-muted group-hover:text-fg sm:inline">
+        {hydrated ? `${level.totalXp} XP` : ""}
+      </span>
     </Link>
   );
 }

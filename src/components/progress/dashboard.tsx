@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { Download, Flame, Lock, RotateCcw, Trophy, Upload } from "lucide-react";
-import { ACHIEVEMENTS, levelFromXp, levelTitle } from "@/lib/gamification/rules";
-import { historyOf, streaks, totalXp } from "@/lib/progress/model";
-import { exportProgress, importProgress, resetProgress, useHydrated, useProgress } from "@/lib/progress/store";
+import { Download, Dumbbell, Flame, Lock, RotateCcw, Target, Trophy, Upload } from "lucide-react";
+import { ACHIEVEMENTS, DAILY_GOALS, levelFromXp, levelTitle } from "@/lib/gamification/rules";
+import { dailyXp, historyOf, streaks, totalXp } from "@/lib/progress/model";
+import { dispatchProgress, exportProgress, importProgress, resetProgress, useHydrated, useProgress } from "@/lib/progress/store";
 import { Alert, Button, cx, EmptyState, ProgressBar } from "@/components/ui/primitives";
 import { AccountSection } from "@/components/auth/account-section";
 import { ContinueCard, type LessonOrderItem } from "./continue-card";
@@ -18,6 +18,7 @@ interface CourseSummary {
 
 const KIND_LABEL: Record<string, string> = {
   lesson: "Aula",
+  practice: "Treino",
   exercise: "Exercício",
   quiz: "Quiz",
   game: "Jogo",
@@ -96,6 +97,39 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
             <p className="text-xs text-muted">sequência atual · recorde {best}</p>
           </div>
         </div>
+      </section>
+
+      {/* Meta diária */}
+      <section aria-labelledby="meta" className="grid gap-6 rounded-[var(--radius-lg)] border border-line p-6 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <h2 id="meta" className="flex items-center gap-2 text-xl font-semibold">
+            <Target aria-hidden className="size-5 text-amber" /> Meta diária
+          </h2>
+          <p className="mt-2 text-sm text-muted">
+            Hoje: <span className="font-mono text-amber">{dailyXp(progress, new Date())}</span> de {progress.settings.dailyGoal} XP
+            {dailyXp(progress, new Date()) >= progress.settings.dailyGoal ? " · meta cumprida!" : ""}
+          </p>
+          <ProgressBar value={dailyXp(progress, new Date()) / progress.settings.dailyGoal} label="Meta diária de XP" className="mt-3 max-w-md" />
+          <div role="group" aria-label="Escolher meta diária" className="mt-4 flex flex-wrap gap-2">
+            {DAILY_GOALS.map((g) => (
+              <button
+                key={g}
+                type="button"
+                aria-pressed={progress.settings.dailyGoal === g}
+                onClick={() => dispatchProgress({ type: "settings/goal", goal: g })}
+                className={cx(
+                  "min-h-10 rounded-full border px-4 text-sm",
+                  progress.settings.dailyGoal === g ? "border-amber bg-amber/10 text-amber" : "border-line-strong text-muted hover:text-fg",
+                )}
+              >
+                {g} XP {g === 10 ? "· leve" : g === 20 ? "· regular" : g === 30 ? "· puxado" : "· intenso"}
+              </button>
+            ))}
+          </div>
+        </div>
+        <Link href="/treino" className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-5 font-semibold text-white hover:bg-electric-hi">
+          <Dumbbell aria-hidden className="size-5" /> Treino de hoje
+        </Link>
       </section>
 
       {lessonsDone === 0 && history.length === 0 ? (

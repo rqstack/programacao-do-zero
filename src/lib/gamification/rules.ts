@@ -5,7 +5,16 @@ export const XP_RULES = {
   quizPassed: 30,
   gameCompleted: 25,
   project: 100,
+  practice: 15,
 } as const;
+
+/** Metas diárias de XP que a pessoa pode escolher (como no Duolingo). */
+export const DAILY_GOALS = [10, 20, 30, 50] as const;
+export type DailyGoal = (typeof DAILY_GOALS)[number];
+
+/** Vidas por treino: cada erro tira uma; sem vidas, o treino termina sem XP. */
+export const PRACTICE_HEARTS = 3;
+export const PRACTICE_SIZE = 10;
 
 /** Precisão mínima numa partida para o jogo contar como concluído. */
 export const GAME_MIN_ACCURACY = 0.6;

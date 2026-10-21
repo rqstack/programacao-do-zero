@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { evaluateAchievements, GAME_MIN_ACCURACY, XP_RULES, type AchievementDefinition, type LearnerStats } from "@/lib/gamification/rules";
+import { DAILY_GOALS, evaluateAchievements, GAME_MIN_ACCURACY, XP_RULES, type AchievementDefinition, type DailyGoal, type LearnerStats } from "@/lib/gamification/rules";
 
 /**
  * Progresso do aluno, guardado só no navegador (sem conta, sem servidor).
@@ -28,19 +28,40 @@ export const progressSchema = z.object({
   achievements: z.record(z.string().max(60), iso),
   /** Dias (AAAA-MM-DD, fuso local) com alguma atividade. */
   days: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(5000),
+  /** Preferências (campos novos têm valor padrão para aceitar progressos antigos). */
+  settings: z
+    .object({ dailyGoal: z.number().int().refine((n) => (DAILY_GOALS as readonly number[]).includes(n)) })
+    .default({ dailyGoal: 20 }),
+  /** Erros por pergunta (id "aula#indice"): alimenta a revisão do treino diário. */
+  mistakes: z.record(z.string().max(160), z.number().int().min(0).max(1000)).default({}),
 });
 
 export type ProgressState = z.infer<typeof progressSchema>;
 
 export function emptyProgress(now: Date): ProgressState {
-  return { version: 1, createdAt: now.toISOString(), xp: {}, lessons: {}, exercises: {}, quizzes: {}, games: {}, projects: {}, achievements: {}, days: [] };
+  return {
+    version: 1,
+    createdAt: now.toISOString(),
+    xp: {},
+    lessons: {},
+    exercises: {},
+    quizzes: {},
+    games: {},
+    projects: {},
+    achievements: {},
+    days: [],
+    settings: { dailyGoal: 20 },
+    mistakes: {},
+  };
 }
 
 export type ProgressAction =
   | { type: "lesson/complete"; slug: string; title: string }
   | { type: "exercise/solve"; slug: string; title: string }
   | { type: "exercise/reveal"; slug: string }
-  | { type: "quiz/result"; slug: string; title: string; percent: number; passed: boolean }
+  | { type: "quiz/result"; slug: string; title: string; percent: number; passed: boolean; wrongIds?: string[]; rightIds?: string[] }
+  | { type: "practice/complete"; correct: number; total: number; heartsLeft: number; wrongIds: string[]; rightIds: string[] }
+  | { type: "settings/goal"; goal: DailyGoal }
   | { type: "game/result"; slug: string; title: string; score: number; max: number; accuracy: number }
   | { type: "project/toggle"; slug: string; index: number }
   | { type: "project/complete"; slug: string; title: string; totalCriteria: number; url: string | null };
@@ -138,8 +159,24 @@ export function applyProgress(prev: ProgressState, action: ProgressAction, now: 
       };
       if (action.passed) xp = grant(state, `quiz:${action.slug}`, XP_RULES.quizPassed, `Quiz aprovado: ${action.title}`, at);
       label = action.passed ? "Quiz aprovado" : "Tentativa registrada";
+      trackMistakes(state, action.wrongIds ?? [], action.rightIds ?? []);
       break;
     }
+    case "practice/complete": {
+      trackMistakes(state, action.wrongIds, action.rightIds);
+      if (action.heartsLeft > 0 && action.total > 0) {
+        const today = localDay(now);
+        xp = grant(state, `practice:${today}`, XP_RULES.practice, "Treino diário", at);
+        label = "Treino concluído";
+      } else {
+        label = "Treino sem vidas";
+      }
+      break;
+    }
+    case "settings/goal":
+      state.settings = { dailyGoal: action.goal };
+      activity = false;
+      break;
     case "game/result": {
       const g = state.games[action.slug];
       const completed = action.accuracy >= GAME_MIN_ACCURACY;
@@ -185,6 +222,24 @@ export function applyProgress(prev: ProgressState, action: ProgressAction, now: 
   for (const a of fresh) state.achievements[a.slug] = at;
 
   return { state, reward: { xp, label, achievements: fresh } };
+}
+
+/** Erro soma 1; acerto posterior reduz 1 (a pergunta sai da revisão quando chega a zero). */
+function trackMistakes(state: ProgressState, wrong: readonly string[], right: readonly string[]) {
+  for (const id of wrong) state.mistakes[id] = Math.min(1000, (state.mistakes[id] ?? 0) + 1);
+  for (const id of right) {
+    const n = (state.mistakes[id] ?? 0) - 1;
+    if (n > 0) state.mistakes[id] = n;
+    else delete state.mistakes[id];
+  }
+}
+
+/** XP ganho no dia (fuso local) — usado na meta diária. */
+export function dailyXp(state: ProgressState, now: Date): number {
+  const today = localDay(now);
+  return Object.values(state.xp)
+    .filter((e) => localDay(new Date(e.at)) === today)
+    .reduce((s, e) => s + e.amount, 0);
 }
 
 /** Lê dados salvos (ou importados) com validação. Dados inválidos são rejeitados. */
@@ -253,5 +308,9 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     for (const [k, v] of Object.entries(src.achievements)) out.achievements[k] = earliest(out.achievements[k], v)!;
   }
   out.days = [...new Set([...a.days, ...b.days])].sort();
+  out.settings = { dailyGoal: a.settings.dailyGoal };
+  for (const src of [a, b]) {
+    for (const [k, v] of Object.entries(src.mistakes)) out.mistakes[k] = Math.max(out.mistakes[k] ?? 0, v);
+  }
   return out;
 }

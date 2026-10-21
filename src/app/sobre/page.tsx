@@ -54,15 +54,16 @@ export default function SobrePage() {
           Privacidade
         </h2>
         <div className="mt-3 space-y-3 text-muted">
+          <p>Não há anúncios nem rastreamento. Estudar não exige conta: sem login, o progresso fica só no armazenamento local do seu navegador.</p>
           <p>
-            Não há cadastro, login, anúncios nem rastreamento. O site não envia seus dados para nenhum servidor: o progresso (aulas concluídas,
-            XP, conquistas) e o código do laboratório ficam guardados apenas no armazenamento local do seu navegador.
+            Se você entrar com o Google, o site guarda na sua conta (hospedada no Supabase) apenas: nome e foto do Google, e-mail, o progresso de estudo e
+            o XP de cada atividade concluída. O nome, a foto e o XP aparecem no ranking — dá para mudar o nome ou sair do ranking a qualquer momento.
           </p>
           <p>
-            Você controla esses dados na página <Link href="/progresso#dados" className="text-electric-hi underline underline-offset-2">Meu progresso</Link>: é possível
-            exportar um backup, importá-lo em outro aparelho ou apagar tudo. Limpar os dados do navegador também apaga o progresso.
+            Em <Link href="/progresso#conta" className="text-electric-hi underline underline-offset-2">Meu progresso</Link> você pode exportar um backup,
+            sair da conta ou apagá-la definitivamente, junto com todos os seus dados.
           </p>
-          <p>As fontes são servidas pelo próprio site. Alguns projetos guiados ensinam a usar serviços externos; isso só acontece no seu próprio projeto, nunca aqui.</p>
+          <p>O código do laboratório fica só no seu navegador e roda isolado do resto do site.</p>
         </div>
       </section>
 

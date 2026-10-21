@@ -46,7 +46,7 @@ export default async function QuizPage(props: PageProps<"/quizzes/[slug]">) {
         )}
       </p>
       <div className="mt-10">
-        <QuizRunner slug={quiz.slug} title={quiz.title} questions={quiz.questions} passPercent={quiz.passPercent} />
+        <QuizRunner slug={quiz.slug} title={quiz.title} questions={quiz.questions} questionIds={quiz.questionIds} passPercent={quiz.passPercent} />
       </div>
     </Container>
   );
