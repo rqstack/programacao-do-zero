@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Clock, Target } from "lucide-react";
 import { headingsOf, Markdown } from "@/components/content/markdown";
+import { VideoCourses } from "@/components/content/video-courses";
 import { CompleteLessonButton, ExercisePanel, LessonQuiz } from "@/components/learn/lesson-practice";
 import { Container } from "@/components/ui/primitives";
 import { allLessons, getLessonPage } from "@/lib/catalog";
@@ -57,6 +58,8 @@ export default async function AulaPage(props: PageProps<"/aulas/[slug]">) {
           </header>
 
           <Markdown source={body} className="mt-8" />
+
+          <VideoCourses courseSlug={course.slug} compact className="mt-12 rounded-[var(--radius-lg)] border border-line p-5 sm:p-6" />
 
           <section id="pratica" aria-labelledby="pratica-titulo" className="mt-16 scroll-mt-24 space-y-12 border-t border-line pt-10">
             <h2 id="pratica-titulo" className="text-2xl font-bold">

@@ -33,7 +33,10 @@ export default async function ProjetoPage(props: PageProps<"/projetos/[slug]">) 
       </nav>
       <div className="mt-6 grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <article>
-          <p className="font-mono text-xs text-subtle">{LEVEL_LABEL[project.level]}</p>
+          <p className="flex flex-wrap items-center gap-2 font-mono text-xs text-subtle">
+            {LEVEL_LABEL[project.level]}
+            {project.portfolio && <Tag tone="amber">Para o portfólio e vagas</Tag>}
+          </p>
           <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{project.title}</h1>
           <p className="mt-3 text-muted">{project.summary}</p>
           <div className="mt-4 flex flex-wrap gap-1.5">

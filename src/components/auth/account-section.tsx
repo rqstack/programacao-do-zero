@@ -44,6 +44,9 @@ export function AccountSection() {
         Sua conta
       </h2>
       <p className="mt-1 text-sm text-muted">{session.user.email}</p>
+      <Link href="/perfil" className="mt-3 inline-flex min-h-10 items-center rounded-md border border-line-strong px-4 text-sm font-semibold hover:border-electric">
+        Editar perfil público (GitHub, LinkedIn, bio)
+      </Link>
 
       <p className={cx("mt-4 inline-flex items-center gap-2 text-sm", syncStatus === "error" ? "text-bad" : "text-muted")} aria-live="polite">
         {syncStatus === "error" ? <CloudOff aria-hidden className="size-4" /> : <RefreshCw aria-hidden className={cx("size-4", syncStatus === "syncing" && "animate-spin")} />}

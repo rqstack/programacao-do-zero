@@ -25,6 +25,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "server-only": "^0.0.1",
+    "sucrase": "^3.35.1",
     "sugar-high": "^2.6.0",
     "zod": "^4.6.7"
   },

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Trophy } from "lucide-react";
+import { VideoCourses } from "@/components/content/video-courses";
 import { CourseMap } from "@/components/progress/course-map";
 import { Container } from "@/components/ui/primitives";
 import { allCourses, getCourse, LEVEL_LABEL } from "@/lib/catalog";
@@ -41,6 +42,7 @@ export default async function CursoPage(props: PageProps<"/trilhas/[curso]">) {
           <div className="mt-10">
             <CourseMap modules={course.modules} />
           </div>
+          <VideoCourses courseSlug={course.slug} className="mt-14 border-t border-line pt-10" />
         </div>
         <aside className="h-fit space-y-4 rounded-[var(--radius-lg)] border border-line bg-navy/60 p-5 lg:sticky lg:top-24">
           <Trophy aria-hidden className="size-5 text-amber" />

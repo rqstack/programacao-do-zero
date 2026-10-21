@@ -149,7 +149,7 @@ describe("mesclagem de progresso (aparelho + conta)", () => {
 describe("troféus", () => {
   it("platina só vem com todos os outros", async () => {
     const { ACHIEVEMENTS, evaluateAchievements } = await import("@/lib/gamification/rules");
-    const all = { totalXp: 99999, lessonsCompleted: 200, exercisesSolved: 200, quizzesPassed: 200, perfectQuizzes: 20, gamesCompleted: 9, perfectGames: 9, projectsCompleted: 11, bestStreak: 40, practiceDays: 30, goalDays: 30 };
+    const all = { totalXp: 99999, lessonsCompleted: 200, exercisesSolved: 200, quizzesPassed: 200, perfectQuizzes: 20, gamesCompleted: 9, perfectGames: 9, projectsCompleted: 11, bestStreak: 40, practiceDays: 30, goalDays: 30, challengesSolved: 33, hardChallenges: 9, challengeLangs: 4 };
     const fresh = evaluateAchievements(all, new Set());
     expect(fresh.map((a) => a.slug)).toContain("platina");
     expect(fresh.length).toBe(ACHIEVEMENTS.length);

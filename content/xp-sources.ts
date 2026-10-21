@@ -1,4 +1,5 @@
 import { XP_RULES } from "../src/lib/gamification/rules";
+import { codeChallenges, sqlChallenges } from "./challenges";
 import { courses, games, projects } from "./index";
 
 export interface XpSource {
@@ -24,6 +25,9 @@ export function xpSources(): XpSource[] {
   }
   for (const g of games) out.push({ key: `game:${g.slug}`, amount: XP_RULES.gameCompleted, label: `Jogo: ${g.title}` });
   for (const p of projects) out.push({ key: `project:${p.slug}`, amount: XP_RULES.project, label: `Projeto: ${p.title}` });
+  for (const c of [...codeChallenges, ...sqlChallenges]) {
+    out.push({ key: `challenge:${c.id}`, amount: XP_RULES.challenge[c.difficulty], label: `Desafio: ${c.title}` });
+  }
   return out;
 }
 

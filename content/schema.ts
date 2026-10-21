@@ -75,5 +75,7 @@ export interface SeedProject {
   level: "iniciante" | "intermediario" | "avancado";
   skills: string[];
   criteria: string[];
+  /** Projeto pensado para portfólio e vagas (tem a seção "Como apresentar no currículo"). */
+  portfolio?: boolean;
   /** Corpo em content/projetos/<slug>.md */
 }

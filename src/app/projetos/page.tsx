@@ -33,6 +33,7 @@ export default function ProjetosPage() {
               </span>
               <span className="flex flex-col items-start gap-1 sm:items-end">
                 <span className="font-mono text-xs text-subtle">{LEVEL_LABEL[p.level]}</span>
+                {p.portfolio && <Tag tone="amber">Para o portfólio</Tag>}
                 <ProjectBadge slug={p.slug} />
               </span>
             </Link>

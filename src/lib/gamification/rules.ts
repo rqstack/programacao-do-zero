@@ -6,6 +6,8 @@ export const XP_RULES = {
   gameCompleted: 25,
   project: 100,
   practice: 15,
+  /** Desafios de código, por dificuldade. */
+  challenge: { facil: 15, medio: 25, dificil: 40 },
 } as const;
 
 /** Metas diárias de XP que a pessoa pode escolher (como no Duolingo). */
@@ -82,6 +84,12 @@ export interface LearnerStats {
   practiceDays: number;
   /** Dias em que a meta diária de XP foi cumprida. */
   goalDays: number;
+  /** Desafios de código resolvidos (em qualquer linguagem). */
+  challengesSolved: number;
+  /** Desafios difíceis resolvidos. */
+  hardChallenges: number;
+  /** Linguagens diferentes usadas para resolver desafios. */
+  challengeLangs: number;
 }
 
 /** Raridade, como os troféus de videogame: bronze → prata → ouro → platina. */
@@ -124,6 +132,10 @@ const BASE_ACHIEVEMENTS: readonly AchievementDefinition[] = [
   { slug: "trinta-dias", title: "Imparável", description: "Estudou 30 dias seguidos.", icon: "zap", rarity: "ouro", earned: (s) => s.bestStreak >= 30 },
   { slug: "primeiro-projeto", title: "Construtor", description: "Concluiu o primeiro projeto guiado.", icon: "rocket", rarity: "prata", earned: (s) => s.projectsCompleted >= 1 },
   { slug: "cinco-projetos", title: "Portfólio em construção", description: "Concluiu 5 projetos guiados.", icon: "briefcase", rarity: "ouro", earned: (s) => s.projectsCompleted >= 5 },
+  { slug: "primeiro-desafio", title: "Hello, problema", description: "Resolveu o primeiro desafio de código.", icon: "code", rarity: "bronze", earned: (s) => s.challengesSolved >= 1 },
+  { slug: "dez-desafios", title: "Resolvedor de problemas", description: "Resolveu 10 desafios de código.", icon: "terminal", rarity: "prata", earned: (s) => s.challengesSolved >= 10 },
+  { slug: "desafio-dificil", title: "Chefão derrotado", description: "Resolveu um desafio difícil.", icon: "swords", rarity: "prata", earned: (s) => s.hardChallenges >= 1 },
+  { slug: "poliglota", title: "Poliglota", description: "Resolveu desafios em JavaScript, TypeScript, Python e SQL.", icon: "languages", rarity: "ouro", earned: (s) => s.challengeLangs >= 4 },
   { slug: "nivel-3", title: "Dev Curioso", description: "Alcançou o nível 3.", icon: "star", rarity: "bronze", earned: (s) => lvl(s) >= 3 },
   { slug: "nivel-5", title: "Dev Estagiário", description: "Alcançou o nível 5.", icon: "award", rarity: "prata", earned: (s) => lvl(s) >= 5 },
   { slug: "nivel-10", title: "Dev Arquiteto", description: "Alcançou o nível 10.", icon: "crown", rarity: "ouro", earned: (s) => lvl(s) >= 10 },

@@ -1,4 +1,7 @@
 import { z } from "zod";
+import type { ChallengeDifficulty } from "@content/challenges";
+import type { ChallengeLang } from "@/lib/challenges/langs";
+import { CHALLENGE_LANGS } from "@/lib/challenges/langs";
 import { DAILY_GOALS, evaluateAchievements, GAME_MIN_ACCURACY, XP_RULES, type AchievementDefinition, type DailyGoal, type LearnerStats } from "@/lib/gamification/rules";
 
 /**
@@ -34,6 +37,10 @@ export const progressSchema = z.object({
     .default({ dailyGoal: 20 }),
   /** Erros por pergunta (id "aula#indice"): alimenta a revisão do treino diário. */
   mistakes: z.record(z.string().max(160), z.number().int().min(0).max(1000)).default({}),
+  /** Desafios de código: resolvido (vale XP) ou solução revelada antes; e em quais linguagens. */
+  challenges: z
+    .record(z.string().max(120), z.object({ status: z.enum(["solved", "revealed"]), langs: z.array(z.enum(CHALLENGE_LANGS)).max(4), at: iso }))
+    .default({}),
 });
 
 export type ProgressState = z.infer<typeof progressSchema>;
@@ -52,6 +59,7 @@ export function emptyProgress(now: Date): ProgressState {
     days: [],
     settings: { dailyGoal: 20 },
     mistakes: {},
+    challenges: {},
   };
 }
 
@@ -64,7 +72,9 @@ export type ProgressAction =
   | { type: "settings/goal"; goal: DailyGoal }
   | { type: "game/result"; slug: string; title: string; score: number; max: number; accuracy: number }
   | { type: "project/toggle"; slug: string; index: number }
-  | { type: "project/complete"; slug: string; title: string; totalCriteria: number; url: string | null };
+  | { type: "project/complete"; slug: string; title: string; totalCriteria: number; url: string | null }
+  | { type: "challenge/solve"; id: string; title: string; lang: ChallengeLang; difficulty: ChallengeDifficulty }
+  | { type: "challenge/reveal"; id: string };
 
 export interface Reward {
   xp: number;
@@ -118,6 +128,9 @@ export function statsOf(state: ProgressState, now: Date): LearnerStats {
     bestStreak: streaks(state.days, now).best,
     practiceDays: Object.keys(state.xp).filter((k) => k.startsWith("practice:")).length,
     goalDays: [...perDay.values()].filter((xp) => xp >= state.settings.dailyGoal).length,
+    challengesSolved: Object.values(state.challenges).filter((c) => c.langs.length > 0).length,
+    hardChallenges: Object.keys(state.xp).filter((k) => k.startsWith("challenge:") && state.xp[k]!.amount >= XP_RULES.challenge.dificil).length,
+    challengeLangs: new Set(Object.values(state.challenges).flatMap((c) => c.langs)).size,
   };
 }
 
@@ -221,6 +234,22 @@ export function applyProgress(prev: ProgressState, action: ProgressAction, now: 
       label = "Projeto concluído";
       break;
     }
+    case "challenge/solve": {
+      const c = state.challenges[action.id];
+      const langs = [...new Set([...(c?.langs ?? []), action.lang])].sort() as ChallengeLang[];
+      state.challenges[action.id] = { status: c?.status ?? "solved", langs, at: c?.at ?? at };
+      // Quem revelou a solução antes de resolver não ganha XP por este desafio.
+      if (state.challenges[action.id]!.status === "solved") {
+        xp = grant(state, `challenge:${action.id}`, XP_RULES.challenge[action.difficulty], `Desafio resolvido: ${action.title}`, at);
+      }
+      label = "Desafio resolvido";
+      break;
+    }
+    case "challenge/reveal": {
+      state.challenges[action.id] ??= { status: "revealed", langs: [], at };
+      activity = false;
+      break;
+    }
   }
 
   if (activity) {
@@ -321,6 +350,16 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
   out.settings = { dailyGoal: a.settings.dailyGoal };
   for (const src of [a, b]) {
     for (const [k, v] of Object.entries(src.mistakes)) out.mistakes[k] = Math.max(out.mistakes[k] ?? 0, v);
+    for (const [k, v] of Object.entries(src.challenges)) {
+      const cur = out.challenges[k];
+      out.challenges[k] = cur
+        ? {
+            status: cur.status === "solved" || v.status === "solved" ? "solved" : "revealed",
+            langs: [...new Set([...cur.langs, ...v.langs])].sort(),
+            at: earliest(cur.at, v.at)!,
+          }
+        : { ...v, langs: [...v.langs] };
+    }
   }
   return out;
 }

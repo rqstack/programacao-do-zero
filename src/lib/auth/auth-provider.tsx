@@ -8,6 +8,7 @@ import { BASE_PATH, getSupabase, isSupabaseConfigured } from "@/lib/supabase/cli
 
 export interface Profile {
   id: string;
+  username: string;
   displayName: string;
   avatarUrl: string | null;
   showInRanking: boolean;
@@ -27,6 +28,8 @@ interface AuthContextValue {
   syncNow: () => Promise<void>;
   updateProfile: (changes: Partial<Pick<Profile, "displayName" | "showInRanking">>) => Promise<boolean>;
   deleteAccount: () => Promise<boolean>;
+  /** Relê o perfil depois de editar em /perfil. */
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -44,10 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = useCallback(async (userId: string) => {
     const supabase = getSupabase();
     if (!supabase) return;
-    const { data } = await supabase.from("profiles").select("id, display_name, avatar_url, show_in_ranking").eq("id", userId).maybeSingle();
+    const { data } = await supabase.from("profiles").select("id, username, display_name, avatar_url, show_in_ranking").eq("id", userId).maybeSingle();
     if (data) {
       setProfile({
         id: data.id as string,
+        username: String(data.username ?? ""),
         displayName: String(data.display_name ?? ""),
         avatarUrl: (data.avatar_url as string | null) ?? null,
         showInRanking: Boolean(data.show_in_ranking),
@@ -163,6 +167,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [userId, loadProfile],
   );
 
+  const refreshProfile = useCallback(async () => {
+    if (userId) await loadProfile(userId);
+  }, [userId, loadProfile]);
+
   const deleteAccount = useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase || !userId) return false;
@@ -173,8 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [userId]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ configured, loading, session, profile, syncStatus, serverXp, signInWithGoogle, signOut, syncNow, updateProfile, deleteAccount }),
-    [configured, loading, session, profile, syncStatus, serverXp, signInWithGoogle, signOut, syncNow, updateProfile, deleteAccount],
+    () => ({ configured, loading, session, profile, syncStatus, serverXp, signInWithGoogle, signOut, syncNow, updateProfile, deleteAccount, refreshProfile }),
+    [configured, loading, session, profile, syncStatus, serverXp, signInWithGoogle, signOut, syncNow, updateProfile, deleteAccount, refreshProfile],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bug, Brain, Database, Keyboard, Layers, ListOrdered, MousePointerClick, Rocket, Zap } from "lucide-react";
+import { Bug, Brain, Code, Database, Keyboard, Layers, ListOrdered, MousePointerClick, Rocket, Zap } from "lucide-react";
 import { GameRecord } from "@/components/progress/game-record";
 import { Container, PageHeader } from "@/components/ui/primitives";
 import { allGames } from "@/lib/catalog";
@@ -27,7 +27,21 @@ export default function JogosPage() {
   return (
     <Container className="py-12">
       <PageHeader title="Jogos" description={`${games.length} jogos para revisar brincando. Conclua com 60% de acertos para ganhar XP.`} />
-      <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Link
+        href="/desafios"
+        className="group mt-10 flex flex-col gap-4 rounded-[var(--radius-lg)] border-2 border-amber/50 bg-gradient-to-br from-amber/[0.12] to-electric/[0.08] p-6 hover:border-amber sm:flex-row sm:items-center"
+      >
+        <span className="grid size-14 shrink-0 place-items-center rounded-[14px] bg-amber text-[#1a1206]">
+          <Code aria-hidden className="size-7" strokeWidth={2.4} />
+        </span>
+        <span className="flex-1">
+          <span className="font-mono text-xs text-amber">NOVO · resolva programando</span>
+          <span className="mt-1 block text-xl font-bold">Desafios de código</span>
+          <span className="mt-1 block text-sm text-muted">Escolha JavaScript, TypeScript, Python ou SQL e a dificuldade. O site sorteia um problema, você escreve o código e ele é testado na hora.</span>
+        </span>
+        <span className="font-semibold text-amber group-hover:underline">Jogar agora →</span>
+      </Link>
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {games.map((g) => {
           const Icon = ICONS[g.kind];
           return (

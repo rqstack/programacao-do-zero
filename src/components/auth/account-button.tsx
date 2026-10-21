@@ -17,7 +17,7 @@ export function AccountButton() {
   }
   const name = profile?.displayName || session.user.email?.split("@")[0] || "Você";
   return (
-    <Link href="/progresso#conta" className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full border border-line-strong bg-panel-2 hover:border-electric" aria-label={`Sua conta: ${name}`}>
+    <Link href="/perfil" className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full border border-line-strong bg-panel-2 hover:border-electric" aria-label={`Seu perfil: ${name}`}>
       {profile?.avatarUrl ? (
         // Foto do Google: imagem externa simples (o site é estático, sem otimização de imagens).
         // eslint-disable-next-line @next/next/no-img-element

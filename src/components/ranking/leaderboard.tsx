@@ -6,17 +6,19 @@ import { Crown, Medal, RefreshCw } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { levelFromXp, levelTitle } from "@/lib/gamification/rules";
 import { getSupabase } from "@/lib/supabase/client";
+import { getFriendsLeaderboard, profileHref } from "@/lib/profiles/api";
 import { Alert, Button, cx, EmptyState, Spinner } from "@/components/ui/primitives";
 
 interface Row {
   rank: number;
+  username: string | null;
   display_name: string;
   avatar_url: string | null;
   xp: number;
   is_me: boolean | null;
 }
 
-type Tab = "semana" | "geral";
+type Tab = "semana" | "amigos" | "geral";
 
 /** Dias até a próxima segunda-feira, 00:00 em Brasília. */
 function daysUntilReset(now = new Date()): number {
@@ -37,6 +39,16 @@ export function Leaderboard() {
     if (!supabase) return;
     setLoading(true);
     setError(false);
+    if (which === "amigos") {
+      const friends = await getFriendsLeaderboard();
+      setLoading(false);
+      if (!friends) {
+        setError(true);
+        return;
+      }
+      setRows(friends.map((r) => ({ rank: r.rank, username: r.username, display_name: r.display_name, avatar_url: r.avatar_url, xp: r.weekly_xp, is_me: r.is_me })));
+      return;
+    }
     const { data, error: err } = await supabase.rpc(which === "semana" ? "get_weekly_leaderboard" : "get_leaderboard", { p_limit: 50 });
     setLoading(false);
     if (err) {
@@ -66,7 +78,7 @@ export function Leaderboard() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="tablist" aria-label="Tipo de ranking" className="inline-flex rounded-full border border-line-strong p-1">
-          {(["semana", "geral"] as const).map((t) => (
+          {(session ? (["semana", "amigos", "geral"] as const) : (["semana", "geral"] as const)).map((t) => (
             <button
               key={t}
               role="tab"
@@ -75,12 +87,12 @@ export function Leaderboard() {
               onClick={() => setTab(t)}
               className={cx("min-h-9 rounded-full px-4 text-sm", tab === t ? "bg-electric text-white" : "text-muted hover:text-fg")}
             >
-              {t === "semana" ? "Liga da semana" : "Geral"}
+              {t === "semana" ? "Liga da semana" : t === "amigos" ? "Amigos" : "Geral"}
             </button>
           ))}
         </div>
         <span className="text-sm text-muted">
-          {tab === "semana" ? `A liga recomeça em ${days} dia${days === 1 ? "" : "s"} (segunda-feira).` : "XP acumulado desde o primeiro dia."}
+          {tab === "geral" ? "XP acumulado desde o primeiro dia." : `${tab === "amigos" ? "Você e quem você adicionou, XP da semana. " : ""}A liga recomeça em ${days} dia${days === 1 ? "" : "s"} (segunda-feira).`}
         </span>
       </div>
 
@@ -105,6 +117,10 @@ export function Leaderboard() {
         ) : !rows || rows.length === 0 ? (
           <EmptyState title={tab === "semana" ? "Ninguém pontuou nesta semana ainda" : "O ranking ainda está vazio"}>
             Conclua uma aula ou o treino do dia para ser a primeira pessoa da lista.
+          </EmptyState>
+        ) : tab === "amigos" && rows.length <= 1 ? (
+          <EmptyState title="Adicione colegas para competir" action={<Link href="/perfil" className="underline">Buscar pessoas</Link>}>
+            Na liga dos amigos aparecem você e as pessoas que você adicionou. Busque colegas em “Meu perfil” ou abra o perfil de alguém pelo ranking.
           </EmptyState>
         ) : (
           <ol className="divide-y divide-line rounded-[var(--radius-lg)] border border-line">
@@ -133,7 +149,13 @@ export function Leaderboard() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">
-                      {r.display_name}
+                      {r.username ? (
+                        <Link href={profileHref(r.username)} className="hover:underline">
+                          {r.display_name}
+                        </Link>
+                      ) : (
+                        r.display_name
+                      )}
                       {r.is_me && <span className="ml-2 text-xs text-electric-hi">você</span>}
                     </span>
                     {tab === "geral" && (

@@ -76,3 +76,14 @@ describe("conteúdo educacional", () => {
     expect(problems).toEqual([]);
   });
 });
+
+describe("videoaulas", () => {
+  it("usa IDs de playlist válidos, sem repetir dentro da trilha", async () => {
+    const { videosByCourse } = await import("@content/videos");
+    for (const [slug, list] of Object.entries(videosByCourse)) {
+      expect(list.length, slug).toBeGreaterThan(0);
+      for (const v of list) expect(v.playlist, slug).toMatch(/^PL[\w-]{16,40}$/);
+      expect(new Set(list.map((v) => v.playlist)).size, slug).toBe(list.length);
+    }
+  });
+});

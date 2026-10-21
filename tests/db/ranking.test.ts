@@ -93,7 +93,7 @@ describe("ranking", () => {
     );
     expect(rows.rows.map((r) => r.display_name)).toEqual(["Ana S.", "Beto"]);
     expect(Number(rows.rows[0]!.rank)).toBe(1);
-    expect(Object.keys(rows.rows[0]!).sort()).toEqual(["avatar_url", "display_name", "is_me", "rank", "xp"]);
+    expect(Object.keys(rows.rows[0]!).sort()).toEqual(["avatar_url", "display_name", "is_me", "rank", "username", "xp"]);
   });
 
   it("quem escolhe não aparecer some do ranking, mas vê a própria posição", async () => {

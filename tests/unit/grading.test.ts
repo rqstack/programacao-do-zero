@@ -44,14 +44,13 @@ describe("níveis e conquistas", () => {
     expect(levelFromXp(175).progress).toBeCloseTo(0.5);
   });
   it("só concede conquistas ainda não obtidas", () => {
-    const stats = { totalXp: 20, lessonsCompleted: 1, exercisesSolved: 0, quizzesPassed: 0, gamesCompleted: 0, projectsCompleted: 0, bestStreak: 0, perfectQuizzes: 0, perfectGames: 0, practiceDays: 0, goalDays: 0 };
+    const stats = { totalXp: 20, lessonsCompleted: 1, exercisesSolved: 0, quizzesPassed: 0, gamesCompleted: 0, projectsCompleted: 0, bestStreak: 0, perfectQuizzes: 0, perfectGames: 0, practiceDays: 0, goalDays: 0, challengesSolved: 0, hardChallenges: 0, challengeLangs: 0 };
     expect(evaluateAchievements(stats, new Set()).map((a) => a.slug)).toEqual(["primeira-aula"]);
     expect(evaluateAchievements(stats, new Set(["primeira-aula"]))).toEqual([]);
   });
 });
 
 describe("motor de jogos", () => {
-  const choice = { payload: { prompt: "?", options: ["1", "2"] }, solution: { index: 1 }, points: 10, explanation: "porque" };
 
   it("impede responder a mesma rodada duas vezes", () => {
     const rain = { payload: { statement: "x" }, solution: { truth: false }, points: 5, explanation: "" };
