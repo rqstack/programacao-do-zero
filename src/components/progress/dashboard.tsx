@@ -7,6 +7,7 @@ import { ACHIEVEMENTS, levelFromXp, levelTitle } from "@/lib/gamification/rules"
 import { historyOf, streaks, totalXp } from "@/lib/progress/model";
 import { exportProgress, importProgress, resetProgress, useHydrated, useProgress } from "@/lib/progress/store";
 import { Alert, Button, cx, EmptyState, ProgressBar } from "@/components/ui/primitives";
+import { AccountSection } from "@/components/auth/account-section";
 import { ContinueCard, type LessonOrderItem } from "./continue-card";
 
 interface CourseSummary {
@@ -71,6 +72,8 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
 
   return (
     <div className="space-y-12">
+      <AccountSection />
+
       {/* Nível */}
       <section aria-labelledby="nivel" className="grid gap-6 rounded-[var(--radius-lg)] border border-line bg-navy/60 p-6 md:grid-cols-[1fr_auto] md:items-center">
         <div>

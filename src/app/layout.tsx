@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
 import { RewardToaster } from "@/components/layout/reward-toaster";
+import { AuthProvider } from "@/lib/auth/auth-provider";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import "./globals.css";
@@ -34,12 +35,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo
         </a>
-        <SiteHeader />
-        <main id="conteudo" tabIndex={-1} className="outline-none">
-          {children}
-        </main>
-        <SiteFooter />
-        <RewardToaster />
+        <AuthProvider>
+          <SiteHeader />
+          <main id="conteudo" tabIndex={-1} className="outline-none">
+            {children}
+          </main>
+          <SiteFooter />
+          <RewardToaster />
+        </AuthProvider>
       </body>
     </html>
   );

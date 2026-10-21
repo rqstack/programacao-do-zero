@@ -8,15 +8,17 @@ import { levelFromXp } from "@/lib/gamification/rules";
 import { totalXp } from "@/lib/progress/model";
 import { useHydrated, useProgress } from "@/lib/progress/store";
 import { cx } from "@/components/ui/primitives";
+import { AccountButton } from "@/components/auth/account-button";
 import { Logo } from "./logo";
 
 export const NAV = [
   { href: "/trilhas", label: "Trilhas" },
+  { href: "/treino", label: "Treino" },
   { href: "/quizzes", label: "Quizzes" },
   { href: "/jogos", label: "Jogos" },
-  { href: "/laboratorio", label: "Laboratório" },
+  { href: "/ranking", label: "Ranking" },
   { href: "/projetos", label: "Projetos" },
-  { href: "/glossario", label: "Glossário" },
+  { href: "/laboratorio", label: "Laboratório" },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -52,7 +54,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-line/70 bg-ink/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4 sm:px-6">
         <Logo />
-        <nav aria-label="Principal" className="hidden flex-1 lg:block">
+        <nav aria-label="Principal" className="hidden flex-1 xl:block">
           <ul className="flex items-center gap-1">
             {NAV.map((item) => (
               <li key={item.href}>
@@ -72,10 +74,11 @@ export function SiteHeader() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <XpChip />
+          <AccountButton />
           <button
             type="button"
             onClick={() => dialog.current?.showModal()}
-            className="grid size-11 place-items-center rounded-md border border-line-strong lg:hidden"
+            className="grid size-11 place-items-center rounded-md border border-line-strong xl:hidden"
             aria-label="Abrir menu"
           >
             <Menu aria-hidden className="size-5" />
@@ -99,7 +102,7 @@ export function SiteHeader() {
         </div>
         <nav aria-label="Menu móvel" className="p-3">
           <ul className="space-y-1">
-            {[{ href: "/", label: "Início" }, ...NAV, { href: "/progresso", label: "Meu progresso" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
+            {[{ href: "/", label: "Início" }, ...NAV, { href: "/glossario", label: "Glossário" }, { href: "/progresso", label: "Meu progresso" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

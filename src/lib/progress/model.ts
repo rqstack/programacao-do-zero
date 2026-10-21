@@ -206,3 +206,52 @@ export function historyOf(state: ProgressState): HistoryItem[] {
     .map(([key, e]) => ({ key, kind: key.split(":")[0] ?? "", label: e.label, amount: e.amount, at: e.at }))
     .sort((a, b) => (a.at < b.at ? 1 : -1));
 }
+
+const earliest = (a: string | undefined, b: string | undefined) => (!a ? b : !b ? a : a < b ? a : b);
+const latest = (a: string, b: string) => (a > b ? a : b);
+
+/**
+ * Combina dois progressos (ex.: este aparelho + a conta). Nada se perde e nada conta em
+ * dobro: aplicar várias vezes dá o mesmo resultado (idempotente) e a ordem não importa.
+ */
+export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState {
+  const out = emptyProgress(new Date(0));
+  out.createdAt = earliest(a.createdAt, b.createdAt)!;
+
+  for (const src of [a, b]) {
+    for (const [k, v] of Object.entries(src.xp)) {
+      const cur = out.xp[k];
+      out.xp[k] = cur ? { ...cur, at: earliest(cur.at, v.at)! } : { ...v };
+    }
+    for (const [k, v] of Object.entries(src.lessons)) out.lessons[k] = earliest(out.lessons[k], v)!;
+    for (const [k, v] of Object.entries(src.exercises)) out.exercises[k] = out.exercises[k] === "solved" || v === "solved" ? "solved" : "revealed";
+    for (const [k, v] of Object.entries(src.quizzes)) {
+      const cur = out.quizzes[k];
+      out.quizzes[k] = cur
+        ? { best: Math.max(cur.best, v.best), passed: cur.passed || v.passed, attempts: Math.max(cur.attempts, v.attempts), lastAt: latest(cur.lastAt, v.lastAt) }
+        : { ...v };
+    }
+    for (const [k, v] of Object.entries(src.games)) {
+      const cur = out.games[k];
+      if (!cur) {
+        out.games[k] = { ...v };
+        continue;
+      }
+      const better = v.best > cur.best ? v : cur;
+      out.games[k] = { best: better.best, max: better.max, plays: Math.max(cur.plays, v.plays), completed: cur.completed || v.completed, lastAt: latest(cur.lastAt, v.lastAt) };
+    }
+    for (const [k, v] of Object.entries(src.projects)) {
+      const cur = out.projects[k];
+      out.projects[k] = cur
+        ? {
+            checked: [...new Set([...cur.checked, ...v.checked])].sort((x, y) => x - y),
+            completedAt: earliest(cur.completedAt ?? undefined, v.completedAt ?? undefined) ?? null,
+            url: cur.url ?? v.url,
+          }
+        : { ...v, checked: [...v.checked] };
+    }
+    for (const [k, v] of Object.entries(src.achievements)) out.achievements[k] = earliest(out.achievements[k], v)!;
+  }
+  out.days = [...new Set([...a.days, ...b.days])].sort();
+  return out;
+}

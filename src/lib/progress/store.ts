@@ -100,6 +100,16 @@ export function importProgress(text: string): boolean {
   }
 }
 
+/** Substitui todo o progresso (usado pela sincronização com a conta). */
+export function replaceProgress(state: ProgressState) {
+  write(state);
+}
+
+/** Leitura direta, fora de componentes. */
+export function getProgress(): ProgressState {
+  return read();
+}
+
 export function resetProgress() {
   write(emptyProgress(new Date()));
 }

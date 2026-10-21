@@ -115,3 +115,33 @@ describe("títulos de nível", () => {
     expect(levelTitle(0)).toBe("Dev Bebê");
   });
 });
+
+describe("mesclagem de progresso (aparelho + conta)", () => {
+  const t = (iso: string) => new Date(iso);
+  let local = emptyProgress(t("2026-10-01T10:00:00"));
+  local = applyProgress(local, { type: "lesson/complete", slug: "a", title: "A" }, t("2026-10-02T10:00:00")).state;
+  local = applyProgress(local, { type: "quiz/result", slug: "q", title: "Q", percent: 50, passed: false }, t("2026-10-02T11:00:00")).state;
+  let remote = emptyProgress(t("2026-09-01T10:00:00"));
+  remote = applyProgress(remote, { type: "lesson/complete", slug: "a", title: "A" }, t("2026-09-05T10:00:00")).state;
+  remote = applyProgress(remote, { type: "lesson/complete", slug: "b", title: "B" }, t("2026-09-06T10:00:00")).state;
+  remote = applyProgress(remote, { type: "quiz/result", slug: "q", title: "Q", percent: 90, passed: true }, t("2026-09-06T11:00:00")).state;
+
+  it("une tudo sem contar XP em dobro", async () => {
+    const { mergeProgress } = await import("@/lib/progress/model");
+    const m = mergeProgress(local, remote);
+    expect(Object.keys(m.lessons).sort()).toEqual(["a", "b"]);
+    expect(m.lessons.a).toBe(remote.lessons.a);
+    expect(m.quizzes.q).toMatchObject({ best: 90, passed: true });
+    expect(totalXp(m)).toBe(20 + 20 + 30);
+    expect(m.createdAt).toBe(remote.createdAt);
+    expect(parseProgress(JSON.parse(JSON.stringify(m)))).not.toBeNull();
+  });
+
+  it("é idempotente e não depende da ordem", async () => {
+    const { mergeProgress } = await import("@/lib/progress/model");
+    const m = mergeProgress(local, remote);
+    expect(mergeProgress(m, remote)).toEqual(m);
+    expect(mergeProgress(m, local)).toEqual(m);
+    expect(mergeProgress(remote, local)).toEqual(m);
+  });
+});
