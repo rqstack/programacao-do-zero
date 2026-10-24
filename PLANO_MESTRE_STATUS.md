@@ -43,11 +43,12 @@ Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui P
 - ✅ Full Stack com projetos (6 aulas) — limitador de tentativas da aula executado (200,200,200,429,429).
 - ✅ Java e Orientação a Objetos (7 aulas) — os 7 programas compilados e executados no Judge0 (JDK 17), saídas conferidas (scripts/check-java-blocks.mts).
 - ✅ IA aplicada à programação (6 aulas, inclui n8n e "praticar com IA sem depender dela") — exemplos JS (classificador com Zod e nó Code do n8n) executados no Node.
-- Banco de produção sincronizado: 458 atividades.
-- ⬜ Pendentes: Portfólio/Carreira, (JS assíncrono dedicado — hoje coberto por 1 aula na trilha JavaScript), AWS, Canvas.
+- ✅ Portfólio, Currículo, GitHub e Entrevistas (`carreira`, 6 aulas).
+- Banco de produção sincronizado: 477 atividades.
+- ⬜ Opcionais: (JS assíncrono dedicado — hoje coberto por 1 aula na trilha JavaScript), AWS, Canvas.
 
 ## Como sincronizar o XP de uma trilha nova
 `npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
 
 ## Próximo passo exato
-Escrever a trilha Carreira (`carreira`). Depois: deploy do site e relatório final.
+Checagem completa (tsc, lint, vitest), deploy do site, conferir páginas no ar e relatório final. Pix: aguardando o dono cadastrar os secrets da Syncpay (docs/APOIO_PIX.md).
