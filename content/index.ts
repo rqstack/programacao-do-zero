@@ -14,9 +14,10 @@ import { course as sqlTrilha } from "./courses/sql/course";
 import { course as supabaseTrilha } from "./courses/supabase/course";
 import { course as testes } from "./courses/testes-e-depuracao/course";
 import { course as deployTrilha } from "./courses/deploy-e-hospedagem/course";
+import { course as fullStackTrilha } from "./courses/full-stack/course";
 
 /** Ordem de exibição das trilhas. Só entram aqui cursos com todas as aulas escritas. */
-export const courses: SeedCourse[] = [logica, html, css, javascript, git, typescript, react, node, modelagem, sqlTrilha, supabaseTrilha, testes, deployTrilha];
+export const courses: SeedCourse[] = [logica, html, css, javascript, git, typescript, react, node, modelagem, sqlTrilha, supabaseTrilha, testes, deployTrilha, fullStackTrilha];
 
 export const games = allGames;
 

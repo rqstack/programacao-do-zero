@@ -40,11 +40,12 @@ Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui P
 - ✅ Supabase, autenticação e segurança (7 aulas) — exemplos de RLS e funções executados com dois usuários (tests/db/lessons-supabase.test.ts).
 - ✅ Testes, depuração e qualidade (6 aulas) — exemplos rodados com Vitest (20 testes passando); 2 imprecisões minhas corrigidas.
 - ✅ Deploy, hospedagem e variáveis de ambiente (6 aulas) — exemplos Node executados (config falha cedo, /saude responde).
-- Banco de produção sincronizado: 398 atividades.
+- ✅ Full Stack com projetos (6 aulas) — limitador de tentativas da aula executado (200,200,200,429,429).
+- Banco de produção sincronizado: 417 atividades.
 - ⬜ Pendentes: Supabase/Auth/Segurança, Testes e Depuração, Deploy e Variáveis de Ambiente, Full Stack, Java e OO, IA aplicada, Portfólio/Carreira, (JS assíncrono dedicado — hoje coberto por 1 aula na trilha JavaScript), AWS, Canvas.
 
 ## Como sincronizar o XP de uma trilha nova
 `npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
 
 ## Próximo passo exato
-Escrever as trilhas Full Stack (slug `full-stack`), Java e OO (`java`), IA aplicada (`ia-aplicada`) e Carreira (`carreira`). Depois: deploy do site e relatório final.
+Escrever as trilhas Java e OO (`java`), IA aplicada (`ia-aplicada`) e Carreira (`carreira`). Depois: deploy do site e relatório final.
