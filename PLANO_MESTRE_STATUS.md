@@ -37,11 +37,12 @@ Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui P
 - ✅ Modelagem de Dados (8 aulas) — blocos SQL executados no PGlite; comportamentos (FK, índice parcial) conferidos.
 - ✅ SQL e Banco de Dados (8 aulas) — blocos SQL executados e números das explicações conferidos (1 erro corrigido).
 - Teste novo: todo bloco ```sql de qualquer trilha roda no PGlite.
-- Banco de produção sincronizado: 338 atividades.
+- ✅ Supabase, autenticação e segurança (7 aulas) — exemplos de RLS e funções executados com dois usuários (tests/db/lessons-supabase.test.ts).
+- Banco de produção sincronizado: 360 atividades.
 - ⬜ Pendentes: Supabase/Auth/Segurança, Testes e Depuração, Deploy e Variáveis de Ambiente, Full Stack, Java e OO, IA aplicada, Portfólio/Carreira, (JS assíncrono dedicado — hoje coberto por 1 aula na trilha JavaScript), AWS, Canvas.
 
 ## Como sincronizar o XP de uma trilha nova
 `npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
 
 ## Próximo passo exato
-Escrever a trilha Supabase, autenticação e segurança (slug `supabase`).
+Escrever as trilhas Testes e Depuração (slug `testes-e-depuracao`) e Deploy (slug `deploy-e-hospedagem`).
