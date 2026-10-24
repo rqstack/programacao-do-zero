@@ -24,6 +24,7 @@ const COLUMNS = [
     links: [
       { href: "/sobre", label: "Sobre e créditos" },
       { href: "/sobre#privacidade", label: "Privacidade" },
+      { href: "/apoiar", label: "Apoiar o projeto" },
     ],
   },
 ];

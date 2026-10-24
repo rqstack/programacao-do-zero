@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Dumbbell, Flame, FlaskConical, Gamepad2, Hammer, Trophy } from "lucide-react";
 import { LEVEL_TITLES } from "@/lib/gamification/rules";
 import { DemoQuiz } from "@/components/home/demo-quiz";
+import { EbookSection } from "@/components/home/ebook-section";
 import { FirstCode } from "@/components/home/first-code";
 import { ContinueCard } from "@/components/progress/continue-card";
 import { Container } from "@/components/ui/primitives";
@@ -224,6 +225,8 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
+
+      <EbookSection />
 
       {/* Perguntas frequentes */}
       <section id="perguntas" aria-labelledby="faq" className="border-t border-line py-20">

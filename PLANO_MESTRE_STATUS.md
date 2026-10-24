@@ -20,5 +20,13 @@ Legenda: ✅ concluído e testado · 🟡 implementado, teste incompleto · ⛔ 
 - ✅ Código × banco idênticos: 288 atividades, mesma impressão md5; 0 eventos órfãos, 0 duplicados, 0 usuários (ninguém conseguiu logar ainda).
 - ✅ Exemplos executados de verdade (Express 5.3, Zod 4.6): servidor node:http (201/400/404), Express + log, CRUD, erros/CORS e os 3 testes `node --test` passam.
 
+## Fase 3 — Ebook
+- ✅ Seção na home (antes do FAQ) com os textos pedidos, capa oficial copiada do site do ebook (`public/ebook-capa.webp`), botão para o link oficial em nova aba. Conferido no celular e desktop, sem rolagem lateral.
+
+## Fase 4 — Apoio via Pix (Syncpay)
+- 🟡 Implementado e publicado **desligado** (Edge Function `support-pix`, tabela `support_donations`, página `/apoiar`, link no rodapé). Detalhes e tarifas: docs/APOIO_PIX.md.
+- ✅ Testado com Syncpay simulada (15 testes) + banco (3) + navegador.
+- ⛔ Ativação depende de: conta Syncpay aprovada, confirmar exigência de IP fixo, secrets no Supabase, webhook cadastrado.
+
 ## Próximo passo exato
-Fase 3: seção do ebook na página inicial (link https://o-proximo-nivel-da-programacao.vercel.app/).
+Fase 5: revisar a Batalha em produção; depois Fase 6 (trilhas: Modelagem de Dados e SQL primeiro).
