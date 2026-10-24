@@ -11,7 +11,7 @@ export interface SeedQuestion {
   prompt: string;
   code?: string;
   /** Linguagem do código da pergunta (padrão: js). */
-  lang?: "js" | "html" | "css" | "sql" | "bash" | "jsx" | "ts" | "texto";
+  lang?: "js" | "html" | "css" | "sql" | "bash" | "jsx" | "ts" | "java" | "python" | "texto";
   options: string[];
   correct: number;
   explanation: string;
