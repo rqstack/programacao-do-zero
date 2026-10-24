@@ -9,9 +9,10 @@ import { course as git } from "./courses/git-e-github/course";
 import { course as typescript } from "./courses/typescript/course";
 import { course as react } from "./courses/react/course";
 import { course as node } from "./courses/node-e-apis/course";
+import { course as modelagem } from "./courses/modelagem-de-dados/course";
 
 /** Ordem de exibição das trilhas. Só entram aqui cursos com todas as aulas escritas. */
-export const courses: SeedCourse[] = [logica, html, css, javascript, git, typescript, react, node];
+export const courses: SeedCourse[] = [logica, html, css, javascript, git, typescript, react, node, modelagem];
 
 export const games = allGames;
 

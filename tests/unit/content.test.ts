@@ -87,3 +87,24 @@ describe("videoaulas", () => {
     }
   });
 });
+
+describe("blocos SQL das aulas", () => {
+  it("todo bloco ```sql roda num Postgres real (um banco limpo por aula)", async () => {
+    const { PGlite } = await import("@electric-sql/pglite");
+    const problems: string[] = [];
+    for (const course of courses) {
+      for (const [slug, body] of readLessonBodies(course)) {
+        const blocks = [...body.matchAll(/```sql\n([\s\S]*?)```/g)].map((m) => m[1]!);
+        if (blocks.length === 0) continue;
+        const db = new PGlite();
+        try {
+          for (const b of blocks) await db.exec(b);
+        } catch (e) {
+          problems.push(`${course.slug}/${slug}: ${(e as Error).message}`);
+        }
+        await db.close();
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+});
