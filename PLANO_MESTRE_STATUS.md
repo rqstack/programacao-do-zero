@@ -28,5 +28,20 @@ Legenda: ✅ concluído e testado · 🟡 implementado, teste incompleto · ⛔ 
 - ✅ Testado com Syncpay simulada (15 testes) + banco (3) + navegador.
 - ⛔ Ativação depende de: conta Syncpay aprovada, confirmar exigência de IP fixo, secrets no Supabase, webhook cadastrado.
 
+## Fase 5 — Batalha de Código
+- ✅ Em produção: pg_cron rodando (6.302 execuções, 0 falhas), 20 desafios, 6 arenas. Adicionada limpeza diária do histórico do cron (evita estourar o plano gratuito).
+- ⛔ Teste com duas contas reais depende do login Google ativo. Testes locais/E2E com Judge0 real: OK (ver docs/BATALHA.md).
+
+## Fase 6 — Trilhas
+Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui Promises/fetch), Git (7), TypeScript (6), React (8), Node/APIs (8).
+- ✅ Modelagem de Dados (8 aulas) — blocos SQL executados no PGlite; comportamentos (FK, índice parcial) conferidos.
+- ✅ SQL e Banco de Dados (8 aulas) — blocos SQL executados e números das explicações conferidos (1 erro corrigido).
+- Teste novo: todo bloco ```sql de qualquer trilha roda no PGlite.
+- Banco de produção sincronizado: 338 atividades.
+- ⬜ Pendentes: Supabase/Auth/Segurança, Testes e Depuração, Deploy e Variáveis de Ambiente, Full Stack, Java e OO, IA aplicada, Portfólio/Carreira, (JS assíncrono dedicado — hoje coberto por 1 aula na trilha JavaScript), AWS, Canvas.
+
+## Como sincronizar o XP de uma trilha nova
+`npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
+
 ## Próximo passo exato
-Fase 5: revisar a Batalha em produção; depois Fase 6 (trilhas: Modelagem de Dados e SQL primeiro).
+Escrever a trilha Supabase, autenticação e segurança (slug `supabase`).
