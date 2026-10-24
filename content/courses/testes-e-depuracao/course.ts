@@ -1,0 +1,230 @@
+import type { SeedCourse } from "../../schema";
+
+export const course: SeedCourse = {
+  slug: "testes-e-depuracao",
+  title: "Testes, depuração e qualidade de código",
+  description: "Encontrar bugs com método, escrever testes automatizados com Vitest, praticar TDD, usar mocks e manter o código limpo com lint e integração contínua.",
+  category: "fundamentos",
+  level: "intermediario",
+  modules: [
+    {
+      title: "Encontrar e prevenir bugs",
+      lessons: [
+        {
+          slug: "depurando-com-devtools",
+          title: "Depuração com método e DevTools",
+          objective: "Ler mensagens de erro e stack traces, usar breakpoints, Console e aba Rede para achar a causa de um bug.",
+          summary: "Leia o erro, reproduza, isole e confirme hipóteses com as ferramentas.",
+          minutes: 14,
+          exercise: {
+            prompt: "Qual instrução JavaScript pausa a execução naquela linha quando o DevTools está aberto?",
+            hint: "É uma palavra só, seguida de ponto e vírgula.",
+            accepted: ["debugger", "debugger;"],
+            explanation: "`debugger;` funciona como um breakpoint escrito no código. Não esqueça de remover antes de publicar.",
+          },
+          quiz: [
+            {
+              kind: "code_reading",
+              prompt: "O que este código mostra no console?",
+              code: "let soma = \"0\";\nsoma += \"18.90\";\nconsole.log(soma);",
+              options: ["\"018.90\"", "18.9", "18.90", "NaN"],
+              correct: 0,
+              explanation: "Com texto, + concatena. Converta com Number() na entrada.",
+            },
+            {
+              prompt: "A tela \"não carrega os dados\". Onde você olha primeiro para ver se a API respondeu 401 ou 500?",
+              options: ["Na aba Rede (Network) do DevTools", "No CSS", "No README", "Na aba Elements"],
+              correct: 0,
+              explanation: "A aba Rede mostra cada requisição com status, cabeçalhos e corpo.",
+            },
+            {
+              kind: "true_false",
+              prompt: "Mudar várias partes do código ao mesmo tempo é a forma mais rápida de achar um bug.",
+              options: ["Verdadeiro", "Falso"],
+              correct: 1,
+              explanation: "Uma hipótese por vez: assim você sabe o que corrigiu e o que quebrou.",
+            },
+          ],
+        },
+        {
+          slug: "por-que-testes-automatizados",
+          title: "Por que testes automatizados",
+          objective: "Diferenciar testes unitários, de integração e ponta a ponta e escrever testes com a estrutura AAA.",
+          summary: "Muitos testes rápidos de unidade, alguns de integração, poucos de ponta a ponta.",
+          minutes: 13,
+          exercise: {
+            prompt: "Qual sigla descreve as três partes de um teste: preparar, executar e verificar?",
+            hint: "Em inglês: Arrange, Act, Assert.",
+            accepted: ["AAA", "aaa"],
+            explanation: "AAA: Arrange (preparar), Act (executar), Assert (verificar).",
+          },
+          quiz: [
+            {
+              prompt: "Qual tipo de teste deve existir em maior quantidade, segundo a pirâmide de testes?",
+              options: ["Unitário", "Ponta a ponta", "Manual", "Teste de carga"],
+              correct: 0,
+              explanation: "Unitários são rápidos, baratos e precisos.",
+            },
+            {
+              prompt: "A regra diz \"frete grátis a partir de R$ 200\". Qual valor é o caso de borda mais importante para testar?",
+              options: ["Exatamente 200", "50", "1000", "0,01"],
+              correct: 0,
+              explanation: "O limite exato pega a troca de >= por >.",
+            },
+            {
+              kind: "true_false",
+              prompt: "100% de cobertura de código garante que não há bugs.",
+              options: ["Verdadeiro", "Falso"],
+              correct: 1,
+              explanation: "Cobertura mostra o que foi executado, não se as verificações são boas.",
+            },
+          ],
+        },
+        {
+          slug: "testes-unitarios-com-vitest",
+          title: "Testes unitários com Vitest",
+          objective: "Escrever testes com describe, it, expect, beforeEach e it.each, escolhendo o matcher certo.",
+          summary: "toEqual para conteúdo, toBeCloseTo para decimais, () => para toThrow.",
+          minutes: 17,
+          exercise: {
+            prompt: "Qual matcher do Vitest compara duas listas pelo conteúdo, como `expect(lista).___([1, 2])`?",
+            hint: "Não é toBe.",
+            accepted: ["toEqual", "toequal", "toStrictEqual"],
+            explanation: "toEqual compara o conteúdo; toBe compara a referência na memória.",
+          },
+          quiz: [
+            {
+              kind: "find_bug",
+              prompt: "Por que este teste falha mesmo com a função lançando o erro certo?",
+              code: "expect(dividir(1, 0)).toThrow(\"zero\");",
+              options: ["O erro acontece antes do expect; o certo é expect(() => dividir(1, 0))", "toThrow não aceita texto", "Falta await", "dividir não existe"],
+              correct: 0,
+              explanation: "toThrow precisa receber uma função para ele mesmo executar.",
+            },
+            {
+              prompt: "Para que serve o beforeEach?",
+              options: ["Preparar dados novos antes de cada teste, isolando-os", "Rodar só o primeiro teste", "Pular testes lentos", "Ordenar os testes"],
+              correct: 0,
+              explanation: "Cada teste começa limpo e não depende do anterior.",
+            },
+            {
+              prompt: "Qual matcher usar para conferir um total com decimais calculados, como 0.1 * 3?",
+              options: ["toBeCloseTo", "toBe", "toContain", "toMatch"],
+              correct: 0,
+              explanation: "0.1 * 3 dá 0.30000000000000004; toBeCloseTo tolera essa diferença.",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Testes avançados e qualidade",
+      lessons: [
+        {
+          slug: "tdd-e-casos-de-borda",
+          title: "TDD e casos de borda",
+          objective: "Aplicar o ciclo vermelho, verde e refatorar e identificar casos de borda a partir de um requisito.",
+          summary: "Escreva o teste primeiro e procure as bordas: vazio, limites, espaços e acentos.",
+          minutes: 15,
+          exercise: {
+            prompt: "No TDD, qual é a primeira etapa do ciclo? (uma cor)",
+            hint: "O teste ainda falha.",
+            accepted: ["vermelho", "red"],
+            explanation: "Vermelho (teste falhando) → verde (código mínimo) → refatorar.",
+          },
+          quiz: [
+            {
+              prompt: "Qual destes é um caso de borda para uma função que recebe uma lista?",
+              options: ["Lista vazia", "Lista com 3 itens comuns", "Lista ordenada", "Lista com nomes bonitos"],
+              correct: 0,
+              explanation: "Vazio, um elemento e muitos elementos são as bordas clássicas.",
+            },
+            {
+              prompt: "Apareceu um bug em produção. Qual a primeira coisa a fazer no TDD?",
+              options: ["Escrever um teste que reproduz o bug (e falha)", "Apagar os testes antigos", "Publicar de novo", "Ignorar"],
+              correct: 0,
+              explanation: "O teste de regressão garante que o bug não volte.",
+            },
+            {
+              kind: "code_reading",
+              prompt: "O que `slugify(\"  Ação -- Já! \")` devolve com a função da aula?",
+              code: "titulo.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\")\n  .toLowerCase().replace(/[^a-z0-9]+/g, \"-\").replace(/^-+|-+$/g, \"\")",
+              options: ["\"acao-ja\"", "\"Ação -- Já!\"", "\"-acao--ja-\"", "\"acao ja\""],
+              correct: 0,
+              explanation: "Remove acentos, junta símbolos e espaços em um hífen e tira hífens das pontas.",
+            },
+          ],
+        },
+        {
+          slug: "mocks-e-codigo-assincrono",
+          title: "Mocks e testes de código assíncrono",
+          objective: "Substituir APIs e o relógio por dublês controlados e testar funções assíncronas.",
+          summary: "Mocke só o que é externo; injete dependências para testar sem truques.",
+          minutes: 16,
+          exercise: {
+            prompt: "Qual função do Vitest cria uma função espiã que registra chamadas? (escreva com o prefixo vi.)",
+            hint: "Abreviação de \"function\".",
+            accepted: ["vi.fn", "vi.fn()"],
+            explanation: "vi.fn() cria um mock; você define o retorno e confere as chamadas.",
+          },
+          quiz: [
+            {
+              prompt: "Por que não chamar a API real nos testes?",
+              options: ["Fica lento, depende da internet e da cota, e falha aleatoriamente", "A API proíbe", "O Vitest não faz requisições", "Não há problema"],
+              correct: 0,
+              explanation: "Testes devem ser rápidos e determinísticos.",
+            },
+            {
+              kind: "find_bug",
+              prompt: "Este teste passa mesmo quando a função está errada. Por quê?",
+              code: "it(\"busca a temperatura\", () => {\n  expect(temperaturaAtual(recife, falso)).resolves.toBe(28);\n});",
+              options: ["Falta async/await: o teste termina antes da verificação", "resolves não existe", "toBe não funciona com números", "recife está errado"],
+              correct: 0,
+              explanation: "Use it(..., async () => { await expect(...).resolves.toBe(28) }).",
+            },
+            {
+              prompt: "Qual é a forma mais simples de testar uma função que depende da hora atual?",
+              options: ["Receber a data como parâmetro (com padrão new Date())", "Rodar o teste só à tarde", "Mudar o relógio do computador", "Não testar"],
+              correct: 0,
+              explanation: "Injeção de dependência: o teste passa a data que quiser.",
+            },
+          ],
+        },
+        {
+          slug: "qualidade-de-codigo",
+          title: "Lint, formatação e integração contínua",
+          objective: "Configurar ESLint, Prettier, TypeScript estrito, scripts de verificação e um workflow de CI.",
+          summary: "Automatize as verificações e rode as mesmas no seu computador e no CI.",
+          minutes: 13,
+          exercise: {
+            prompt: "Qual comando instala exatamente as versões do package-lock.json, ideal para o CI?",
+            hint: "É npm seguido de duas letras.",
+            accepted: ["npm ci"],
+            explanation: "npm ci instala o que está travado no lock, de forma limpa e reprodutível.",
+          },
+          quiz: [
+            {
+              prompt: "Qual ferramenta aponta variáveis declaradas e nunca usadas?",
+              options: ["ESLint", "Prettier", "npm", "Git"],
+              correct: 0,
+              explanation: "O linter analisa o código; o Prettier só formata.",
+            },
+            {
+              prompt: "O que um workflow de CI faz a cada push ou pull request?",
+              options: ["Roda tipos, lint e testes automaticamente e marca o resultado", "Publica o site sem verificar", "Apaga a branch", "Formata o computador"],
+              correct: 0,
+              explanation: "Assim nada quebrado entra na branch principal sem aviso.",
+            },
+            {
+              kind: "true_false",
+              prompt: "Misturar formatação em massa e mudança de lógica no mesmo commit facilita a revisão.",
+              options: ["Verdadeiro", "Falso"],
+              correct: 1,
+              explanation: "O diff fica enorme e a mudança importante se perde. Separe os commits.",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
