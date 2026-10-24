@@ -93,6 +93,6 @@ Para adicionar uma aula, escreva o texto em `aulas.md` (separado por `<!-- aula:
 ## Créditos e referências
 
 - A estrutura das trilhas segue o sumário do e-book *O Próximo Nível da Programação*, do mesmo autor.
-- A trilha de Modelagem de Dados (em construção) acompanha os temas estudados na disciplina de Modelagem de Dados da faculdade; o texto e os exemplos são próprios.
-- A trilha de Java e Orientação a Objetos (em construção) cobre os temas clássicos de livros introdutórios da linguagem, com texto e exemplos próprios.
+- A trilha de Modelagem de Dados acompanha os temas estudados na disciplina de Modelagem de Dados da faculdade; o texto e os exemplos são próprios.
+- A trilha de Java e Orientação a Objetos cobre os temas clássicos de livros introdutórios da linguagem, com texto e exemplos próprios.
 - Documentações oficiais (MDN, Node.js, React, PostgreSQL, Supabase e outras) são a fonte de verdade: quando algo divergir, vale a documentação.
