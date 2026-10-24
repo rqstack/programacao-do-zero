@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
-import { useAuth } from "@/lib/auth/auth-provider";
+import { AuthSetupError, useAuth } from "@/lib/auth/auth-provider";
 import { Alert, Button, Spinner } from "@/components/ui/primitives";
 
 function GoogleIcon() {
@@ -29,6 +29,22 @@ export function SignInPanel() {
     if (session) router.replace("/progresso");
   }, [session, router]);
 
+  // Voltou do Google com erro (cancelou, provedor recusou, URL não autorizada...).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search + window.location.hash.replace(/^#/, "&"));
+    const code = params.get("error");
+    if (!code) return;
+    const desc = params.get("error_description") ?? "";
+    // Mensagem vinda da volta do login (dados externos à página).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setError(
+      code === "access_denied"
+        ? "O login foi cancelado no Google. Tente de novo quando quiser."
+        : `O login não foi concluído (${code}${desc ? `: ${desc.replace(/\+/g, " ")}` : ""}). Tente de novo; se continuar, avise no repositório do projeto.`,
+    );
+    window.history.replaceState(null, "", window.location.pathname);
+  }, []);
+
   if (!configured) {
     return (
       <Alert tone="warning" title="Login ainda não configurado">
@@ -50,8 +66,12 @@ export function SignInPanel() {
           setError(null);
           try {
             await signInWithGoogle();
-          } catch {
-            setError("Não foi possível abrir o login do Google. Verifique sua conexão e tente de novo.");
+          } catch (e) {
+            setError(
+              e instanceof AuthSetupError
+                ? "O login com Google ainda não foi ativado neste site. Enquanto isso, você pode estudar normalmente: seu progresso fica salvo neste navegador e vai para a conta quando o login voltar."
+                : "Não foi possível abrir o login do Google. Verifique sua conexão e tente de novo.",
+            );
             setStarting(false);
           }
         }}

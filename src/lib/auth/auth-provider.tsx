@@ -4,7 +4,10 @@ import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { onReward, resetProgress } from "@/lib/progress/store";
 import { syncProgress } from "@/lib/progress/sync";
-import { BASE_PATH, getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { BASE_PATH, getSupabase, isGoogleEnabled, isSupabaseConfigured } from "@/lib/supabase/client";
+
+/** Erro de configuração do login (não é falha da pessoa usuária). */
+export class AuthSetupError extends Error {}
 
 export interface Profile {
   id: string;
@@ -122,10 +125,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase) return;
-    await supabase.auth.signInWithOAuth({
+    // Confere antes se o provedor Google está ligado no Supabase; sem isso o usuário
+    // seria levado a uma página com um erro em JSON ("provider is not enabled").
+    if (!(await isGoogleEnabled())) throw new AuthSetupError("google-desativado");
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}${BASE_PATH}/entrar/` },
     });
+    if (error) throw error;
   }, []);
 
   /**

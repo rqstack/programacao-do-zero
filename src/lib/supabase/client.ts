@@ -31,3 +31,19 @@ export function getSupabase(): SupabaseClient | null {
   });
   return client;
 }
+
+/**
+ * Pergunta ao Supabase quais provedores de login estão ligados (endpoint público
+ * /auth/v1/settings). Em caso de falha de rede, devolve true para não bloquear o login.
+ */
+export async function isGoogleEnabled(): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+  try {
+    const res = await fetch(`${URL}/auth/v1/settings`, { headers: { apikey: ANON_KEY } });
+    if (!res.ok) return true;
+    const data = (await res.json()) as { external?: Record<string, boolean> };
+    return Boolean(data.external?.google);
+  } catch {
+    return true;
+  }
+}

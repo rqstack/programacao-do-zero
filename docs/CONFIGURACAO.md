@@ -1,5 +1,10 @@
 # Configurando o login com Google e o ranking (custo zero)
 
+> **Estado do projeto `kaylnsleygeysszomudd` (out/2026):** banco, migrations 001–005, seed de XP, Batalha de Código (Edge Function + pg_cron) e `.env.production` já estão prontos.
+> **Falta só uma coisa, que precisa ser feita por você:** ativar o provedor Google (passos 3 e 4 abaixo). Enquanto ele estiver desligado, o Supabase responde `Unsupported provider: provider is not enabled` e o site mostra o aviso "O login com Google ainda não foi ativado".
+> Para conferir a qualquer momento (deve aparecer `"google": true`):
+> `curl -s -H "apikey: <chave publishable>" https://kaylnsleygeysszomudd.supabase.co/auth/v1/settings`
+
 O site funciona sem nada disso: as aulas, os jogos, o treino e o laboratório rodam no navegador. O login só é necessário para o XP contar no **ranking** e na **liga da semana**, e para sincronizar o progresso entre aparelhos.
 
 Tudo abaixo usa planos gratuitos:
@@ -32,11 +37,15 @@ Sempre que o conteúdo mudar (aulas, jogos ou projetos novos), rode `npm run db:
 
 1. Acesse [console.cloud.google.com](https://console.cloud.google.com), crie um projeto e abra **APIs e serviços → Tela de permissão OAuth**. Escolha **Externo**, preencha nome do app e e-mail de suporte.
 2. Em **Credenciais → Criar credenciais → ID do cliente OAuth**, escolha **Aplicativo da Web**.
-3. Em **URIs de redirecionamento autorizados**, adicione o endereço de callback do Supabase:
-   `https://SEU-PROJETO.supabase.co/auth/v1/callback`
-   (aparece no Supabase em **Authentication → Sign In / Providers → Google**).
+3. Em **Origens JavaScript autorizadas**, adicione `https://rqstack.github.io` (e `http://localhost:3000` para testes).
+   Em **URIs de redirecionamento autorizados**, adicione o callback do Supabase — neste projeto é exatamente:
+   `https://kaylnsleygeysszomudd.supabase.co/auth/v1/callback`
+   (o mesmo endereço aparece em **Authentication → Sign In / Providers → Google**).
 4. Copie o **ID do cliente** e a **chave secreta**.
-5. No Supabase, em **Authentication → Sign In / Providers → Google**, ative o provedor e cole os dois valores. A chave secreta fica só no Supabase, nunca no site.
+5. No Supabase, em **Authentication → Sign In / Providers → Google**, ative o provedor (**Enable Sign in with Google**), cole o **Client ID** e o **Client Secret** e clique em **Save**. A chave secreta fica só no Supabase, nunca no site nem no repositório.
+6. Na **Tela de permissão OAuth**, enquanto o app estiver em modo **Teste**, só os e-mails cadastrados em "Usuários de teste" conseguem entrar. Para liberar a todos, clique em **Publicar aplicativo** (para os escopos básicos de nome, e-mail e foto não há custo nem revisão paga).
+
+Nada disso tem custo: o OAuth do Google e o Auth do Supabase Free são gratuitos. Contas já existentes continuam as mesmas (o vínculo é pelo e-mail/ID do Google).
 
 ## 4. Endereços permitidos
 
