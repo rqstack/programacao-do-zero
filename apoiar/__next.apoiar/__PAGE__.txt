@@ -1,0 +1,32 @@
+2:"$Sreact.fragment"
+3:"/programacao-do-zero/_next/static/chunks/0umf92h1sb77c.js"
+4:I[39756,["$3"],"default"]
+5:I[37457,["$3"],"default"]
+a:"/programacao-do-zero/_next/static/chunks/1q10jviu91v_d.js"
+b:"/programacao-do-zero/_next/static/chunks/1reuudywv8w5o.js"
+c:"/programacao-do-zero/_next/static/chunks/3w92lqv9ddxnf.js"
+d:"/programacao-do-zero/_next/static/chunks/2wj5bco36327e.js"
+e:"/programacao-do-zero/_next/static/chunks/44ysb-yo_n9x_.js"
+f:"/programacao-do-zero/_next/static/chunks/2qxi2tero2md_.js"
+10:I[71946,["$a","$b","$c","$d","$e","$f"],"SupportPix"]
+11:I[97367,["$3"],"OutletBoundary"]
+12:"$Sreact.suspense"
+15:"ViewportBoundary"
+16:I[97367,["$3"],"$15"]
+17:"MetadataBoundary"
+18:I[97367,["$3"],"$17"]
+19:I[27201,["$3"],"IconMark"]
+7:X
+7:C
+8:X
+9:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$2","c",{"children":[["$","div",null,{"className":"mx-auto w-full max-w-6xl px-4 sm:px-6 max-w-3xl py-12","children":[["$","header",null,{"className":"flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between","children":[["$","div",null,{"className":"max-w-2xl","children":[["$","h1",null,{"className":"text-3xl font-bold sm:text-4xl","children":"Apoiar o projeto"}],["$","div",null,{"className":"mt-2 text-muted","children":"A Programação do Zero é e continua gratuita. Se ela te ajudou e você quiser, pode contribuir com qualquer valor a partir de R$ 5,00."}]]}],"$undefined"]}],["$","ul",null,{"className":"mt-8 space-y-2 text-sm text-muted","children":[["$","li",null,{"children":"• A contribuição é totalmente voluntária e não libera conteúdo, XP, troféus nem vantagens na Batalha."}],["$","li",null,{"children":"• Não é preciso ter conta nem informar nome ou CPF."}],["$","li",null,{"children":"• O pagamento é processado pela Syncpay; a confirmação é feita no servidor, direto com ela."}]]}],["$","div",null,{"className":"mt-8","children":["$","$L10",null,{}]}]]}],[["$","script","script-0",{"src":"/programacao-do-zero/_next/static/chunks/44ysb-yo_n9x_.js","async":true}],["$","script","script-1",{"src":"/programacao-do-zero/_next/static/chunks/2qxi2tero2md_.js","async":true}]],["$","$L11",null,{"children":["$","$12",null,{"name":"Next.MetadataOutlet","children":"$@13"}]}]]}],"p":"$@14","v":null,"s":"$8"}}]]
+1:[["children",{"s":"apoiar","h":64,"d":{"r":["$","$2","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]]}],"p":"$@6","v":"$7","s":"$8"},"c":"$Q9"}]]
+0:{"t":{"t":{"s":"","h":16,"c":"$Q1"},"h":{"r":["$","$2","h",{"children":[null,["$","$L16",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#060a13"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L18",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$12",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Apoiar o projeto · Programação do Zero"}],["$","meta","1",{"name":"description","content":"Contribuição voluntária via Pix para manter a Programação do Zero gratuita."}],["$","meta","2",{"name":"application-name","content":"Programação do Zero"}],["$","meta","3",{"property":"og:title","content":"Apoiar o projeto · Programação do Zero"}],["$","meta","4",{"property":"og:description","content":"Contribuição voluntária via Pix para manter a Programação do Zero gratuita."}],["$","meta","5",{"property":"og:site_name","content":"Programação do Zero"}],["$","meta","6",{"property":"og:locale","content":"pt_BR"}],["$","meta","7",{"property":"og:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","8",{"property":"og:image:type","content":"image/png"}],["$","meta","9",{"property":"og:image:width","content":"1200"}],["$","meta","10",{"property":"og:image:height","content":"630"}],["$","meta","11",{"property":"og:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","12",{"property":"og:type","content":"website"}],["$","meta","13",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","14",{"name":"twitter:title","content":"Apoiar o projeto · Programação do Zero"}],["$","meta","15",{"name":"twitter:description","content":"Contribuição voluntária via Pix para manter a Programação do Zero gratuita."}],["$","meta","16",{"name":"twitter:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","17",{"name":"twitter:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","18",{"name":"twitter:image:type","content":"image/png"}],["$","meta","19",{"name":"twitter:image:width","content":"1200"}],["$","meta","20",{"name":"twitter:image:height","content":"630"}],["$","link","21",{"rel":"icon","href":"/programacao-do-zero/icon.svg?icon.3-y0e7v9k7rth.svg","sizes":"any","type":"image/svg+xml"}],["$","link","22",{"rel":"apple-touch-icon","href":"/programacao-do-zero/apple-icon.png?apple-icon.2g0dt5upmkjcz.png","sizes":"180x180","type":"image/png"}],["$","$L19","23",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@1a","v":null,"s":"$8"}},"a":"$@1b","u":"$@1c","b":"UECirnIiVXmC7m_fC2n8F"}
+13:null
+1c:true
+8:300
+8:C
+1b:0
+6:"$undefined"
+1a:"$undefined"
+14:"$undefined"

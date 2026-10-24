@@ -1,0 +1,4 @@
+:HL["/programacao-do-zero/_next/static/chunks/34iib2gexfnbk.css","style"]
+2:[["children",{"s":"__PAGE__","h":160}]]
+1:[["children",{"s":"/_not-found","h":64,"c":"$Q2"}]]
+0:{"b":"UECirnIiVXmC7m_fC2n8F","t":{"t":{"s":"","h":16,"c":"$Q1"}}}
