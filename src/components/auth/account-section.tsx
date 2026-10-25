@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { CloudOff, LogIn, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-provider";
+import { XP_LIMITS } from "@/lib/gamification/rules";
+import { totalXp } from "@/lib/progress/model";
+import { useProgress } from "@/lib/progress/store";
 import { Alert, Button, cx } from "@/components/ui/primitives";
 
 const SYNC_LABEL = {
@@ -19,6 +22,7 @@ export function AccountSection() {
   const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState("");
   const [busy, setBusy] = useState(false);
+  const localXp = totalXp(useProgress());
 
   if (!configured || loading) return null;
 
@@ -53,6 +57,12 @@ export function AccountSection() {
         {SYNC_LABEL[syncStatus]}
         {serverXp !== null && syncStatus === "synced" && <span className="font-mono text-amber"> · {serverXp} XP no ranking</span>}
       </p>
+      {serverXp !== null && syncStatus === "synced" && localXp > serverXp && (
+        <p className="mt-2 max-w-2xl text-xs text-muted">
+          {localXp - serverXp} XP do seu progresso ainda vão entrar no ranking. Por segurança, o ranking registra no máximo {XP_LIMITS.perTenMinutes} XP a cada 10 minutos e{" "}
+          {XP_LIMITS.perDay.toLocaleString("pt-BR")} XP por dia; o restante entra sozinho nas próximas sincronizações. Nada do seu progresso se perde.
+        </p>
+      )}
       {syncStatus === "error" && (
         <Button variant="ghost" size="sm" className="ml-2" onClick={() => syncNow()}>
           Tentar de novo

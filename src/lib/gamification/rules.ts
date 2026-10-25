@@ -1,4 +1,7 @@
 /** Regras de XP: cada atividade rende XP uma única vez. */
+/** Limite de ritmo do XP no banco (supabase/migrations/20261026000008_xp_limites.sql). */
+export const XP_LIMITS = { perDay: 1200, perTenMinutes: 400 } as const;
+
 export const XP_RULES = {
   lesson: 20,
   exercise: 10,
