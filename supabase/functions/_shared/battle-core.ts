@@ -27,7 +27,8 @@ export const LANG_INFO: Record<BattleLang, LangInfo> = {
   javascript: { label: "JavaScript", judge0Id: 102, version: "Node.js 22", cpuSeconds: 3, memoryKb: 192_000 },
   // O TypeScript do Judge0 leva ~2,5 s só para iniciar o ambiente, por isso o limite é maior.
   typescript: { label: "TypeScript", judge0Id: 101, version: "TypeScript 5.6", cpuSeconds: 8, memoryKb: 256_000, compilerOptions: "--target es2020 --lib es2020,dom" },
-  python: { label: "Python", judge0Id: 100, version: "Python 3.12", cpuSeconds: 4, memoryKb: 128_000 },
+  // O Python do Judge0 leva ~2,4 s para iniciar o ambiente.
+  python: { label: "Python", judge0Id: 100, version: "Python 3.12", cpuSeconds: 6, memoryKb: 128_000 },
   java: { label: "Java", judge0Id: 91, version: "JDK 17", cpuSeconds: 4, memoryKb: 256_000 },
   c: { label: "C", judge0Id: 103, version: "GCC 14", cpuSeconds: 2, memoryKb: 128_000 },
   cpp: { label: "C++", judge0Id: 105, version: "GCC 14", cpuSeconds: 2, memoryKb: 128_000, compilerOptions: "-O2" },
@@ -225,14 +226,15 @@ function pyStarter(sig: Signature): string {
 # ---- ${HARNESS_NOTE}
 import sys
 
-linhas = sys.stdin.read().split("\\n")
-pos = 0
+# (nomes com _ para não colidir com os parâmetros, que ficam no escopo global)
+_entrada = sys.stdin.read().split("\\n")
+_pos = 0
 
 
 def ler():
-    global pos
-    pos += 1
-    return linhas[pos - 1].rstrip("\\r") if pos - 1 < len(linhas) else ""
+    global _pos
+    _pos += 1
+    return _entrada[_pos - 1].rstrip("\\r") if _pos - 1 < len(_entrada) else ""
 
 
 def ler_lista():
@@ -240,13 +242,13 @@ def ler_lista():
     return [int(x) for x in ler().split()][:n]
 
 
-t = int(ler())
-saida = []
-for _ in range(t):
+_t = int(ler())
+_saida = []
+for _ in range(_t):
 ${reads}
     r = resolver(${names})
-    saida.append(${fmt})
-print("\\n".join(saida))
+    _saida.append(${fmt})
+print("\\n".join(_saida))
 `;
 }
 
@@ -716,12 +718,13 @@ function resolver(${params}) {
 }
 
 // ---- ${HARNESS_NOTE}
-$linhas = explode("\\n", file_get_contents("php://stdin"));
-$pos = 0;
+// (nomes com _ para não colidir com os parâmetros, que ficam no escopo global)
+$_entrada = explode("\\n", file_get_contents("php://stdin"));
+$_pos = 0;
 
 function ler() {
-    global $linhas, $pos;
-    return rtrim($linhas[$pos++] ?? "", "\\r");
+    global $_entrada, $_pos;
+    return rtrim($_entrada[$_pos++] ?? "", "\\r");
 }
 
 function lerLista() {
@@ -730,14 +733,14 @@ function lerLista() {
     return $n === 0 ? [] : array_map("intval", array_slice(preg_split('/\\s+/', $l), 0, $n));
 }
 
-$t = intval(ler());
-$saida = [];
-for ($caso = 0; $caso < $t; $caso++) {
+$_t = intval(ler());
+$_saida = [];
+for ($_caso = 0; $_caso < $_t; $_caso++) {
 ${reads}
     $r = resolver(${params});
-    $saida[] = ${fmt};
+    $_saida[] = ${fmt};
 }
-echo implode("\\n", $saida), "\\n";
+echo implode("\\n", $_saida), "\\n";
 `;
 }
 
