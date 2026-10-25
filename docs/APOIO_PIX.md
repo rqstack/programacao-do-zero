@@ -1,6 +1,6 @@
 # Apoio voluntário via Pix (Syncpay)
 
-Status: **implementado e desligado**. Fica ativo assim que os secrets abaixo forem cadastrados. Nenhuma cobrança, plano ou cartão foi ativado.
+Status: **ativo desde 25/10/2026**. Chave de API com permissões só de Consulta e Venda (sem Saque), secrets `SYNCPAY_CLIENT_ID`, `SYNCPAY_CLIENT_SECRET`, `PIX_IP_SALT` e `SYNCPAY_WEBHOOK_TOKEN` cadastrados, e webhook "Recebimento - Cash in" apontando para a função. Receber Pix não exige IP liberado (a restrição de IP da Syncpay vale só para saques). Nenhum plano ou cartão foi contratado.
 
 ## O que a documentação oficial da Syncpay informa (consultada em out/2026)
 

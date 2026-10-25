@@ -24,7 +24,7 @@ Legenda: ✅ concluído e testado · 🟡 implementado, teste incompleto · ⛔ 
 - ✅ Seção na home (antes do FAQ) com os textos pedidos, capa oficial copiada do site do ebook (`public/ebook-capa.webp`), botão para o link oficial em nova aba. Conferido no celular e desktop, sem rolagem lateral.
 
 ## Fase 4 — Apoio via Pix (Syncpay)
-- 🟡 Implementado e publicado **desligado** (Edge Function `support-pix`, tabela `support_donations`, página `/apoiar`, link no rodapé). Detalhes e tarifas: docs/APOIO_PIX.md.
+- ✅ Ativo desde 25/10/2026 (Edge Function `support-pix`, tabela `support_donations`, página `/apoiar`). Secrets e webhook configurados; função responde `enabled: true` e recusa webhook sem token. ⬜ Falta um Pix real de teste feito pelo dono.
 - ✅ Testado com Syncpay simulada (15 testes) + banco (3) + navegador.
 - ⛔ Ativação depende de: conta Syncpay aprovada, confirmar exigência de IP fixo, secrets no Supabase, webhook cadastrado.
 
@@ -51,4 +51,4 @@ Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui P
 `npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
 
 ## Próximo passo exato
-Checagem completa (tsc, lint, vitest), deploy do site, conferir páginas no ar e relatório final. Pix: aguardando o dono cadastrar os secrets da Syncpay (docs/APOIO_PIX.md).
+Checagem completa (tsc, lint, vitest), deploy do site, conferir páginas no ar e relatório final. Pix ativo; falta o dono fazer um Pix de R$ 5 de teste. Batalha: 10 linguagens e 9 arenas no ar (falta o teste com duas contas).
