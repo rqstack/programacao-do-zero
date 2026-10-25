@@ -90,6 +90,7 @@ const store: DonationStore = {
   findByKey: (k) => one(table().select("*").eq("idempotency_key", k).maybeSingle()),
   findById: (id) => one(table().select("*").eq("id", id).maybeSingle()),
   findByProviderId: (p) => one(table().select("*").eq("provider_id", p).maybeSingle()),
+  findByPixCode: (c) => one(table().select("*").eq("pix_code", c).limit(1).maybeSingle()),
   countRecentByIp: async (ip, since) => {
     const { count, error } = await table().select("id", { count: "exact", head: true }).eq("ip_hash", ip).gte("created_at", since);
     if (error) throw error;

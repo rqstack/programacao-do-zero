@@ -34,6 +34,7 @@ export interface DonationStore {
   findByKey(key: string): Promise<Donation | null>;
   findById(id: string): Promise<Donation | null>;
   findByProviderId(providerId: string): Promise<Donation | null>;
+  findByPixCode(pixCode: string): Promise<Donation | null>;
   countRecentByIp(ipHash: string, sinceIso: string): Promise<number>;
   insert(d: Donation): Promise<Donation>; // falha se a chave de idempotência já existir
   update(id: string, patch: Partial<Donation>): Promise<Donation>;
@@ -231,17 +232,27 @@ async function expireIfDue(deps: { store: DonationStore }, d: Donation, now: Dat
 /**
  * Webhook da Syncpay: confere o token Bearer (tempo constante) e, em vez de confiar no
  * corpo, consulta a transação na Syncpay. Repetições não mudam nada (idempotente).
+ *
+ * O corpo só serve para achar a doação: pelo `id` (que a Syncpay descreve como
+ * "reference_id / UUID" e pode não ser o mesmo `identifier` devolvido na criação) ou, se não
+ * achar, pelo `pix_code` (o Copia e Cola, que o site guardou ao criar a cobrança). A
+ * confirmação vem sempre da consulta do servidor, com o identificador guardado pelo site.
+ * Espaços e quebras de linha em volta do token são ignorados (erro comum ao colar o segredo).
  */
 export async function handleWebhook(
   deps: { store: DonationStore; client: SyncpayClient; now: () => Date; webhookToken: string },
   authorization: string | null,
   body: unknown,
 ): Promise<{ status: number; body: { ok: boolean; message: string } }> {
-  const token = authorization?.replace(/^Bearer\s+/i, "") ?? "";
-  if (!deps.webhookToken || !safeEqual(token, deps.webhookToken)) return { status: 401, body: { ok: false, message: "não autorizado" } };
-  const id = typeof body === "object" && body !== null ? (body as { id?: unknown; data?: { id?: unknown } }).id ?? (body as { data?: { id?: unknown } }).data?.id : null;
-  if (typeof id !== "string" || id.length > 100) return { status: 200, body: { ok: true, message: "ignorado" } };
-  const d = await deps.store.findByProviderId(id);
+  const token = (authorization ?? "").trim().replace(/^Bearer\s+/i, "").trim();
+  const expected = deps.webhookToken.trim();
+  if (!expected || !safeEqual(token, expected)) return { status: 401, body: { ok: false, message: "não autorizado" } };
+  const obj = typeof body === "object" && body !== null ? (body as { id?: unknown; pix_code?: unknown; data?: { id?: unknown; pix_code?: unknown } }) : null;
+  const id = obj?.id ?? obj?.data?.id;
+  const pixCode = obj?.pix_code ?? obj?.data?.pix_code;
+  let d: Donation | null = null;
+  if (typeof id === "string" && id.length > 0 && id.length <= 100) d = await deps.store.findByProviderId(id);
+  if (!d && typeof pixCode === "string" && pixCode.length > 0 && pixCode.length <= 1000) d = await deps.store.findByPixCode(pixCode);
   if (!d) return { status: 200, body: { ok: true, message: "ignorado" } };
   await refreshDonation(deps, d);
   return { status: 200, body: { ok: true, message: "processado" } };

@@ -45,6 +45,7 @@ function memoryStore(): DonationStore & { rows: Map<string, Donation> } {
     findByKey: async (k) => [...rows.values()].find((d) => d.idempotencyKey === k) ?? null,
     findById: async (id) => rows.get(id) ?? null,
     findByProviderId: async (p) => [...rows.values()].find((d) => d.providerId === p) ?? null,
+    findByPixCode: async (c) => [...rows.values()].find((d) => d.pixCode === c) ?? null,
     countRecentByIp: async (ip, since) => [...rows.values()].filter((d) => d.ipHash === ip && d.createdAt >= since).length,
     insert: async (d) => {
       if ([...rows.values()].some((x) => x.idempotencyKey === d.idempotencyKey)) throw new Error("duplicate");
@@ -193,6 +194,32 @@ describe("webhook", () => {
     clock = new Date(clock.getTime() + 60_000);
     await handleWebhook(deps, "Bearer segredo-do-webhook", { id: r.value.providerId });
     expect(store.rows.get(r.value.id)!).toMatchObject({ status: "confirmado", confirmedAt: first });
+  });
+
+  it("aceita o token com espaços ou quebra de linha em volta (erro comum ao colar o segredo)", async () => {
+    const { deps } = setup();
+    expect((await handleWebhook({ ...deps, webhookToken: "segredo-do-webhook\n" }, "Bearer segredo-do-webhook", { id: "x" })).status).toBe(200);
+    expect((await handleWebhook(deps, "  Bearer   segredo-do-webhook  ", { id: "x" })).status).toBe(200);
+    expect((await handleWebhook(deps, "Bearer segredo-do-webhook-x", { id: "x" })).status).toBe(401);
+    expect((await handleWebhook({ ...deps, webhookToken: "   " }, "Bearer ", { id: "x" })).status).toBe(401);
+  });
+
+  it("acha a doação pelo pix_code quando o id do aviso não é o identificador guardado", async () => {
+    const { sp, deps, store } = setup();
+    const r = await createDonation(deps, { amount: 10, idempotencyKey: key(), ipHash: "ip1" });
+    if (!r.ok) throw new Error();
+    sp.state.charges.get(r.value.providerId!)!.status = "completed";
+    const res = await handleWebhook(deps, "Bearer segredo-do-webhook", { id: "outro-reference-id", pix_code: r.value.pixCode, status: "completed" });
+    expect(res.body.message).toBe("processado");
+    expect(store.rows.get(r.value.id)!.status).toBe("confirmado");
+  });
+
+  it("pix_code certo com pagamento ainda pendente na Syncpay não confirma", async () => {
+    const { deps, store } = setup();
+    const r = await createDonation(deps, { amount: 10, idempotencyKey: key(), ipHash: "ip1" });
+    if (!r.ok) throw new Error();
+    await handleWebhook(deps, "Bearer segredo-do-webhook", { id: "x", pix_code: r.value.pixCode, status: "completed", amount: 10 });
+    expect(store.rows.get(r.value.id)!.status).toBe("aguardando");
   });
 
   it("transação desconhecida é ignorada sem erro", async () => {
