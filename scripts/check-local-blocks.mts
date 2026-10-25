@@ -14,7 +14,8 @@ const slug = process.argv[2];
 const mostrar = process.argv.includes("--mostrar");
 if (!slug) throw new Error("informe a trilha");
 const md = readFileSync(`content/courses/${slug}/aulas.md`, "utf8").replace(/\r/g, "");
-const re = /```(python|csharp)\n([\s\S]*?)```\s*\n+Saída:\s*\n+```texto\n([\s\S]*?)```/g;
+// O código do bloco não pode conter ``` (assim a busca não atravessa de um bloco para o outro).
+const re = /```(python|csharp)\n((?:(?!```)[\s\S])*?)```\s*\n+Saída:\s*\n+```texto\n([\s\S]*?)```/g;
 const norm = (s: string) => s.replace(/\r/g, "").replace(/[ \t]+$/gm, "").trimEnd();
 let falhas = 0;
 let n = 0;

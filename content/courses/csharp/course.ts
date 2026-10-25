@@ -1,0 +1,262 @@
+import type { SeedCourse } from "../../schema";
+
+export const course: SeedCourse = {
+  slug: "csharp",
+  title: "C# e .NET: aplicações desktop",
+  description: "Do primeiro programa em C# a aplicações desktop: tipos, coleções, orientação a objetos, Windows Forms e WPF, camadas, LINQ e acesso a dados com ADO.NET e Entity Framework Core.",
+  category: "backend",
+  level: "iniciante",
+  modules: [
+    {
+      title: "A linguagem C#",
+      lessons: [
+        {
+          slug: "csharp-e-dotnet",
+          title: "C# e a plataforma .NET",
+          objective: "Criar e rodar um programa C#, usar os tipos básicos, interpolação, cultura brasileira e conversões seguras.",
+          summary: "SDK do .NET, tipos fixos, decimal para dinheiro e TryParse para converter sem quebrar.",
+          minutes: 14,
+          exercise: {
+            prompt: "Qual tipo do C# deve ser usado para valores em dinheiro? (uma palavra)",
+            hint: "Usa o sufixo m nos valores.",
+            accepted: ["decimal"],
+            explanation: "decimal guarda valores decimais exatos; double tem pequenas imprecisões.",
+          },
+          quiz: [
+            {
+              kind: "code_reading",
+              lang: "csharp",
+              prompt: "O que este código imprime?",
+              code: "int a = 7, b = 2;\nConsole.WriteLine(a / b);",
+              options: ["3", "3,5", "4", "Erro"],
+              correct: 0,
+              explanation: "Divisão entre inteiros descarta a parte decimal.",
+            },
+            {
+              prompt: "Por que preferir int.TryParse a int.Parse com dados digitados?",
+              options: ["TryParse devolve false em vez de lançar exceção com texto inválido", "TryParse é mais rápido sempre", "Parse não existe", "TryParse aceita qualquer texto como zero"],
+              correct: 0,
+              explanation: "Assim o programa trata a entrada inválida sem quebrar.",
+            },
+            {
+              prompt: "Qual comando cria um projeto de console pelo terminal?",
+              options: ["dotnet new console", "npm init", "dotnet run console", "csharp new"],
+              correct: 0,
+              explanation: "Depois, dotnet run compila e executa.",
+            },
+          ],
+        },
+        {
+          slug: "decisoes-repeticoes-e-colecoes",
+          title: "Decisões, repetições e coleções",
+          objective: "Usar if, expressão switch, laços e as coleções List e Dictionary com genéricos.",
+          summary: "switch que devolve valor, for/foreach/while, List<T> e Dictionary<K, V>.",
+          minutes: 15,
+          exercise: {
+            prompt: "Qual coleção genérica do C# cresce e diminui de tamanho e guarda itens em ordem? (só o nome, sem <T>)",
+            hint: "Em inglês, \"lista\".",
+            accepted: ["List", "list", "List<T>"],
+            explanation: "List<T> tem Add, Remove, Insert e Count; arrays têm tamanho fixo.",
+          },
+          quiz: [
+            {
+              prompt: "Numa expressão switch, o que o _ representa?",
+              options: ["O caso padrão (qualquer outro valor)", "Um erro de sintaxe", "Uma variável descartada obrigatória", "O primeiro caso"],
+              correct: 0,
+              explanation: "Sem ele, o compilador avisa que nem todos os valores são tratados.",
+            },
+            {
+              prompt: "Como ler um dicionário sem exceção se a chave não existir?",
+              options: ["TryGetValue", "dicionario[chave]", "First", "Parse"],
+              correct: 0,
+              explanation: "TryGetValue devolve false quando a chave não está lá.",
+            },
+            {
+              kind: "find_bug",
+              lang: "csharp",
+              prompt: "Por que este laço lança exceção?",
+              code: "int[] v = { 1, 2, 3 };\nfor (int i = 0; i <= v.Length; i++)\n    Console.WriteLine(v[i]);",
+              options: ["O <= passa do último índice", "Arrays não aceitam for", "Falta ToString", "v.Length não existe"],
+              correct: 0,
+              explanation: "Os índices vão de 0 a Length - 1: use <.",
+            },
+          ],
+        },
+        {
+          slug: "classes-objetos-e-encapsulamento",
+          title: "Classes, objetos e encapsulamento",
+          objective: "Criar classes com propriedades, construtores e regras, usar herança, interfaces e record.",
+          summary: "Propriedades com set controlado, herança com base, interfaces e record com with.",
+          minutes: 16,
+          exercise: {
+            prompt: "Qual palavra-chave do C# cria um tipo de dados imutável com comparação por valor e cópia com with?",
+            hint: "Em inglês, \"registro\".",
+            accepted: ["record"],
+            explanation: "record Produto(string Nome, decimal Preco) já vem com ToString, == por valor e with.",
+          },
+          quiz: [
+            {
+              prompt: "O que significa public decimal Saldo { get; private set; }?",
+              options: ["Qualquer um lê, mas só a própria classe altera", "Ninguém lê", "Qualquer um altera", "É um campo estático"],
+              correct: 0,
+              explanation: "As alterações passam pelos métodos da classe, que aplicam as regras.",
+            },
+            {
+              prompt: "Quantas interfaces uma classe C# pode implementar?",
+              options: ["Várias", "Só uma", "Nenhuma", "No máximo duas"],
+              correct: 0,
+              explanation: "A herança de classe é única; interfaces podem ser várias.",
+            },
+            {
+              prompt: "Onde deve ficar a regra \"saldo não pode ficar negativo\"?",
+              options: ["Na classe da conta, no método de saque", "Só no botão do formulário", "No banco de dados apenas", "Em um comentário"],
+              correct: 0,
+              explanation: "Assim qualquer tela ou importação passa pela mesma regra.",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Aplicações desktop e dados",
+      lessons: [
+        {
+          slug: "aplicacoes-desktop-winforms-e-wpf",
+          title: "Aplicações desktop com Windows Forms e WPF",
+          objective: "Entender controles, eventos e validação no WinForms, XAML e data binding no WPF, e as opções multiplataforma.",
+          summary: "WinForms com designer e eventos; WPF com XAML, binding e MVVM.",
+          minutes: 16,
+          exercise: {
+            prompt: "Em qual linguagem de marcação as telas do WPF são descritas? (sigla)",
+            hint: "É baseada em XML.",
+            accepted: ["XAML", "xaml"],
+            explanation: "XAML descreve a interface; o data binding liga os controles às propriedades.",
+          },
+          quiz: [
+            {
+              prompt: "Qual evento de um botão roda quando ele é clicado no WinForms?",
+              options: ["Click", "Load", "TextChanged", "Paint"],
+              correct: 0,
+              explanation: "O designer liga o evento Click a um método como btnSalvar_Click.",
+            },
+            {
+              prompt: "Por que não editar o arquivo Form1.Designer.cs à mão?",
+              options: ["O designer reescreve o arquivo e a alteração pode sumir", "Ele é só leitura no Windows", "Não compila", "Ele não existe"],
+              correct: 0,
+              explanation: "Escreva o seu código em Form1.cs.",
+            },
+            {
+              prompt: "Qual opção roda interfaces .NET também em Linux e macOS?",
+              options: [".NET MAUI ou Avalonia", "Windows Forms", "WPF", "Nenhuma"],
+              correct: 0,
+              explanation: "WinForms e WPF são exclusivos do Windows.",
+            },
+          ],
+        },
+        {
+          slug: "organizando-em-camadas",
+          title: "Organizando o sistema em camadas",
+          objective: "Separar modelo, dados, regras e apresentação em projetos de uma solução, com interfaces e injeção de dependência.",
+          summary: "Solução com projetos por camada; o serviço depende de interfaces, não do banco.",
+          minutes: 16,
+          exercise: {
+            prompt: "Como se chama a técnica de entregar a um objeto, pelo construtor, aquilo de que ele precisa? (três palavras)",
+            hint: "Injeção de ...",
+            accepted: ["injeção de dependência", "injecao de dependencia", "injeção de dependências", "dependency injection"],
+            explanation: "Assim o serviço pode usar um repositório em memória nos testes e um banco real no aplicativo.",
+          },
+          quiz: [
+            {
+              prompt: "Para onde as dependências entre camadas devem apontar?",
+              options: ["Para dentro: apresentação → regras → modelo", "Do modelo para a tela", "Em círculo", "Não importa"],
+              correct: 0,
+              explanation: "O modelo não deve conhecer a tela nem o banco.",
+            },
+            {
+              prompt: "Por que o serviço deve depender de IRepositorioDeFornecedores, e não de RepositorioSql?",
+              options: ["Para trocar a implementação (banco, memória, testes) sem mudar o serviço", "Porque interfaces são mais rápidas", "Porque o C# exige", "Para esconder o código"],
+              correct: 0,
+              explanation: "Programar para a interface desacopla as camadas.",
+            },
+            {
+              prompt: "Uma nota de compra que tem uma lista de itens é exemplo de:",
+              options: ["Composição/associação", "Herança", "Interface", "Polimorfismo de sobrecarga"],
+              correct: 0,
+              explanation: "A nota tem itens; ela não é um item.",
+            },
+          ],
+        },
+        {
+          slug: "linq-e-lambdas",
+          title: "LINQ e expressões lambda",
+          objective: "Consultar coleções com LINQ em sintaxe de métodos e de consulta, usar lambdas e entender a execução adiada.",
+          summary: "Where, Select, OrderBy, GroupBy e agregações; a consulta roda quando é usada.",
+          minutes: 15,
+          exercise: {
+            prompt: "Qual operador do LINQ filtra os itens de uma coleção? (só o nome do método)",
+            hint: "Em inglês, \"onde\".",
+            accepted: ["Where", "where", "Where()"],
+            explanation: "produtos.Where(p => p.Preco < 20) mantém só os que passam no teste.",
+          },
+          quiz: [
+            {
+              kind: "code_reading",
+              lang: "csharp",
+              prompt: "O que este código imprime?",
+              code: "var v = new List<int> { 3, 8, 1, 6 };\nConsole.WriteLine(string.Join(\",\", v.Where(x => x > 2).OrderBy(x => x)));",
+              options: ["3,6,8", "8,6,3", "3,8,6", "1,3,6,8"],
+              correct: 0,
+              explanation: "Filtra os maiores que 2 e ordena em ordem crescente.",
+            },
+            {
+              prompt: "Uma consulta LINQ é criada e depois a lista ganha um item. Ao percorrer a consulta, o item novo aparece?",
+              options: ["Sim, porque a execução é adiada (a não ser que tenha usado ToList antes)", "Nunca", "Só se reiniciar o programa", "Dá erro"],
+              correct: 0,
+              explanation: "ToList() congela o resultado no momento da chamada.",
+            },
+            {
+              prompt: "O que é p => p.Preco * 2?",
+              options: ["Uma expressão lambda", "Uma comparação", "Um ponteiro", "Um comentário"],
+              correct: 0,
+              explanation: "Uma função curta: recebe p e devolve o dobro do preço.",
+            },
+          ],
+        },
+        {
+          slug: "acesso-a-dados-com-ef-core",
+          title: "Acesso a dados com ADO.NET e Entity Framework Core",
+          objective: "Executar SQL com parâmetros, mapear classes para tabelas com EF Core e fazer um CRUD com relacionamentos.",
+          summary: "Parâmetros contra injeção de SQL; DbContext, DbSet, SaveChanges, Include e migrations.",
+          minutes: 17,
+          exercise: {
+            prompt: "Qual método do DbContext grava no banco as alterações feitas nos objetos? (só o nome)",
+            hint: "Salvar mudanças, em inglês.",
+            accepted: ["SaveChanges", "savechanges", "SaveChanges()", "SaveChangesAsync"],
+            explanation: "Sem SaveChanges, nada é gravado.",
+          },
+          quiz: [
+            {
+              prompt: "Por que nunca concatenar o texto digitado pelo usuário dentro do SQL?",
+              options: ["Permite injeção de SQL", "Deixa o SQL mais lento só", "O C# não aceita", "Não há problema"],
+              correct: 0,
+              explanation: "Use parâmetros (@nome) ou o EF Core, que parametriza sozinho.",
+            },
+            {
+              prompt: "Para que serve Include(p => p.Fornecedor) numa consulta do EF Core?",
+              options: ["Carregar o fornecedor junto com o produto, evitando consultas extras", "Criar a tabela de fornecedores", "Apagar o fornecedor", "Ordenar por fornecedor"],
+              correct: 0,
+              explanation: "Evita o problema N+1.",
+            },
+            {
+              kind: "true_false",
+              prompt: "A string de conexão com a senha do banco pode ficar no código-fonte publicado no GitHub.",
+              options: ["Verdadeiro", "Falso"],
+              correct: 1,
+              explanation: "Use configuração fora do repositório (variáveis de ambiente, user secrets).",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};

@@ -13,6 +13,10 @@ const LANG_LABEL: Record<string, string> = {
   sql: "SQL",
   pgsql: "SQL (Supabase)",
   java: "Java",
+  csharp: "C#",
+  cs: "C#",
+  xml: "XML",
+  xaml: "XAML",
   python: "Python",
   py: "Python",
   bash: "Terminal",
@@ -24,7 +28,7 @@ const LANG_LABEL: Record<string, string> = {
 };
 
 /** Linguagens com sintaxe parecida com JS recebem destaque; as demais ficam em texto puro escapado. */
-const HIGHLIGHT = new Set(["js", "javascript", "ts", "typescript", "jsx", "tsx", "json", "css", "sql", "pgsql", "html", "java"]);
+const HIGHLIGHT = new Set(["js", "javascript", "ts", "typescript", "jsx", "tsx", "json", "css", "sql", "pgsql", "html", "java", "csharp", "cs"]);
 
 export function CodeBlock({ code, language }: { code: string; language: string }) {
   const lang = language.toLowerCase();
