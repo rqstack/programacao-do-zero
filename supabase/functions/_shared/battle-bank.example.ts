@@ -26,6 +26,11 @@ export const battleBank: readonly BattleChallenge[] = [
       python: "    return a if a > b else b",
       java: "        return a > b ? a : b;",
       c: "    return a > b ? a : b;",
+      cpp: "    return a > b ? a : b;",
+      csharp: "        return a > b ? a : b;",
+      go: "\tif a > b {\n\t\treturn a\n\t}\n\treturn b",
+      rust: "    if a > b { a } else { b }",
+      php: "    return $a > $b ? $a : $b;",
     },
   },
   {
@@ -45,6 +50,11 @@ export const battleBank: readonly BattleChallenge[] = [
       python: "    soma = 0\n    for i in range(1, n + 1):\n        soma += i\n    return soma",
       java: "        int soma = 0;\n        for (int i = 1; i <= n; i++) soma += i;\n        return soma;",
       c: "    int soma = 0;\n    for (int i = 1; i <= n; i++) soma += i;\n    return soma;",
+      cpp: "    int soma = 0;\n    for (int i = 1; i <= n; i++) soma += i;\n    return soma;",
+      csharp: "        int soma = 0;\n        for (int i = 1; i <= n; i++) soma += i;\n        return soma;",
+      go: "\tsoma := 0\n\tfor i := 1; i <= n; i++ {\n\t\tsoma += i\n\t}\n\treturn soma",
+      rust: "    let mut soma = 0;\n    for i in 1..=n {\n        soma += i;\n    }\n    soma",
+      php: "    $soma = 0;\n    for ($i = 1; $i <= $n; $i++) $soma += $i;\n    return $soma;",
     },
   },
 ];

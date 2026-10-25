@@ -7,7 +7,10 @@ insert into public.battle_arenas (id, slug, name, min_trophies, tier, duration_s
   (3, 'biblioteca-das-listas', 'Biblioteca das Listas', 400, 3, 240, 30, 15, false),
   (4, 'fabrica-de-funcoes', 'Fábrica de Funções', 800, 4, 270, 30, 20, false),
   (5, 'torre-dos-algoritmos', 'Torre dos Algoritmos', 1300, 5, 300, 30, 25, false),
-  (6, 'nucleo-do-kernel', 'Núcleo do Kernel', 2000, 6, 330, 30, 30, false)
+  (6, 'nucleo-do-kernel', 'Núcleo do Kernel', 2000, 6, 330, 30, 30, false),
+  (7, 'labirinto-dos-grafos', 'Labirinto dos Grafos', 2800, 7, 420, 30, 35, false),
+  (8, 'camara-da-memoria', 'Câmara da Memória', 3700, 8, 480, 30, 40, false),
+  (9, 'trono-do-compilador', 'Trono do Compilador', 4800, 9, 540, 30, 45, false)
 on conflict (id) do update set slug = excluded.slug, name = excluded.name, min_trophies = excluded.min_trophies, tier = excluded.tier,
   duration_sec = excluded.duration_sec, win = excluded.win, loss = excluded.loss, floor_protected = excluded.floor_protected;
 insert into public.battle_rules (id, countdown_sec, diff_step, diff_cap, abandon_extra_loss, abandon_after_sec, max_submissions,

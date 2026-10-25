@@ -33,7 +33,7 @@ export default function PrivacidadePage() {
       <Section id="sem-conta" title="1. Usando o site sem conta">
         <p>
           Estudar não exige cadastro. Sem login, o seu progresso fica apenas no armazenamento local do seu navegador (localStorage) e não é
-          enviado para nenhum servidor. O código que você escreve no laboratório e nos desafios roda no seu próprio navegador.
+          enviado para nenhum servidor. O código que você escreve no laboratório e nos desafios em JavaScript, TypeScript, Python e SQL roda no seu próprio navegador.
         </p>
       </Section>
 
@@ -74,8 +74,8 @@ export default function PrivacidadePage() {
             <strong className="text-fg">Google</strong>: faz o login. O site não tem acesso à sua senha.
           </li>
           <li>
-            <strong className="text-fg">Judge0</strong>: executa os códigos enviados na Batalha de Código. Só o código é enviado, sem nome nem
-            e-mail.
+            <strong className="text-fg">Judge0</strong>: executa os códigos enviados na Batalha de Código e os dos Desafios em Java, C, C++, C#,
+            Go, Rust e PHP. Só o código e os casos de teste são enviados, sem nome nem e-mail.
           </li>
           <li>
             <strong className="text-fg">Syncpay</strong>: processa os apoios por Pix.

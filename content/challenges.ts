@@ -25,6 +25,8 @@ export interface CodeChallenge {
   fn: string;
   params: Array<{ name: string; type: ValueType }>;
   returns: ValueType;
+  /** O retorno pode ter casas decimais (nas linguagens compiladas vira double). */
+  decimal?: boolean;
   /** Exemplos visíveis (só os argumentos; o resultado vem da referência). */
   examples: unknown[][];
   /** Casos-limite sempre testados no envio. */
@@ -183,6 +185,7 @@ export const codeChallenges: readonly CodeChallenge[] = [
     fn: "media",
     params: [{ name: "notas", type: "number[]" }],
     returns: "number",
+    decimal: true,
     examples: [[[7, 8, 9]], [[5, 10]]],
     edge: [[[]]],
     generate: (r) => [nums(r, r.int(0, 8), 0, 10)],

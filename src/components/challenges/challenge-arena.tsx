@@ -8,6 +8,7 @@ import { Button, cx, Tag } from "@/components/ui/primitives";
 import { XP_RULES } from "@/lib/gamification/rules";
 import { buildCases, fnName, formatArgs, formatValue, LANG_LABEL, makeRng, pickChallenge, randomSeed, sameTable, sameValue, solutionCode, starterCode, type ChallengeLang, type SqlTable } from "@/lib/challenges/core";
 import { runFunction, runSql, type CaseResult } from "@/lib/challenges/sandbox";
+import { isRemote, runRemote, supportsRemote } from "@/lib/challenges/remote";
 import { dispatchProgress, useHydrated, useProgress } from "@/lib/progress/store";
 import { CodeEditor } from "./code-editor";
 
@@ -16,6 +17,13 @@ const LANGS: Array<{ id: ChallengeLang; badge: string; color: string; note: stri
   { id: "typescript", badge: "TS", color: "bg-[#3178c6] text-white", note: "Os tipos são removidos e o código roda como JS." },
   { id: "python", badge: "PY", color: "bg-[#ffd43b] text-[#1f3b57]", note: "Python de verdade (Pyodide). Primeira vez baixa ~10 MB." },
   { id: "sql", badge: "SQL", color: "bg-[#00a1e0] text-white", note: "SQLite no navegador, com dados gerados na hora." },
+  { id: "java", badge: "JV", color: "bg-[#e76f00] text-white", note: "JDK 17, compilado no servidor de execução." },
+  { id: "c", badge: "C", color: "bg-[#5c6bc0] text-white", note: "GCC 14, compilado no servidor de execução." },
+  { id: "cpp", badge: "C++", color: "bg-[#00599c] text-white", note: "GCC 14, compilado no servidor de execução." },
+  { id: "csharp", badge: "C#", color: "bg-[#68217a] text-white", note: "Mono 6.6, compilado no servidor de execução." },
+  { id: "go", badge: "GO", color: "bg-[#00add8] text-[#0b2733]", note: "Go 1.18, compilado no servidor de execução." },
+  { id: "rust", badge: "RS", color: "bg-[#dea584] text-[#1a1a1a]", note: "Rust 1.85, compilado no servidor de execução." },
+  { id: "php", badge: "PHP", color: "bg-[#777bb4] text-white", note: "PHP 8.3, executado no servidor de execução." },
 ];
 const DIFFS: ChallengeDifficulty[] = ["facil", "medio", "dificil"];
 const PREF_KEY = "pdz-desafio-pref";
@@ -60,7 +68,8 @@ export function ChallengeArena() {
   }, []);
 
   const solvedIn = (id: string, l: ChallengeLang) => Boolean(progress.challenges[id]?.langs.includes(l));
-  const listFor = (l: ChallengeLang, d: ChallengeDifficulty) => (l === "sql" ? sqlChallenges : codeChallenges).filter((c) => c.difficulty === d);
+  const listFor = (l: ChallengeLang, d: ChallengeDifficulty): ReadonlyArray<CodeChallenge | SqlChallenge> =>
+    l === "sql" ? sqlChallenges.filter((c) => c.difficulty === d) : codeChallenges.filter((c) => c.difficulty === d && (!isRemote(l) || supportsRemote(c)));
 
   function generate(exclude?: string) {
     writeStore(PREF_KEY, JSON.stringify({ lang, diff }));
@@ -100,7 +109,7 @@ export function ChallengeArena() {
         </h2>
         <div role="radiogroup" aria-labelledby="escolha-linguagem" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {LANGS.map((l) => {
-            const all = l.id === "sql" ? sqlChallenges : codeChallenges;
+            const all = l.id === "sql" ? sqlChallenges : isRemote(l.id) ? codeChallenges.filter(supportsRemote) : codeChallenges;
             const n = hydrated ? all.filter((c) => solvedIn(c.id, l.id)).length : 0;
             const active = lang === l.id;
             return (
@@ -305,7 +314,7 @@ function CodeArena({ ch, lang }: { ch: CodeChallenge; lang: Exclude<ChallengeLan
   const progress = useProgress();
   const record = progress.challenges[ch.id];
   const [code, setCode] = useState(() => starterCode(ch, lang));
-  const [busy, setBusy] = useState<null | "loading" | "running">(null);
+  const [busy, setBusy] = useState<null | "loading" | "running" | "remote">(null);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [mode, setMode] = useState<"examples" | "submit">("examples");
   const [error, setError] = useState<string | null>(null);
@@ -325,12 +334,13 @@ function CodeArena({ ch, lang }: { ch: CodeChallenge; lang: Exclude<ChallengeLan
   }
 
   async function run(which: "examples" | "submit") {
-    setBusy(lang === "python" ? "loading" : "running");
+    setBusy(lang === "python" ? "loading" : isRemote(lang) ? "remote" : "running");
     setError(null);
     setWin(null);
     setMode(which);
     const cases = buildCases(ch, randomSeed(), which);
-    const out = await runFunction(lang, code, fnName(ch, lang), cases.map((c) => c.args), () => setBusy("running"));
+    const args = cases.map((c) => c.args);
+    const out = isRemote(lang) ? await runRemote(ch, lang, code, args) : await runFunction(lang, code, fnName(ch, lang), args, () => setBusy("running"));
     setBusy(null);
     setLogs(out.logs);
     if (!out.ok) {
@@ -384,7 +394,12 @@ function CodeArena({ ch, lang }: { ch: CodeChallenge; lang: Exclude<ChallengeLan
             <RotateCcw aria-hidden className="size-4" /> Recomeçar
           </Button>
         </div>
-        <CodeEditor value={code} onChange={change} indent={lang === "python" ? 4 : 2} label={`Código em ${LANG_LABEL[lang]}`} />
+        {isRemote(lang) && (
+          <p className="text-xs text-muted">
+            O programa completo já vem pronto: escreva só o corpo da função <code className="font-mono text-[#9cc2ff]">{ch.fn}</code>. Ele roda no Judge0, um servidor de execução gratuito e isolado; a saída padrão é usada para conferir as respostas, então para depurar escreva no erro padrão (stderr).
+          </p>
+        )}
+        <CodeEditor value={code} onChange={change} indent={lang === "javascript" || lang === "typescript" ? 2 : 4} label={`Código em ${LANG_LABEL[lang]}`} />
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => run("examples")} disabled={busy !== null}>
             <Play aria-hidden className="size-4" /> Testar exemplos
@@ -394,7 +409,7 @@ function CodeArena({ ch, lang }: { ch: CodeChallenge; lang: Exclude<ChallengeLan
           </Button>
         </div>
         <p aria-live="polite" className="text-sm text-muted">
-          {busy === "loading" ? "Carregando o Python no navegador (só demora na primeira vez)…" : busy === "running" ? "Rodando os testes…" : ""}
+          {busy === "loading" ? "Carregando o Python no navegador (só demora na primeira vez)…" : busy === "remote" ? "Compilando e rodando no servidor de execução (alguns segundos)…" : busy === "running" ? "Rodando os testes…" : ""}
         </p>
 
         {win !== null && <Win xp={win} />}

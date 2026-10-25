@@ -21,7 +21,7 @@ Supabase Postgres  ◄──── service_role ────  Edge Function batt
 
 | Peça | Onde | O que faz |
 | --- | --- | --- |
-| Configuração central | `supabase/functions/_shared/battle-core.ts` | Arenas, troféus, tempos, limites, linguagens, gerador de código inicial nas 4 linguagens |
+| Configuração central | `supabase/functions/_shared/battle-core.ts` | Arenas, troféus, tempos, limites, linguagens, gerador de código inicial nas 10 linguagens |
 | Banco de desafios | `supabase/functions/_shared/battle-bank.ts` (**privado, fora do Git**) | Enunciados, geradores de testes ocultos, solução de referência e soluções de validação |
 | Correção | `supabase/functions/_shared/battle-judge.ts` | Monta a entrada, chama o Judge0, decide o veredito |
 | Edge Function | `supabase/functions/battle-submit/index.ts` | Autentica, registra, corrige e grava |
@@ -38,6 +38,12 @@ O navegador não pode decidir vitórias (dá para trapacear). E a Edge Function 
 
 O repositório é público. Se as soluções estivessem no GitHub, daria para copiar no meio da partida. O arquivo real fica no `.gitignore` e só existe dentro da Edge Function. O repositório traz `battle-bank.example.ts` com 2 desafios para quem quiser montar a própria cópia.
 
+## Linguagens
+
+JavaScript (Node.js 22), TypeScript 5.6, Python 3.12, Java (JDK 17), C (GCC 14), C++ (GCC 14, `-O2`), C# (Mono 6.6), Go 1.18, Rust 1.85 (`-O`) e PHP 8.3, todas no Judge0. Cada desafio tem solução de referência validada em todas elas (o TypeScript reaproveita a de JavaScript).
+
+Observações do Judge0 público: Go 1.22+ estoura o tempo de compilação (por isso a 1.18), e o TypeScript leva cerca de 2,5 s só para iniciar o ambiente (por isso o limite de CPU dele é de 8 s).
+
 ## Regras (configuráveis em `battle-core.ts`)
 
 | Arena | Troféus | Nível | Tempo | Vitória | Derrota |
@@ -48,6 +54,9 @@ O repositório é público. Se as soluções estivessem no GitHub, daria para co
 | Fábrica de Funções | 800+ | lógica elaborada | 4,5 min | +30 | −20 |
 | Torre dos Algoritmos | 1300+ | algoritmos e estruturas | 5 min | +30 | −25 |
 | Núcleo do Kernel | 2000+ | eficiência (entradas de 100 mil) | 5,5 min | +30 | −30 |
+| Labirinto dos Grafos | 2800+ | grades, grafos e buscas (BFS, union-find) | 7 min | +30 | −35 |
+| Câmara da Memória | 3700+ | programação dinâmica | 8 min | +30 | −40 |
+| Trono do Compilador | 4800+ | otimização (O(n log n), somas de prefixo) | 9 min | +30 | −45 |
 
 - Ganhar de quem tem mais troféus vale mais e perder para quem tem menos custa mais: ±1 troféu a cada 25 de diferença, até ±10.
 - O desafio é do nível da arena de quem tem **menos** troféus (justo para iniciantes).
@@ -107,7 +116,8 @@ npx supabase functions deploy battle-submit --no-verify-jwt --project-ref kaylns
 ```bash
 npm test                                            # inclui 21 testes da Batalha no Postgres real (PGlite)
 BATTLE_E2E=1 npx vitest run tests/db/battle-e2e.test.ts   # ponta a ponta com o Judge0 real (usa internet)
-npm run battle:validate                             # 20 desafios × 4 linguagens no Judge0
+npm run battle:validate                             # 29 desafios × 10 linguagens no Judge0
+npx tsx scripts/battle-validate.mts - rust          # só uma linguagem (ou um id de desafio no lugar do -)
 ```
 
 ## Ideias para melhorar

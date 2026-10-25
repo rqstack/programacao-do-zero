@@ -1,6 +1,7 @@
 import type { CodeChallenge, Rng, SqlChallenge, ValueType } from "@content/challenges";
 
 import type { ChallengeLang } from "./langs";
+import { isRemote, remoteStarter } from "./remote";
 export type { ChallengeLang };
 
 export const LANG_LABEL: Record<ChallengeLang, string> = {
@@ -8,7 +9,17 @@ export const LANG_LABEL: Record<ChallengeLang, string> = {
   typescript: "TypeScript",
   python: "Python",
   sql: "SQL",
+  java: "Java",
+  c: "C",
+  cpp: "C++",
+  csharp: "C#",
+  go: "Go",
+  rust: "Rust",
+  php: "PHP",
 };
+
+/** Linguagens que rodam no navegador (as outras vão para o Judge0). */
+type LocalLang = "javascript" | "typescript" | "python";
 
 /** Gerador pseudoaleatório com semente (mulberry32): mesma semente, mesmos casos. */
 export function makeRng(seed: number): Rng {
@@ -36,18 +47,22 @@ export function snake(name: string): string {
 
 const TS_TYPE: Record<ValueType, string> = { number: "number", string: "string", boolean: "boolean", "number[]": "number[]", "string[]": "string[]" };
 
-function signature(ch: CodeChallenge, lang: Exclude<ChallengeLang, "sql">): string {
+function signature(ch: CodeChallenge, lang: LocalLang): string {
   if (lang === "python") return `def ${snake(ch.fn)}(${ch.params.map((p) => snake(p.name)).join(", ")}):`;
   if (lang === "typescript") return `function ${ch.fn}(${ch.params.map((p) => `${p.name}: ${TS_TYPE[p.type]}`).join(", ")}): ${TS_TYPE[ch.returns]} {`;
   return `function ${ch.fn}(${ch.params.map((p) => p.name).join(", ")}) {`;
 }
 
+/** Código inicial. Nas linguagens compiladas vem o programa completo, como na Batalha. */
 export function starterCode(ch: CodeChallenge, lang: Exclude<ChallengeLang, "sql">): string {
+  if (isRemote(lang)) return remoteStarter(ch, lang);
   if (lang === "python") return `${signature(ch, lang)}\n    # escreva sua solução aqui\n    pass\n`;
   return `${signature(ch, lang)}\n  // escreva sua solução aqui\n\n}\n`;
 }
 
+/** Solução de referência. Nas linguagens compiladas mostramos a de Python (a lógica é a mesma). */
 export function solutionCode(ch: CodeChallenge, lang: Exclude<ChallengeLang, "sql">): string {
+  if (isRemote(lang)) return `# Solução de referência em Python. A lógica é a mesma em ${LANG_LABEL[lang]}.\n${signature(ch, "python")}\n${ch.py}\n`;
   if (lang === "python") return `${signature(ch, lang)}\n${ch.py}\n`;
   return `${signature(ch, lang)}\n${ch.js}\n}\n`;
 }

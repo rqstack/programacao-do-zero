@@ -39,7 +39,7 @@ export const progressSchema = z.object({
   mistakes: z.record(z.string().max(160), z.number().int().min(0).max(1000)).default({}),
   /** Desafios de código: resolvido (vale XP) ou solução revelada antes; e em quais linguagens. */
   challenges: z
-    .record(z.string().max(120), z.object({ status: z.enum(["solved", "revealed"]), langs: z.array(z.enum(CHALLENGE_LANGS)).max(4), at: iso }))
+    .record(z.string().max(120), z.object({ status: z.enum(["solved", "revealed"]), langs: z.array(z.enum(CHALLENGE_LANGS)).max(16), at: iso }))
     .default({}),
 });
 

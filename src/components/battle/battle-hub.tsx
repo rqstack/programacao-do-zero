@@ -13,9 +13,15 @@ import { BattleHistory, BattleLeaderboard } from "./battle-boards";
 const LANG_KEY = "pdz-batalha-linguagem";
 const LANG_BADGE: Record<BattleLang, { badge: string; color: string }> = {
   javascript: { badge: "JS", color: "bg-[#f7df1e] text-[#1a1a1a]" },
+  typescript: { badge: "TS", color: "bg-[#3178c6] text-white" },
   python: { badge: "PY", color: "bg-[#ffd43b] text-[#1f3b57]" },
   java: { badge: "JV", color: "bg-[#e76f00] text-white" },
   c: { badge: "C", color: "bg-[#5c6bc0] text-white" },
+  cpp: { badge: "C++", color: "bg-[#00599c] text-white" },
+  csharp: { badge: "C#", color: "bg-[#68217a] text-white" },
+  go: { badge: "GO", color: "bg-[#00add8] text-[#0b2733]" },
+  rust: { badge: "RS", color: "bg-[#dea584] text-[#1a1a1a]" },
+  php: { badge: "PHP", color: "bg-[#777bb4] text-white" },
 };
 
 type View = { kind: "lobby" } | { kind: "fila"; since: number } | { kind: "partida"; matchId: string };

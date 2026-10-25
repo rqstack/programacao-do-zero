@@ -18,11 +18,12 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 
 ## O que tem aqui
 
-- **Trilhas** com aulas que seguem sempre a mesma estrutura: objetivo, por que importa, conceitos, exemplo prático, código explicado, erros comuns, resumo, exercício e quiz.
+- **17 trilhas** com aulas que seguem sempre a mesma estrutura: objetivo, por que importa, conceitos, exemplo prático, código explicado, erros comuns, resumo, exercício e quiz.
+  Lógica de programação, HTML, CSS, JavaScript, Git e GitHub, TypeScript, React, Node.js e APIs, Modelagem de dados, SQL, Supabase (autenticação e segurança), Testes e depuração, Deploy e hospedagem, Full Stack, Java e Orientação a Objetos, IA aplicada à programação (com n8n) e Portfólio, currículo e entrevistas.
 - **Quizzes** de revisão por aula e um desafio final por trilha, com explicação em cada resposta.
 - **9 jogos**: robô programador, caça aos bugs, monte o código, chuva de código, memória, construtor SQL, missões full stack, corrida de digitação e seletor CSS ao vivo.
-- **Desafios de código**: escolha JavaScript, TypeScript, Python ou SQL e a dificuldade; o site sorteia um problema e testa sua solução com casos gerados na hora, tudo no navegador (Web Worker isolado, Pyodide e sql.js).
-- **Batalha de Código (multiplayer)**: duas pessoas reais, o mesmo problema e o mesmo tempo; vence quem enviar primeiro uma solução correta, corrigida no servidor em sandbox (Judge0) com testes ocultos. Java, JavaScript, Python e C. Seis arenas, troféus, temporadas e ranking próprio. Detalhes em [docs/BATALHA.md](docs/BATALHA.md).
+- **Desafios de código** em 11 linguagens: escolha a linguagem e a dificuldade; o site sorteia um problema e testa sua solução com casos gerados na hora. JavaScript, TypeScript, Python e SQL rodam no navegador (Web Worker isolado, Pyodide e sql.js); Java, C, C++, C#, Go, Rust e PHP são compilados no Judge0.
+- **Batalha de Código (multiplayer)**: duas pessoas reais, o mesmo problema e o mesmo tempo; vence quem enviar primeiro uma solução correta, corrigida no servidor em sandbox (Judge0) com testes ocultos. Dez linguagens (JavaScript, TypeScript, Python, Java, C, C++, C#, Go, Rust e PHP). Nove arenas, do Terminal Inicial ao Trono do Compilador (grafos, programação dinâmica e otimização), com troféus, temporadas e ranking próprio. Detalhes em [docs/BATALHA.md](docs/BATALHA.md).
 - **Laboratório** para escrever HTML, CSS e JavaScript e ver o resultado na hora, isolado em um `iframe` com sandbox.
 - **Projetos guiados** (19), do primeiro site a projetos de portfólio para vagas (loja, API com autenticação, agendamento, kanban em tempo real...), cada um com dicas de como apresentar no currículo e no LinkedIn.
 - **Videoaulas gratuitas** recentes (até 1 ano) do YouTube indicadas em cada trilha.
@@ -30,6 +31,8 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 - **Níveis com títulos**, de *Dev Bebê* a *Dev Lendário*, além de conquistas.
 - **Login com Google (opcional)**: o XP passa a contar no **ranking geral** e na **liga da semana**, e o progresso sincroniza entre aparelhos. Sem login, tudo fica salvo no navegador.
 - **Perfil público** com GitHub, LinkedIn e site, **adicionar colegas** e **liga dos amigos**.
+- **Apoio voluntário por Pix** (a partir de R$ 5, sem nenhuma vantagem no site e sem login), com confirmação feita no servidor. Pronto no código, ainda desligado até a configuração da conta de recebimento ([docs/APOIO_PIX.md](docs/APOIO_PIX.md)).
+- **Política de Privacidade** e **Termos de Uso** em linguagem simples, nas páginas `/privacidade` e `/termos`.
 
 ## Tecnologias
 
@@ -55,7 +58,8 @@ Outros comandos:
 | `npm test` | Roda os testes: progresso, correção de quizzes e jogos, validação do conteúdo e da sintaxe dos códigos, e as regras de segurança do banco (RLS, XP e ranking) em um Postgres real embutido |
 | `npm run db:seed` | Gera `supabase/seed.sql` com as atividades que valem XP |
 | `npm run battle:config` | Gera o SQL de arenas, regras, temporadas e desafios da Batalha a partir do código |
-| `npm run battle:validate` | Roda cada desafio da Batalha no Judge0 nas 4 linguagens (solução aceita, código inicial recusado) |
+| `npm run battle:validate` | Roda cada desafio da Batalha no Judge0 nas 10 linguagens (solução aceita, código inicial recusado) |
+| `npx tsx scripts/check-challenges-remote.mts` | Confere os desafios de código nas linguagens compiladas no Judge0 |
 | `npm run deploy` | Gera o site, confere os links e publica no GitHub Pages |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript |

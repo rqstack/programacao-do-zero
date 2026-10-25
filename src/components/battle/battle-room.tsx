@@ -251,7 +251,7 @@ export function BattleRoom({ matchId, onExit }: { matchId: string; onExit: () =>
               {code !== null && (
                 <CodeEditor
                   value={code}
-                  indent={st.me.lang === "python" ? 4 : st.me.lang === "javascript" ? 2 : 4}
+                  indent={st.me.lang === "javascript" || st.me.lang === "typescript" ? 2 : 4}
                   label={`Código em ${LANG_INFO[st.me.lang].label}`}
                   onChange={(v) => {
                     lastType.current = Date.now();

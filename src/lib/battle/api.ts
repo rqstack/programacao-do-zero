@@ -166,4 +166,4 @@ export async function submitCode(matchId: string, code: string): Promise<SubmitR
   }
 }
 
-export const TYPE_LABEL: Record<ParamType, string> = { int: "inteiro", str: "texto", bool: "verdadeiro/falso", "int[]": "lista de inteiros" };
+export const TYPE_LABEL: Record<ParamType, string> = { int: "inteiro", str: "texto", bool: "verdadeiro/falso", "int[]": "lista de inteiros", float: "número decimal" };
