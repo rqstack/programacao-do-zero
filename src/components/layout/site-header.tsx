@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
-import { Flame, Menu, X } from "lucide-react";
+import { BookOpen, Flame, Heart, Menu, X } from "lucide-react";
 import { levelFromXp } from "@/lib/gamification/rules";
 import { dailyXp, streaks, totalXp } from "@/lib/progress/model";
 import { useHydrated, useProgress } from "@/lib/progress/store";
@@ -60,7 +60,7 @@ function XpChip() {
       <span aria-hidden className={cx("flex items-center gap-0.5 font-mono text-xs", hydrated && current > 0 ? "text-amber" : "text-subtle")}>
         <Flame className="size-4" /> {hydrated ? current : 0}
       </span>
-      <span aria-hidden className="hidden font-mono text-xs text-muted group-hover:text-fg sm:inline">
+      <span aria-hidden className="hidden font-mono text-xs text-muted group-hover:text-fg sm:inline xl:hidden">
         {hydrated ? `${level.totalXp} XP` : ""}
       </span>
     </Link>
@@ -84,7 +84,7 @@ export function SiteHeader() {
                   href={item.href}
                   aria-current={isActive(pathname, item.href) ? "page" : undefined}
                   className={cx(
-                    "rounded-md px-3 py-2 text-sm transition-colors",
+                    "rounded-md px-2 py-2 text-sm transition-colors",
                     isActive(pathname, item.href) ? "bg-panel text-fg" : "text-muted hover:text-fg",
                   )}
                 >
@@ -95,6 +95,24 @@ export function SiteHeader() {
           </ul>
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <Link
+            href="/ebook"
+            aria-current={isActive(pathname, "/ebook") ? "page" : undefined}
+            title="E-book do autor"
+            aria-label="Ebook"
+            className="hidden min-h-10 items-center gap-1.5 rounded-full border border-amber/50 px-2.5 text-sm font-semibold text-amber hover:bg-amber/10 xl:flex"
+          >
+            <BookOpen aria-hidden className="size-4" /> <span className="sr-only">Ebook</span>
+          </Link>
+          <Link
+            href="/apoiar"
+            aria-current={isActive(pathname, "/apoiar") ? "page" : undefined}
+            title="Apoiar o projeto"
+            aria-label="Apoiar o projeto"
+            className="hidden min-h-10 items-center gap-1.5 rounded-full border border-line-strong px-2.5 text-sm text-muted hover:border-[#f472b6]/60 hover:text-fg xl:flex"
+          >
+            <Heart aria-hidden className="size-4 text-[#f472b6]" /> <span className="sr-only">Apoiar</span>
+          </Link>
           <XpChip />
           <AccountButton />
           <button
@@ -123,6 +141,14 @@ export function SiteHeader() {
           </button>
         </div>
         <nav aria-label="Menu móvel" className="p-3">
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <Link href="/ebook" onClick={close} className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-amber/50 font-semibold text-amber">
+              <BookOpen aria-hidden className="size-4" /> Ebook
+            </Link>
+            <Link href="/apoiar" onClick={close} className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-line-strong text-fg">
+              <Heart aria-hidden className="size-4 text-[#f472b6]" /> Apoiar
+            </Link>
+          </div>
           <ul className="space-y-1">
             {[{ href: "/", label: "Início" }, ...NAV, { href: "/glossario", label: "Glossário" }, { href: "/progresso", label: "Meu progresso" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
               <li key={item.href}>

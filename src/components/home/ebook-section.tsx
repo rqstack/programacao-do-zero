@@ -6,9 +6,10 @@ import capa from "../../../public/ebook-capa.webp";
 export const EBOOK_URL = "https://o-proximo-nivel-da-programacao.vercel.app/";
 
 /** Divulgação do e-book do autor: discreta, sem pop-up e sem bloquear o conteúdo gratuito. */
-export function EbookSection() {
+export function EbookSection({ page = false }: { page?: boolean }) {
+  const Heading = page ? "h1" : "h2";
   return (
-    <section aria-labelledby="ebook" className="border-t border-line py-20">
+    <section id="ebook-secao" aria-labelledby="ebook" className={page ? "py-12 sm:py-16" : "border-t border-line py-20"}>
       <Container className="grid items-center gap-10 md:grid-cols-[minmax(0,15rem)_1fr] lg:gap-16">
         <Image
           src={capa}
@@ -18,9 +19,9 @@ export function EbookSection() {
         />
         <div className="max-w-2xl">
           <p className="font-mono text-xs text-subtle">E-book do autor da plataforma</p>
-          <h2 id="ebook" className="mt-2 text-2xl font-bold sm:text-3xl">
+          <Heading id="ebook" className={page ? "mt-2 text-3xl font-bold sm:text-4xl" : "mt-2 text-2xl font-bold sm:text-3xl"}>
             Você já começou a aprender. Agora é hora de evoluir.
-          </h2>
+          </Heading>
           <p className="mt-4 text-muted">
             Aprender programação não precisa ser uma jornada de tentativas e dúvidas sem fim. Se você quer aprofundar seus conhecimentos, entender melhor os conceitos e avançar nos estudos, conheça o ebook <strong className="text-fg">O Próximo Nível da Programação</strong>.
           </p>

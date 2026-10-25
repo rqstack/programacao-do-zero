@@ -25,6 +25,7 @@ const COLUMNS = [
       { href: "/sobre", label: "Sobre e créditos" },
       { href: "/privacidade", label: "Privacidade" },
       { href: "/termos", label: "Termos de uso" },
+      { href: "/ebook", label: "E-book do autor" },
       { href: "/apoiar", label: "Apoiar o projeto" },
     ],
   },

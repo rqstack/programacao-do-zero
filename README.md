@@ -32,6 +32,7 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 - **Login com Google (opcional)**: o XP passa a contar no **ranking geral** e na **liga da semana**, e o progresso sincroniza entre aparelhos. Sem login, tudo fica salvo no navegador.
 - **Perfil público** com GitHub, LinkedIn e site, **adicionar colegas** e **liga dos amigos**.
 - **Apoio voluntário por Pix** (a partir de R$ 5, sem nenhuma vantagem no site e sem login), com confirmação feita no servidor. Ativo; detalhes em [docs/APOIO_PIX.md](docs/APOIO_PIX.md).
+- **E-book do autor**, *O Próximo Nível da Programação*, na página `/ebook` e no menu (todo o conteúdo do site continua gratuito).
 - **Política de Privacidade** e **Termos de Uso** em linguagem simples, nas páginas `/privacidade` e `/termos`.
 
 ## Tecnologias
