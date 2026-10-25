@@ -64,6 +64,13 @@ export default function SobrePage() {
             sair da conta ou apagá-la definitivamente, junto com todos os seus dados.
           </p>
           <p>O código do laboratório fica só no seu navegador e roda isolado do resto do site.</p>
+          <p>
+            Detalhes completos na{" "}
+            <Link href="/privacidade" className="text-electric-hi underline underline-offset-2">
+              Política de Privacidade
+            </Link>
+            .
+          </p>
         </div>
       </section>
 

@@ -23,7 +23,8 @@ const COLUMNS = [
     title: "Projeto",
     links: [
       { href: "/sobre", label: "Sobre e créditos" },
-      { href: "/sobre#privacidade", label: "Privacidade" },
+      { href: "/privacidade", label: "Privacidade" },
+      { href: "/termos", label: "Termos de uso" },
       { href: "/apoiar", label: "Apoiar o projeto" },
     ],
   },
