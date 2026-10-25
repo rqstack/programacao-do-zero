@@ -1,7 +1,7 @@
 # Configurando o login com Google e o ranking (custo zero)
 
 > **Estado do projeto `kaylnsleygeysszomudd` (out/2026):** banco, migrations 001–005, seed de XP, Batalha de Código (Edge Function + pg_cron) e `.env.production` já estão prontos.
-> **Falta só uma coisa, que precisa ser feita por você:** ativar o provedor Google (passos 3 e 4 abaixo). Enquanto ele estiver desligado, o Supabase responde `Unsupported provider: provider is not enabled` e o site mostra o aviso "O login com Google ainda não foi ativado".
+> **Login com Google ativo desde 25/10/2026:** projeto "Programacao do Zero" no Google Cloud, app publicado (Em produção), provedor ligado no Supabase, Site URL e Redirect URLs configuradas. Páginas exigidas pelo Google: `/privacidade` e `/termos`. Os passos abaixo ficam como referência caso seja preciso refazer.
 > Para conferir a qualquer momento (deve aparecer `"google": true`):
 > `curl -s -H "apikey: <chave publishable>" https://kaylnsleygeysszomudd.supabase.co/auth/v1/settings`
 

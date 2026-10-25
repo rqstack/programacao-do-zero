@@ -6,14 +6,14 @@ Legenda: ✅ concluído e testado · 🟡 implementado, teste incompleto · ⛔ 
 ## Auditoria (2026-10-23)
 
 - Stack: Next.js 16 (export estático) no GitHub Pages; Supabase Free (Auth, Postgres, Edge Functions, pg_cron) projeto `kaylnsleygeysszomudd`; Judge0 público para a Batalha.
-- Auth: só Google via Supabase (PKCE). Provedores ligados hoje no Supabase: **apenas e-mail**. Google **desligado** → causa do erro `provider is not enabled`.
+- Auth: só Google via Supabase (PKCE). Google **ligado** em 25/10/2026.
 - Banco: migrations 001–005 aplicadas; tabelas com RLS; XP só via `award_xp`.
 
 ## Fase 1 — Login com Google
 
-- ⛔ Provedor Google desligado no painel. Código já usa `provider: "google"` corretamente. **Ação do dono:** docs/CONFIGURACAO.md, passos 3–4.
+- ✅ Provedor Google ligado (25/10/2026): cliente OAuth criado no Google Cloud, app publicado, Site URL e Redirect URLs no Supabase. Páginas /privacidade e /termos criadas (exigidas pelo Google).
 - ✅ Site agora checa `/auth/v1/settings` antes de redirecionar e mostra aviso claro; volta do Google com `?error=` mostra mensagem (testado no navegador).
-- ⬜ Teste completo (login, refresh, logout, novo login) — depende do provedor ativo.
+- ✅ Login real testado no site publicado: volta do Google com sessão ativa (provider google), conta e perfil criados no banco. ⬜ Ainda não testados: logout e novo login.
 
 ## Fase 2 — Trilha Node.js
 - ✅ 3 módulos e 8 aulas aparecem (navegador). Exercício testado: errado recusado, certo aceito, XP uma vez.
@@ -30,7 +30,7 @@ Legenda: ✅ concluído e testado · 🟡 implementado, teste incompleto · ⛔ 
 
 ## Fase 5 — Batalha de Código
 - ✅ Em produção: pg_cron rodando (6.302 execuções, 0 falhas), 20 desafios, 6 arenas. Adicionada limpeza diária do histórico do cron (evita estourar o plano gratuito).
-- ⛔ Teste com duas contas reais depende do login Google ativo. Testes locais/E2E com Judge0 real: OK (ver docs/BATALHA.md).
+- ⬜ Teste com duas contas reais: login já funciona, falta o dono jogar com uma segunda conta. Testes locais/E2E com Judge0 real: OK (ver docs/BATALHA.md).
 
 ## Fase 6 — Trilhas
 Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui Promises/fetch), Git (7), TypeScript (6), React (8), Node/APIs (8).
