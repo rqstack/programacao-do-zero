@@ -47,9 +47,10 @@ export const videosByCourse: Record<string, VideoCourse[]> = {
   supabase: [
     { playlist: "PL4ZwkMMhwaqIem09eRINhc2fjfaM_t2OO", title: "Curso Supabase Master", channel: "Léo Henrique", lang: "pt" },
   ],
+  // Java: cursos do DevDojo por escolha do dono do projeto (exceção à regra de até 1 ano).
   java: [
-    { playlist: "PL6-iiksdrDYxJ5LIJ7RhTDYLRSail-gl-", title: "Como programar em Java 25 para iniciantes", channel: "Prof. Rogério Napoleão Jr.", lang: "pt" },
-    { playlist: "PLoAL82Y1PAzPxtQf-lpKdZFVefIaIqMAs", title: "Lógica de Programação com Java", channel: "Javanauta Academy", lang: "pt" },
+    { playlist: "PL62G310vn6nFIsOCC0H-C2infYgwm8SWW", title: "Maratona Java Virado no Jiraya", channel: "DevDojo", lang: "pt" },
+    { playlist: "PL62G310vn6nFTNJ4JbW8BuhAiK16MEc_x", title: "Spring Boot Direto Das Trincheiras", channel: "DevDojo", lang: "pt" },
   ],
   "ia-aplicada": [
     { playlist: "PLnTte7--UAGg4g-8GrS6RtdN3VqwKdb0x", title: "Engenharia de Prompt para IA", channel: "Bruno Lobo Pinheiro", lang: "pt" },
