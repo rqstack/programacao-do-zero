@@ -51,10 +51,10 @@ Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui P
 `npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
 
 ## Próximo passo exato
-Aguardando autorização do dono para: (1) push e deploy do site; (2) aplicar em produção supabase/migrations/20261026000008_xp_limites.sql e supabase/producao-pendente/2026-10-26_atividades_python_csharp_aws.sql (ver LEIA-ME); (3) publicar a Edge Function support-pix com a correção do webhook. Ação do dono no painel: rotacionar o segredo do webhook na Syncpay (pelo Chrome) e salvar em SYNCPAY_WEBHOOK_TOKEN.
+Ação do dono no painel: rotacionar o segredo do webhook na Syncpay (pelo Chrome, onde o copiar funciona) e salvar em SYNCPAY_WEBHOOK_TOKEN no Supabase. Depois, fazer um Pix de R$ 5 de teste e conferir a aba "Entregas" do webhook na Syncpay.
 
-## Sessão 26/10/2026 (local, sem push)
+## Sessão 26/10/2026 (publicada com autorização)
 - ✅ Trilhas Python (8 aulas), C# (7) e AWS (7). Exemplos de Python e C# executados localmente (scripts/check-local-blocks.mts); WinForms/WPF, EF Core e comandos AWS marcados como não executados.
-- ✅ XP com limite de ritmo no banco (400/10 min, 1.200/dia) + testes. Não aplicado em produção.
-- ✅ Webhook Pix: tolera espaços no token e acha a doação pelo pix_code; navegador não consegue confirmar pagamento. Função não publicada.
+- ✅ XP com limite de ritmo no banco (400/10 min, 1.200/dia) + testes. Aplicado em produção em 26/10/2026.
+- ✅ Webhook Pix: tolera espaços no token e acha a doação pelo pix_code; navegador não consegue confirmar pagamento. Função support-pix publicada (v3) em 26/10/2026.
 

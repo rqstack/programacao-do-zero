@@ -1,6 +1,6 @@
 -- Atividades de XP das trilhas Python, C# e AWS (69 chaves: 25 + 22 + 22).
 -- Gerado por scripts/seed-for-course.mts. Idempotente: pode rodar mais de uma vez.
--- NÃO aplicado em produção. Aplicar só com autorização, DEPOIS da migração 20261026000008_xp_limites.sql.
+-- Aplicado em produção em 26/10/2026 (com autorização), depois da migração 20261026000008_xp_limites.sql.
 begin;
 insert into public.xp_sources (key, amount, label) values
   ('lesson:primeiros-passos-em-python', 20, 'Aula: Primeiros passos em Python'),

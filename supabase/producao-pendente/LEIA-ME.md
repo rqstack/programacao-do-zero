@@ -1,6 +1,6 @@
 # Alterações pendentes no banco de produção
 
-Nada nesta pasta foi aplicado no projeto `kaylnsleygeysszomudd`. Aplique só com autorização do dono, nesta ordem.
+**Aplicado em 26/10/2026** no projeto `kaylnsleygeysszomudd`, com autorização do dono (conferido: 546 atividades e `award_xp` com limite). Mantido como registro e para recriar o banco do zero, na ordem abaixo.
 
 ## 1. Limite de ritmo do XP
 
