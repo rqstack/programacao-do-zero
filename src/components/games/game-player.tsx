@@ -20,6 +20,7 @@ import {
   type SqlPayload,
   type TypingPayload,
 } from "@/lib/games/engine";
+import { buildPlayRounds } from "@/lib/games/generate";
 import { dispatchProgress, useHydrated, useProgress } from "@/lib/progress/store";
 import { CssLiveView } from "./views/css-live-view";
 import { RainView } from "./views/rain-view";
@@ -62,13 +63,11 @@ export function GamePlayer({ game }: { game: SeedGame }) {
   const live = useRef({ score: 0, correct: 0, lives: game.lives ?? 0, current: 0 });
 
   const family = familyOf(game.kind);
+  /** Fases desta partida: sorteadas de novo a cada "Jogar" / "Jogar de novo". */
+  const playRounds = useMemo(() => buildPlayRounds(game, seed), [game, seed]);
   const rounds: PreparedRound[] = useMemo(
-    () =>
-      game.rounds
-        .map((r, index) => ({ r, index }))
-        .sort((a, b) => a.r.difficulty - b.r.difficulty || a.index - b.index)
-        .map(({ r, index }) => ({ index, difficulty: r.difficulty, points: r.points ?? 10, payload: publicPayload(game.kind, r.payload, `${seed}:${index}`) })),
-    [game, seed],
+    () => playRounds.map((r, index) => ({ index, difficulty: r.difficulty, points: r.points ?? 10, payload: publicPayload(game.kind, r.payload, `${seed}:${index}`) })),
+    [game.kind, playRounds, seed],
   );
   const maxScore = rounds.reduce((s, r) => s + r.points, 0);
 
@@ -110,7 +109,7 @@ export function GamePlayer({ game }: { game: SeedGame }) {
   function answer(value: unknown): RoundFeedback | null {
     const round = rounds[current];
     if (!round || phase !== "playing") return null;
-    const def = game.rounds[round.index]!;
+    const def = playRounds[round.index]!;
     const outcome = gradeRound(game.kind, { payload: def.payload, solution: def.solution, points: round.points, explanation: def.explanation }, states[current] ?? null, value);
     if (!outcome.ok) return null;
     setStates((s) => ({ ...s, [current]: outcome.state }));

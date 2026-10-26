@@ -22,7 +22,7 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
   Lógica de programação, HTML, CSS, JavaScript, Git e GitHub, TypeScript, React, Node.js e APIs, Modelagem de dados, SQL, Supabase (autenticação e segurança), Testes e depuração, Deploy e hospedagem, Full Stack, Java e Orientação a Objetos, Python do zero, C# e .NET para desktop, AWS (computação em nuvem com foco em segurança e custo zero), IA aplicada à programação (com n8n) e Portfólio, currículo e entrevistas.
   Os exemplos de código das trilhas de Python, C# e Java são executados de verdade na conferência; os que dependem de janelas do Windows, de pacotes externos ou de uma conta na AWS estão marcados na própria aula como não executados automaticamente.
 - **Quizzes** de revisão por aula e um desafio final por trilha, com explicação em cada resposta.
-- **9 jogos**: robô programador, caça aos bugs, monte o código, chuva de código, memória, construtor SQL, missões full stack, corrida de digitação e seletor CSS ao vivo.
+- **9 jogos**: robô programador, caça aos bugs, monte o código, chuva de código, memória, construtor SQL, missões full stack, corrida de digitação e seletor CSS ao vivo. A cada partida (inclusive em "Jogar de novo") as fases são sorteadas de novo, misturando as cadastradas com fases geradas na hora (novos trechos de digitação, labirintos, consultas SQL, bugs, cartas e seletores), sempre com a mesma quantidade de fases e a mesma pontuação.
 - **Desafios de código** em 11 linguagens: escolha a linguagem e a dificuldade; o site sorteia um problema e testa sua solução com casos gerados na hora. JavaScript, TypeScript, Python e SQL rodam no navegador (Web Worker isolado, Pyodide e sql.js); Java, C, C++, C#, Go, Rust e PHP são compilados no Judge0.
 - **Batalha de Código (multiplayer)**: duas pessoas reais, o mesmo problema e o mesmo tempo; vence quem enviar primeiro uma solução correta, corrigida no servidor em sandbox (Judge0) com testes ocultos. Dez linguagens (JavaScript, TypeScript, Python, Java, C, C++, C#, Go, Rust e PHP). Nove arenas, do Terminal Inicial ao Trono do Compilador (grafos, programação dinâmica e otimização), com troféus, temporadas e ranking próprio. Detalhes em [docs/BATALHA.md](docs/BATALHA.md).
 - **Laboratório** para escrever HTML, CSS e JavaScript e ver o resultado na hora, isolado em um `iframe` com sandbox.
@@ -92,7 +92,7 @@ content/            conteúdo educacional
   projects.ts       projetos guiados (texto em content/projetos/*.md)
 src/app/            páginas
 src/components/     interface
-src/lib/            regras: progresso, XP, treino, correção de quizzes, motor dos jogos e login
+src/lib/            regras: progresso, XP, treino, correção de quizzes, motor dos jogos (e gerador de fases em games/generate.ts) e login
 supabase/           migrations do banco, seeds e as Edge Functions da Batalha e do Pix (functions/)
   producao-pendente/ scripts preparados para o banco de produção que ainda não foram aplicados (veja o LEIA-ME)
 tests/              testes automatizados
