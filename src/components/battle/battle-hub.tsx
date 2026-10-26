@@ -9,6 +9,8 @@ import { battleMe, joinQueue, leaveQueue, type BattleMe } from "@/lib/battle/api
 import { Alert, Button, cx, EmptyState, Spinner } from "@/components/ui/primitives";
 import { BattleRoom } from "./battle-room";
 import { BattleHistory, BattleLeaderboard } from "./battle-boards";
+import { FriendInvite } from "./friend-invite";
+import { WeeklyEvent } from "./weekly-event";
 
 const LANG_KEY = "pdz-batalha-linguagem";
 const LANG_BADGE: Record<BattleLang, { badge: string; color: string }> = {
@@ -33,6 +35,15 @@ export function BattleHub() {
   const [lang, setLang] = useState<BattleLang>("python");
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"arenas" | "ranking" | "historico">("arenas");
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const openMatch = useCallback((id: string) => setView({ kind: "partida", matchId: id }), []);
+
+  // Link de convite (/batalha?convite=CODIGO).
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("convite");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (c && /^[A-Za-z0-9]{8}$/.test(c)) setInviteCode(c.toUpperCase());
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
@@ -68,9 +79,12 @@ export function BattleHub() {
   if (!session) {
     return (
       <div className="space-y-10">
-        <EmptyState title="Entre para batalhar" action={<Link href="/entrar" className="inline-flex min-h-11 items-center rounded-md bg-electric px-4 font-semibold text-white">Entrar com Google</Link>}>
-          Na Batalha de Código você enfrenta outra pessoa de verdade: o mesmo problema, o mesmo tempo, e vence quem enviar primeiro uma solução correta. A conta é necessária para registrar seus troféus.
+        <EmptyState title={inviteCode ? "Entre para aceitar o desafio" : "Entre para batalhar"} action={<Link href="/entrar" className="inline-flex min-h-11 items-center rounded-md bg-electric px-4 font-semibold text-white">Entrar com Google</Link>}>
+          {inviteCode
+            ? `Alguém desafiou você com o código ${inviteCode}. Entre com a conta Google e volte a este link para aceitar.`
+            : "Na Batalha de Código você enfrenta outra pessoa de verdade: o mesmo problema, o mesmo tempo, e vence quem enviar primeiro uma solução correta. A conta é necessária para registrar seus troféus."}
         </EmptyState>
+        <WeeklyEvent signedIn={false} />
         <ArenaPath trophies={0} />
         <BattleLeaderboard />
       </div>
@@ -80,7 +94,9 @@ export function BattleHub() {
   if (view.kind === "partida") {
     return (
       <BattleRoom
+        key={view.matchId}
         matchId={view.matchId}
+        onSwitch={openMatch}
         onExit={() => {
           setView({ kind: "lobby" });
           refresh();
@@ -173,6 +189,11 @@ export function BattleHub() {
           )}
         </div>
       </section>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+        <WeeklyEvent signedIn />
+        <FriendInvite lang={lang} initialCode={inviteCode} onMatch={openMatch} />
+      </div>
 
       <div>
         <div role="tablist" aria-label="Seções da Batalha" className="inline-flex rounded-full border border-line-strong p-1">
@@ -312,6 +333,8 @@ function Rules() {
         <li>Falha do corretor não conta como erro: envie de novo.</li>
         <li>Ganhar contra alguém com mais troféus vale mais; perder para alguém com menos custa mais (até {BATTLE_RULES.diffCap} troféus de ajuste).</li>
         <li>Os troféus da Batalha são separados do XP: não mudam seu nível nem o ranking de XP.</li>
+        <li>Partidas com amigos (por código) e revanches são amistosas: usam a mesma correção, entram no histórico, mas não mexem em troféus, temporada nem eventos.</li>
+        <li>O sorteio do desafio evita problemas que um dos dois jogou nos últimos 30 dias, enquanto houver outros do mesmo nível.</li>
       </ul>
     </details>
   );

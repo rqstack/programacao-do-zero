@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Crown, Flame, Trophy } from "lucide-react";
-import { LANG_INFO } from "@battle/battle-core.ts";
+import { LANG_INFO, type BattleLang } from "@battle/battle-core.ts";
 import { Avatar } from "@/components/profile/avatar";
 import { Alert, cx, EmptyState, Spinner } from "@/components/ui/primitives";
 import { history, leaderboard, type HistoryRow, type LeaderRow } from "@/lib/battle/api";
 import { profileHref } from "@/lib/profiles/api";
+import { historyStats } from "@/lib/battle/stats";
 
 /** Ranking exclusivo da Batalha (troféus). Não tem relação com o ranking de XP. */
 export function BattleLeaderboard() {
@@ -107,6 +108,7 @@ export function BattleLeaderboard() {
 export function BattleHistory() {
   const [rows, setRows] = useState<HistoryRow[] | null>(null);
   const [error, setError] = useState(false);
+  const [filter, setFilter] = useState<"todas" | "ranqueada" | "amistosa">("todas");
   useEffect(() => {
     let alive = true;
     history()
@@ -119,29 +121,115 @@ export function BattleHistory() {
   if (error) return <Alert tone="error" title="Não foi possível carregar o histórico" />;
   if (!rows) return <Spinner label="Carregando histórico" />;
   if (rows.length === 0) return <EmptyState title="Nenhuma batalha ainda">Suas partidas aparecem aqui quando terminarem.</EmptyState>;
+  const shown = filter === "todas" ? rows : rows.filter((r) => r.kind === filter);
+  const st = historyStats(shown);
+  const line = historyStats(rows).trophyLine;
+  const maxAbs = Math.max(1, ...line.map(Math.abs));
+  const fmtSec = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   return (
-    <ul className="divide-y divide-line rounded-[var(--radius-lg)] border border-line">
-      {rows.map((h) => (
-        <li key={h.match_id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
-          <span className={cx("w-20 font-semibold", h.outcome === "vitoria" ? "text-ok" : h.outcome === "derrota" ? "text-bad" : "text-muted")}>
-            {h.outcome === "vitoria" ? "Vitória" : h.outcome === "derrota" ? "Derrota" : "Empate"}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block truncate font-medium">{h.challenge_title}</span>
-            <span className="block truncate text-xs text-muted">
-              contra {h.opponent_username ? <Link href={profileHref(h.opponent_username)} className="underline">{h.opponent_name}</Link> : h.opponent_name} ({LANG_INFO[h.opponent_lang]?.label ?? h.opponent_lang}) · você em {LANG_INFO[h.my_lang]?.label ?? h.my_lang} · {h.arena_name}
-              {h.result === "abandono" ? " · por abandono" : h.result === "tempo_esgotado" ? " · tempo esgotado" : ""}
+    <div className="space-y-8">
+      <div role="group" aria-label="Filtrar partidas" className="flex flex-wrap gap-2 text-sm">
+        {(["todas", "ranqueada", "amistosa"] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            aria-pressed={filter === f}
+            onClick={() => setFilter(f)}
+            className={cx("min-h-9 rounded-md border px-3", filter === f ? "border-electric bg-electric/10" : "border-line-strong text-muted hover:text-fg")}
+          >
+            {f === "todas" ? "Todas" : f === "ranqueada" ? "Ranqueadas" : "Amistosas"} <span className="font-mono text-xs text-subtle">{f === "todas" ? rows.length : rows.filter((r) => r.kind === f).length}</span>
+          </button>
+        ))}
+      </div>
+
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+        {[
+          ["Vitórias", st.wins, "text-ok"],
+          ["Derrotas", st.losses, "text-bad"],
+          ["Empates", st.draws, ""],
+          ["Taxa de vitória", st.winRate === null ? "—" : `${st.winRate}%`, ""],
+          ["Troféus ganhos", `+${st.trophiesWon}`, "text-amber"],
+          ["Troféus perdidos", `−${st.trophiesLost}`, "text-bad"],
+          ["Desafios resolvidos", `${st.solved}/${st.total}`, ""],
+          ["Tempo médio até resolver", st.avgSolveSec === null ? "—" : fmtSec(st.avgSolveSec), ""],
+        ].map(([label, value, tone]) => (
+          <div key={label as string} className="border-l-2 border-line-strong pl-3">
+            <dt className="text-xs text-muted">{label}</dt>
+            <dd className={cx("font-mono text-2xl font-bold", tone as string)}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {line.length >= 2 && (
+        <div>
+          <h3 className="text-sm font-semibold">Evolução dos troféus (partidas ranqueadas)</h3>
+          <svg viewBox={`0 0 ${Math.max(1, line.length - 1) * 20} 60`} preserveAspectRatio="none" className="mt-2 h-24 w-full" role="img" aria-label={`Saldo de troféus ao longo de ${line.length} partidas: de ${line[0]} a ${line[line.length - 1]}`}>
+            <line x1="0" x2={(line.length - 1) * 20} y1="30" y2="30" stroke="var(--color-line-strong)" strokeDasharray="3 3" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <polyline
+              fill="none"
+              stroke="var(--color-amber)"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+              points={line.map((v, i) => `${i * 20},${30 - (v / maxAbs) * 26}`).join(" ")}
+            />
+          </svg>
+          <p className="font-mono text-xs text-subtle">
+            Saldo acumulado: {line[line.length - 1]! > 0 ? "+" : ""}
+            {line[line.length - 1]} troféus em {line.length} partidas
+          </p>
+        </div>
+      )}
+
+      <div className="grid gap-6 sm:grid-cols-2">
+        {(
+          [
+            ["Por linguagem", st.byLang.map((g) => ({ ...g, label: LANG_INFO[g.key as BattleLang]?.label ?? g.key }))],
+            ["Por arena", st.byArena.map((g) => ({ ...g, label: g.key }))],
+          ] as const
+        ).map(([title, list]) => (
+          <div key={title}>
+            <h3 className="text-sm font-semibold">{title}</h3>
+            <ul className="mt-2 divide-y divide-line border-y border-line text-sm">
+              {list.map((g) => (
+                <li key={g.key} className="flex justify-between gap-3 py-2">
+                  <span>{g.label}</span>
+                  <span className="font-mono text-xs text-muted">
+                    {g.wins}/{g.total} vitórias
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <ul className="divide-y divide-line rounded-[var(--radius-lg)] border border-line">
+        {shown.map((h) => (
+          <li key={h.match_id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
+            <span className={cx("w-20 font-semibold", h.outcome === "vitoria" ? "text-ok" : h.outcome === "derrota" ? "text-bad" : "text-muted")}>
+              {h.outcome === "vitoria" ? "Vitória" : h.outcome === "derrota" ? "Derrota" : "Empate"}
             </span>
-          </span>
-          <span className={cx("font-mono", (h.trophy_delta ?? 0) > 0 ? "text-amber" : (h.trophy_delta ?? 0) < 0 ? "text-bad" : "text-muted")}>
-            {(h.trophy_delta ?? 0) > 0 ? "+" : ""}
-            {h.trophy_delta ?? 0}
-          </span>
-          <time className="font-mono text-xs text-subtle" dateTime={h.finished_at}>
-            {new Date(h.finished_at).toLocaleDateString("pt-BR")}
-          </time>
-        </li>
-      ))}
-    </ul>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-medium">
+                {h.challenge_title}
+                {h.kind === "amistosa" && <span className="ml-2 rounded border border-line-strong px-1.5 text-[11px] font-normal text-muted">amistosa</span>}
+              </span>
+              <span className="block truncate text-xs text-muted">
+                contra {h.opponent_username ? <Link href={profileHref(h.opponent_username)} className="underline">{h.opponent_name}</Link> : h.opponent_name} ({LANG_INFO[h.opponent_lang]?.label ?? h.opponent_lang}) · você em {LANG_INFO[h.my_lang]?.label ?? h.my_lang} · {h.arena_name}
+                {h.result === "abandono" ? " · por abandono" : h.result === "tempo_esgotado" ? " · tempo esgotado" : ""}
+                {h.solved ? ` · resolvido${h.solve_sec !== null ? ` em ${fmtSec(h.solve_sec)}` : ""}` : ""} · {h.submissions} envio(s)
+              </span>
+            </span>
+            <span className={cx("font-mono", (h.trophy_delta ?? 0) > 0 ? "text-amber" : (h.trophy_delta ?? 0) < 0 ? "text-bad" : "text-muted")}>
+              {(h.trophy_delta ?? 0) > 0 ? "+" : ""}
+              {h.trophy_delta ?? 0}
+            </span>
+            <time className="font-mono text-xs text-subtle" dateTime={h.finished_at}>
+              {new Date(h.finished_at).toLocaleDateString("pt-BR")}
+            </time>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

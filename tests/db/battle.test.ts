@@ -50,6 +50,8 @@ describe("configuração da Batalha", () => {
       const { battleBank } = await import("@battle/battle-bank.ts");
       expect(readFileSync(path.join(ROOT, "supabase/battle-challenges.sql"), "utf8")).toBe(battleChallengesSql(battleBank));
       for (const a of ARENAS) expect(battleBank.some((c) => c.tier === a.tier), `nível ${a.tier}`).toBe(true);
+      const { BATTLE_REVIEWS } = await import("@battle/battle-review.ts");
+      for (const c of battleBank) expect(BATTLE_REVIEWS[c.id]?.idea, `revisão de ${c.id}`).toBeTruthy();
     }
   });
 

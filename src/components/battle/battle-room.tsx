@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Clock, Flag, Loader2, RotateCcw, Send, Trophy, Wifi, WifiOff, X } from "lucide-react";
+import { Clock, Flag, Loader2, RotateCcw, Send, Trophy, Wifi, WifiOff } from "lucide-react";
 import { formatValue, LANG_INFO, starterCode } from "@battle/battle-core.ts";
 import { CodeEditor } from "@/components/challenges/code-editor";
 import { InlineMd } from "@/components/content/inline-md";
 import { Avatar } from "@/components/profile/avatar";
 import { Alert, Button, cx, Spinner } from "@/components/ui/primitives";
-import { forfeit, matchState, submitCode, TYPE_LABEL, type MatchState, type OpponentState, type Submission } from "@/lib/battle/api";
+import { forfeit, matchState, submitCode, TYPE_LABEL, type MatchState, type OpponentState, type RematchInfo, type Submission } from "@/lib/battle/api";
+import { PostBattleReview, RematchPanel } from "./post-battle";
 import { profileHref } from "@/lib/profiles/api";
 
 const POLL_MS = 1500;
@@ -36,7 +37,7 @@ const fmt = (ms: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 };
 
-export function BattleRoom({ matchId, onExit }: { matchId: string; onExit: () => void }) {
+export function BattleRoom({ matchId, onExit, onSwitch }: { matchId: string; onExit: () => void; onSwitch?: (matchId: string) => void }) {
   const [st, setSt] = useState<MatchState | null>(null);
   const [offset, setOffset] = useState(0); // servidor - navegador, em ms
   const [now, setNow] = useState(() => Date.now());
@@ -68,11 +69,13 @@ export function BattleRoom({ matchId, onExit }: { matchId: string; onExit: () =>
   useEffect(() => {
     alive.current = true;
     let timer = 0;
+    const startedAt = Date.now();
     const loop = async () => {
       const s = await poll();
       if (!alive.current) return;
-      if (s && (s.status === "finalizada" || s.status === "cancelada")) return;
-      timer = window.setTimeout(loop, POLL_MS);
+      const finished = s && (s.status === "finalizada" || s.status === "cancelada");
+      if (finished && Date.now() - startedAt > 10 * 60_000) return;
+      timer = window.setTimeout(loop, finished ? 3000 : POLL_MS);
     };
     loop();
     const clock = window.setInterval(() => setNow(Date.now()), 250);
@@ -106,7 +109,7 @@ export function BattleRoom({ matchId, onExit }: { matchId: string; onExit: () =>
   const done = st.status === "finalizada" || st.status === "cancelada";
   const pending = st.my_submissions.some((s) => s.status === "julgando");
 
-  if (done) return <Result st={st} code={code} onExit={onExit} />;
+  if (done) return <Result st={st} onExit={onExit} onSwitch={onSwitch} onRematch={(r) => setSt({ ...st, rematch: r })} />;
 
   async function send() {
     if (!code || sending) return;
@@ -315,10 +318,11 @@ export function BattleRoom({ matchId, onExit }: { matchId: string; onExit: () =>
   );
 }
 
-function Result({ st, code, onExit }: { st: MatchState; code: string | null; onExit: () => void }) {
+function Result({ st, onExit, onSwitch, onRematch }: { st: MatchState; onExit: () => void; onSwitch?: (id: string) => void; onRematch: (r: RematchInfo) => void }) {
   const won = st.winner === "eu";
   const lost = st.winner === "adversario";
   const delta = st.me.trophy_delta ?? 0;
+  const friendly = st.kind === "amistosa";
   const title = won ? "Vitória!" : lost ? "Derrota" : "Sem vencedor";
   const reason =
     st.result === "abandono"
@@ -326,60 +330,55 @@ function Result({ st, code, onExit }: { st: MatchState; code: string | null; onE
         ? "O adversário desistiu ou perdeu a conexão."
         : "Você desistiu ou ficou tempo demais sem conexão."
       : st.result === "tempo_esgotado"
-        ? "O tempo acabou sem nenhuma solução correta. Ninguém ganha nem perde troféus."
+        ? "O tempo acabou sem nenhuma solução correta."
         : st.result === "cancelada"
           ? "A partida foi cancelada por uma falha técnica."
           : won
             ? "Sua solução correta chegou primeiro ao servidor."
             : "O adversário enviou uma solução correta primeiro.";
+
+  // Revanche aceita: entra na partida nova (a anterior continua registrada no histórico).
+  const next = st.rematch?.status === "aceito" ? st.rematch.match_id : null;
+  useEffect(() => {
+    if (next && onSwitch) onSwitch(next);
+  }, [next, onSwitch]);
+
   return (
     <div className="space-y-6">
       <section className={cx("rounded-[var(--radius-lg)] border-2 p-8 text-center", won ? "border-ok/60 bg-ok/[0.06]" : lost ? "border-bad/50 bg-bad/[0.05]" : "border-line")} role="status">
-        <p className="text-sm text-muted">{st.arena.name} · {st.challenge?.title}</p>
+        <p className="text-sm text-muted">
+          {friendly ? "Partida amistosa" : st.arena.name} · {st.challenge?.title}
+        </p>
         <h2 className={cx("mt-2 text-4xl font-black", won ? "text-ok" : lost ? "text-bad" : "text-fg")}>{title}</h2>
         <p className="mt-2 text-muted">{reason}</p>
-        <p className={cx("mt-5 inline-flex items-center gap-2 font-mono text-3xl font-bold", delta > 0 ? "text-amber" : delta < 0 ? "text-bad" : "text-muted")}>
-          <Trophy aria-hidden className="size-7" /> {delta > 0 ? `+${delta}` : delta}
-        </p>
-        <p className="mt-1 text-sm text-muted">
-          {st.me.trophies_before} → {Math.max(0, st.me.trophies_before + delta)} troféus
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Button onClick={onExit}>Jogar de novo</Button>
-          {st.opponent.username && (
-            <Link href={profileHref(st.opponent.username)} className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-line-strong px-4 font-semibold hover:border-muted">
-              Ver perfil de {st.opponent.name}
-            </Link>
-          )}
+        {friendly ? (
+          <p className="mt-4 text-sm text-muted">Amistosa: os troféus não mudam.</p>
+        ) : (
+          <>
+            <p className={cx("mt-5 inline-flex items-center gap-2 font-mono text-3xl font-bold", delta > 0 ? "text-amber" : delta < 0 ? "text-bad" : "text-muted")}>
+              <Trophy aria-hidden className="size-7" /> {delta > 0 ? `+${delta}` : delta}
+            </p>
+            <p className="mt-1 text-sm text-muted">
+              {st.me.trophies_before} → {Math.max(0, st.me.trophies_before + delta)} troféus
+            </p>
+          </>
+        )}
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <RematchPanel matchId={st.match_id} info={st.rematch} opponentName={st.opponent.name} onUpdate={onRematch} />
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button variant="ghost" onClick={onExit}>
+              Voltar para a Batalha
+            </Button>
+            {st.opponent.username && (
+              <Link href={profileHref(st.opponent.username)} className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-line-strong px-4 font-semibold hover:border-muted">
+                Ver perfil de {st.opponent.name}
+              </Link>
+            )}
+          </div>
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2" aria-label="Códigos da partida">
-        <details open className="rounded-[var(--radius-lg)] border border-line p-4">
-          <summary className="cursor-pointer text-sm font-semibold">Seu código ({LANG_INFO[st.me.lang].label})</summary>
-          <pre className="mt-3 max-h-96 overflow-auto rounded-[var(--radius-md)] bg-[#060d1c] p-3 font-mono text-xs leading-5 text-[#dbe7ff]">{code ?? "(nenhum)"}</pre>
-        </details>
-        <details className="rounded-[var(--radius-lg)] border border-line p-4">
-          <summary className="cursor-pointer text-sm font-semibold">Código de {st.opponent.name} ({LANG_INFO[st.opponent.lang].label})</summary>
-          <pre className="mt-3 max-h-96 overflow-auto rounded-[var(--radius-md)] bg-[#060d1c] p-3 font-mono text-xs leading-5 text-[#dbe7ff]">{st.opponent.final_code ?? "(não enviou código)"}</pre>
-        </details>
-      </section>
-
-      {st.my_submissions.length > 0 && (
-        <section className="rounded-[var(--radius-lg)] border border-line p-4">
-          <h3 className="text-sm font-semibold">Seus envios</h3>
-          <ol className="mt-2 space-y-1 text-sm">
-            {st.my_submissions.map((s, i) => (
-              <li key={s.id} className="flex items-baseline gap-2">
-                {s.status === "aceito" ? <Check aria-hidden className="size-4 text-ok" /> : <X aria-hidden className="size-4 text-bad" />}
-                <span className="font-mono text-xs text-subtle">#{i + 1}</span>
-                <span className={VERDICT[s.status].tone}>{VERDICT[s.status].label}</span>
-                {s.message && s.status !== "aceito" && <span className="truncate text-xs text-muted">{s.message}</span>}
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+      <PostBattleReview st={st} />
     </div>
   );
 }

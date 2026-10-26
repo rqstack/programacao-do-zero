@@ -27,6 +27,16 @@ Arquivo: `2026-10-27_missoes.sql` (equivale à migração `20261027000009_missoe
 - Teste: `tests/db/missions.test.ts` e `tests/db/pending-production.test.ts`.
 - Depois de aplicar: `select count(*) from public.xp_sources;` deve dar 554.
 
+## 4. Batalha com amigos, revanche, eventos (PENDENTE — ainda não aplicado)
+
+Aplicar NESTA ORDEM, antes de publicar o site novo (o site novo chama funções que só existem depois disso):
+
+1. `supabase/migrations/20261027000010_batalha_amigos.sql` — novas tabelas (`battle_invites`, `battle_events`), colunas (`kind`, `rematch_of`, `review_data`) e funções. Não apaga nem altera dados; partidas antigas ficam como "ranqueada".
+2. `supabase/battle-config.sql` — agora também cadastra os 8 eventos semanais.
+3. `supabase/battle-challenges.sql` — agora também grava a revisão de cada desafio (`review_data`).
+
+A Edge Function `battle-submit` não muda. Testes: `tests/db/battle-friends.test.ts` (14) e `tests/db/battle.test.ts`.
+
 ## Como conferir depois de aplicar (somente leitura)
 
 ```sql

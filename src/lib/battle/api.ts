@@ -37,8 +37,26 @@ export interface Submission {
   submitted_at: string;
 }
 
+export interface ChallengeReview {
+  idea: string;
+  steps: string[];
+  pitfalls: string[];
+  study: string[];
+}
+
+export type RematchStatus = "nenhum" | "pedido_por_mim" | "pedido_pelo_adversario" | "aceito" | "recusado" | "cancelado" | "expirado";
+export interface RematchInfo {
+  status: RematchStatus;
+  match_id: string | null;
+  expires_at: string | null;
+  opponent_available: boolean;
+  error?: string;
+}
+
 export interface MatchState {
   match_id: string;
+  /** Ranqueada (fila, vale troféus) ou amistosa (amigos e revanches, não vale troféus). */
+  kind: "ranqueada" | "amistosa";
   status: "pronta" | "em_andamento" | "finalizada" | "cancelada";
   result: "vitoria" | "tempo_esgotado" | "abandono" | "cancelada" | null;
   winner: "eu" | "adversario" | null;
@@ -48,7 +66,10 @@ export interface MatchState {
   finished_at: string | null;
   arena: { id: number; name: string; tier: number };
   challenge: PublicChallenge | null;
-  me: { lang: BattleLang; trophies_before: number; trophy_delta: number | null };
+  me: { lang: BattleLang; trophies_before: number; trophy_delta: number | null; final_code: string | null };
+  /** Só depois do fim da partida. */
+  review: ChallengeReview | null;
+  rematch: RematchInfo | null;
   opponent: {
     name: string;
     username: string | null;
@@ -59,6 +80,7 @@ export interface MatchState {
     state: OpponentState;
     submissions: number;
     final_code: string | null;
+    final_accepted: boolean | null;
   };
   my_submissions: Submission[];
 }
@@ -90,6 +112,13 @@ export interface HistoryRow {
   outcome: "vitoria" | "derrota" | "empate";
   result: string;
   trophy_delta: number | null;
+  kind: "ranqueada" | "amistosa";
+  challenge_id: string;
+  tier: number;
+  solved: boolean;
+  submissions: number;
+  /** Segundos do início até a primeira solução aceita (null = não resolveu). */
+  solve_sec: number | null;
 }
 
 function sb() {
@@ -133,9 +162,80 @@ export async function leaderboard(scope: "geral" | "temporada"): Promise<LeaderR
 }
 
 export async function history(): Promise<HistoryRow[]> {
-  const { data, error } = await sb().rpc("battle_history", { p_limit: 30 });
+  const { data, error } = await sb().rpc("battle_history", { p_limit: 100 });
   if (error) throw error;
   return (data ?? []) as HistoryRow[];
+}
+
+/* ------------------------------ Amigos e revanche ------------------------------ */
+
+export interface MyInvite {
+  code: string;
+  status: "aberto" | "aceito" | "cancelado" | "expirado" | "recusado";
+  expires_at: string;
+  match_id: string | null;
+}
+
+export interface InvitePeek {
+  status: "aberto" | "expirado" | "usado" | "cancelado" | "inexistente";
+  mine?: boolean;
+  host_name?: string;
+  host_lang?: BattleLang;
+  expires_at?: string;
+}
+
+/** Mensagem legível de um erro do banco (as funções usam textos em português). */
+export function errorText(e: unknown, fallback: string): string {
+  const msg = (e as { message?: string } | null)?.message;
+  return msg && msg.length < 200 && !/fetch|network/i.test(msg) ? msg.charAt(0).toUpperCase() + msg.slice(1) + "." : fallback;
+}
+
+export async function inviteCreate(lang: BattleLang): Promise<MyInvite> {
+  const { data, error } = await sb().rpc("battle_invite_create", { p_lang: lang });
+  if (error) throw error;
+  return { ...(data as MyInvite), match_id: null };
+}
+
+export async function inviteMine(): Promise<MyInvite | null> {
+  const { data, error } = await sb().rpc("battle_invite_mine");
+  if (error) throw error;
+  return (data as MyInvite | null) ?? null;
+}
+
+export async function invitePeek(code: string): Promise<InvitePeek> {
+  const { data, error } = await sb().rpc("battle_invite_peek", { p_code: code });
+  if (error) throw error;
+  return data as InvitePeek;
+}
+
+export async function inviteAccept(code: string, lang: BattleLang): Promise<{ ok: boolean; match_id?: string; error?: string }> {
+  const { data, error } = await sb().rpc("battle_invite_accept", { p_code: code, p_lang: lang });
+  if (error) throw error;
+  return data;
+}
+
+export async function inviteCancel(): Promise<void> {
+  await sb().rpc("battle_invite_cancel");
+}
+
+export async function rematch(matchId: string, action: "pedir" | "aceitar" | "recusar"): Promise<RematchInfo> {
+  const { data, error } = await sb().rpc("battle_rematch", { p_match: matchId, p_action: action });
+  if (error) throw error;
+  return data as RematchInfo;
+}
+
+/* --------------------------------- Eventos --------------------------------- */
+
+export interface EventSummary {
+  participants: number;
+  leaders: Array<{ rank: number; name: string; username: string | null; avatar_url: string | null; score: number; is_me: boolean }>;
+  me: { rank: number; score: number } | null;
+}
+
+export async function eventSummary(eventId: number): Promise<EventSummary | null> {
+  const { data, error } = await sb().rpc("battle_event_summary", { p_event: eventId, p_limit: 10 });
+  if (error) throw error;
+  return (data as EventSummary | null) ?? null;
 }
 
 export interface SubmitResponse {
