@@ -18,8 +18,9 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 
 ## O que tem aqui
 
-- **17 trilhas** com aulas que seguem sempre a mesma estrutura: objetivo, por que importa, conceitos, exemplo prático, código explicado, erros comuns, resumo, exercício e quiz.
-  Lógica de programação, HTML, CSS, JavaScript, Git e GitHub, TypeScript, React, Node.js e APIs, Modelagem de dados, SQL, Supabase (autenticação e segurança), Testes e depuração, Deploy e hospedagem, Full Stack, Java e Orientação a Objetos, IA aplicada à programação (com n8n) e Portfólio, currículo e entrevistas.
+- **20 trilhas** com aulas que seguem sempre a mesma estrutura: objetivo, por que importa, conceitos, exemplo prático, código explicado, erros comuns, resumo, exercício e quiz.
+  Lógica de programação, HTML, CSS, JavaScript, Git e GitHub, TypeScript, React, Node.js e APIs, Modelagem de dados, SQL, Supabase (autenticação e segurança), Testes e depuração, Deploy e hospedagem, Full Stack, Java e Orientação a Objetos, Python do zero, C# e .NET para desktop, AWS (computação em nuvem com foco em segurança e custo zero), IA aplicada à programação (com n8n) e Portfólio, currículo e entrevistas.
+  Os exemplos de código das trilhas de Python, C# e Java são executados de verdade na conferência; os que dependem de janelas do Windows, de pacotes externos ou de uma conta na AWS estão marcados na própria aula como não executados automaticamente.
 - **Quizzes** de revisão por aula e um desafio final por trilha, com explicação em cada resposta.
 - **9 jogos**: robô programador, caça aos bugs, monte o código, chuva de código, memória, construtor SQL, missões full stack, corrida de digitação e seletor CSS ao vivo.
 - **Desafios de código** em 11 linguagens: escolha a linguagem e a dificuldade; o site sorteia um problema e testa sua solução com casos gerados na hora. JavaScript, TypeScript, Python e SQL rodam no navegador (Web Worker isolado, Pyodide e sql.js); Java, C, C++, C#, Go, Rust e PHP são compilados no Judge0.
@@ -29,7 +30,7 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 - **Videoaulas gratuitas** recentes (até 1 ano) do YouTube indicadas em cada trilha.
 - **Treino diário estilo Duolingo**: 10 perguntas, 3 vidas, revisão das perguntas erradas, meta diária de XP e ofensiva (dias seguidos).
 - **Níveis com títulos**, de *Dev Bebê* a *Dev Lendário*, além de conquistas.
-- **Login com Google (opcional)**: o XP passa a contar no **ranking geral** e na **liga da semana**, e o progresso sincroniza entre aparelhos. Sem login, tudo fica salvo no navegador.
+- **Login com Google (opcional)**: o XP passa a contar no **ranking geral** e na **liga da semana**, e o progresso sincroniza entre aparelhos. Sem login, tudo fica salvo no navegador. Por segurança, o banco registra no ranking no máximo 400 XP a cada 10 minutos e 1.200 XP por dia por pessoa; o restante entra nas sincronizações seguintes.
 - **Perfil público** com GitHub, LinkedIn e site, **adicionar colegas** e **liga dos amigos**.
 - **Apoio voluntário por Pix** (a partir de R$ 5, sem nenhuma vantagem no site e sem login), com confirmação feita no servidor. Ativo; detalhes em [docs/APOIO_PIX.md](docs/APOIO_PIX.md).
 - **E-book do autor**, *O Próximo Nível da Programação*, na página `/ebook` e no menu (todo o conteúdo do site continua gratuito).
@@ -61,6 +62,9 @@ Outros comandos:
 | `npm run battle:config` | Gera o SQL de arenas, regras, temporadas e desafios da Batalha a partir do código |
 | `npm run battle:validate` | Roda cada desafio da Batalha no Judge0 nas 10 linguagens (solução aceita, código inicial recusado) |
 | `npx tsx scripts/check-challenges-remote.mts` | Confere os desafios de código nas linguagens compiladas no Judge0 |
+| `npx tsx scripts/check-local-blocks.mts <trilha>` | Roda localmente os exemplos de Python e C# de uma trilha e compara com a saída escrita na aula (precisa de Python 3 e do .NET 10 SDK) |
+| `npx tsx scripts/check-java-blocks.mts java` | Compila e roda no Judge0 os exemplos da trilha de Java |
+| `npx tsx scripts/bundle-battle-submit.mts <saída.js>` | Gera o pacote da Edge Function da Batalha sem as soluções de referência |
 | `npm run deploy` | Gera o site, confere os links e publica no GitHub Pages |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript |
@@ -89,11 +93,14 @@ content/            conteúdo educacional
 src/app/            páginas
 src/components/     interface
 src/lib/            regras: progresso, XP, treino, correção de quizzes, motor dos jogos e login
-supabase/           migrations do banco, seeds e a Edge Function da Batalha (functions/)
+supabase/           migrations do banco, seeds e as Edge Functions da Batalha e do Pix (functions/)
+  producao-pendente/ scripts preparados para o banco de produção que ainda não foram aplicados (veja o LEIA-ME)
 tests/              testes automatizados
 ```
 
 Para adicionar uma aula, escreva o texto em `aulas.md` (separado por `<!-- aula: slug -->`) e os metadados em `course.ts`. Os testes acusam seções faltando, slugs repetidos, gabaritos inválidos e erros de sintaxe nos blocos de JavaScript.
+
+Nos exemplos executáveis de Python e C#, escreva logo abaixo do bloco de código a linha `Saída:` e um bloco ```` ```texto ```` com o resultado esperado; `scripts/check-local-blocks.mts` roda o código e confere. Exemplos que não podem rodar sem internet, sem Windows ou sem uma conta externa ficam sem `Saída:` e com um aviso na aula. Depois de criar uma trilha, rode `npm run db:seed` e gere o SQL de produção da trilha com `npx tsx scripts/seed-for-course.mts <trilha>`.
 
 ## Créditos e referências
 
