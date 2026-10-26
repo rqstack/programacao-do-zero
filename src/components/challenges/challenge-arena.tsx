@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorHelp } from "@/components/learn/error-help";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, Eye, Lightbulb, Play, RotateCcw, Send, Shuffle, Sparkles, X } from "lucide-react";
 import { CHALLENGE_LABEL, codeChallenges, sqlChallenges, sqlDataset, SQL_SCHEMA, type ChallengeDifficulty, type CodeChallenge, type SqlChallenge } from "@content/challenges";
@@ -53,7 +54,27 @@ export function ChallengeArena() {
   const [diff, setDiff] = useState<ChallengeDifficulty>("facil");
   const [picked, setPicked] = useState<Picked | null>(null);
 
+  // Link direto (?id=...), usado pela busca, pelos favoritos e pela revisão.
   useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("id");
+    if (!id) return;
+    const sql = sqlChallenges.find((c) => c.id === id);
+    const code = codeChallenges.find((c) => c.id === id);
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (sql) {
+      setLang("sql");
+      setDiff(sql.difficulty);
+      setPicked({ kind: "sql", ch: sql });
+    } else if (code) {
+      setLang("javascript");
+      setDiff(code.difficulty);
+      setPicked({ kind: "code", ch: code });
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("id")) return;
     const raw = readStore(PREF_KEY);
     if (!raw) return;
     try {
@@ -417,6 +438,7 @@ function CodeArena({ ch, lang }: { ch: CodeChallenge; lang: Exclude<ChallengeLan
           <div role="alert" className="rounded-[var(--radius-md)] border border-bad/50 bg-bad/[0.08] p-3">
             <p className="text-sm font-semibold text-bad">Seu código deu erro</p>
             <pre className="mt-1 whitespace-pre-wrap font-mono text-xs text-[#ffd6d6]">{error}</pre>
+            <ErrorHelp message={error} />
           </div>
         )}
         {rows && (
@@ -624,6 +646,7 @@ function SqlArena({ ch }: { ch: SqlChallenge }) {
           <div role="alert" className="rounded-[var(--radius-md)] border border-bad/50 bg-bad/[0.08] p-3">
             <p className="text-sm font-semibold text-bad">Erro na consulta</p>
             <pre className="mt-1 whitespace-pre-wrap font-mono text-xs text-[#ffd6d6]">{error}</pre>
+            <ErrorHelp message={error} />
           </div>
         )}
         {mine && <ResultTable table={mine} caption="Seu resultado" />}

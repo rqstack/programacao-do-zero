@@ -2,6 +2,9 @@ import "server-only";
 import { courses, games, projects } from "@content/index";
 import { readLessonBodies, readProjectBody } from "@content/load";
 import type { SeedCourse, SeedGame, SeedLesson, SeedProject, SeedQuestion } from "@content/schema";
+import { CHALLENGE_LABEL, codeChallenges, sqlChallenges } from "@content/challenges";
+import { glossary } from "@content/glossario";
+import type { SearchEntry } from "@/lib/search/query";
 
 export const CATEGORY_LABEL: Record<SeedCourse["category"], string> = {
   fundamentos: "Fundamentos",
@@ -195,4 +198,46 @@ export function allProjects(): SeedProject[] {
 export function getProject(slug: string): { project: SeedProject; body: string } | null {
   const project = projects.find((p) => p.slug === slug);
   return project ? { project, body: readProjectBody(project.slug) } : null;
+}
+
+/* --------------------------------- Busca --------------------------------- */
+
+let SEARCH: SearchEntry[] | null = null;
+
+/** Índice da busca global (gerado no build, enviado ao navegador como dado estático). */
+export function searchIndex(): SearchEntry[] {
+  if (SEARCH) return SEARCH;
+  const out: SearchEntry[] = [];
+  for (const [ci, seed] of courses.entries()) {
+    const course = COURSES[ci]!;
+    out.push({ kind: "trilha", title: course.title, text: course.description, href: `/trilhas/${course.slug}`, context: CATEGORY_LABEL[course.category], fav: `course:${course.slug}` });
+    const bodies = readLessonBodies(seed);
+    for (const l of course.lessons) {
+      const headings = (bodies.get(l.slug) ?? "")
+        .split("\n")
+        .filter((line) => line.startsWith("## ") || line.startsWith("### "))
+        .map((line) => line.replace(/^#+\s*/, ""))
+        .join(" · ");
+      out.push({ kind: "aula", title: l.title, text: l.summary, href: `/aulas/${l.slug}`, context: course.title, extra: `${l.objective} ${headings}`, fav: `lesson:${l.slug}` });
+    }
+  }
+  for (const q of QUIZZES) {
+    out.push({ kind: "quiz", title: q.title, text: q.description, href: `/quizzes/${q.slug}`, context: q.courseTitle, fav: `quiz:${q.slug}` });
+  }
+  for (const g of games) out.push({ kind: "jogo", title: g.title, text: g.description, href: `/jogos/${g.slug}`, fav: `game:${g.slug}` });
+  for (const p of projects) out.push({ kind: "projeto", title: p.title, text: p.summary, href: `/projetos/${p.slug}`, extra: p.skills.join(" "), fav: `project:${p.slug}` });
+  for (const c of [...codeChallenges, ...sqlChallenges]) {
+    const isSql = sqlChallenges.some((s) => s.id === c.id);
+    out.push({
+      kind: "desafio",
+      title: c.title,
+      text: `${isSql ? "SQL" : "Lógica"} · ${CHALLENGE_LABEL[c.difficulty]} · ${c.topics.join(", ")}`,
+      href: `/desafios?id=${c.id}`,
+      extra: c.statement.slice(0, 300),
+      fav: `challenge:${c.id}`,
+    });
+  }
+  for (const t of glossary) out.push({ kind: "glossario", title: t.term, text: t.definition, href: "/glossario", context: t.area });
+  SEARCH = out;
+  return out;
 }

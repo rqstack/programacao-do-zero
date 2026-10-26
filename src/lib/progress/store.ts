@@ -9,6 +9,7 @@ const BACKUP_KEY = "pdz-progresso-backup";
 type Listener = () => void;
 const listeners = new Set<Listener>();
 const rewardListeners = new Set<(r: Reward) => void>();
+const changeListeners = new Set<() => void>();
 let cache: ProgressState | null = null;
 
 function read(): ProgressState {
@@ -70,8 +71,10 @@ export function useHydrated(): boolean {
 }
 
 export function dispatchProgress(action: ProgressAction): Reward {
-  const { state, reward } = applyProgress(read(), action, new Date());
+  const before = read();
+  const { state, reward } = applyProgress(before, action, new Date());
   write(state);
+  if (state !== before) for (const l of changeListeners) l();
   if (reward.xp > 0 || reward.achievements.length > 0) {
     for (const l of rewardListeners) l(reward);
   }
@@ -82,6 +85,14 @@ export function onReward(listener: (r: Reward) => void) {
   rewardListeners.add(listener);
   return () => {
     rewardListeners.delete(listener);
+  };
+}
+
+/** Qualquer ação que mudou o progresso (usado para sincronizar com a conta). */
+export function onProgressChange(listener: () => void) {
+  changeListeners.add(listener);
+  return () => {
+    changeListeners.delete(listener);
   };
 }
 

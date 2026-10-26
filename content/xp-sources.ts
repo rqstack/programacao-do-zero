@@ -1,4 +1,5 @@
 import { XP_RULES } from "../src/lib/gamification/rules";
+import { LOCAL_MISSIONS } from "../src/lib/progress/missions";
 import { codeChallenges, sqlChallenges } from "./challenges";
 import { courses, games, projects } from "./index";
 
@@ -28,6 +29,7 @@ export function xpSources(): XpSource[] {
   for (const c of [...codeChallenges, ...sqlChallenges]) {
     out.push({ key: `challenge:${c.id}`, amount: XP_RULES.challenge[c.difficulty], label: `Desafio: ${c.title}` });
   }
+  for (const m of LOCAL_MISSIONS) out.push({ key: `mission:${m.slug}`, amount: m.xp, label: `Missão: ${m.title}` });
   return out;
 }
 

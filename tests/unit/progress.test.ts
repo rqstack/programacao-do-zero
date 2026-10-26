@@ -56,7 +56,9 @@ describe("progresso local", () => {
     expect(early.reward.xp).toBe(0);
     s = applyProgress(s, { type: "project/toggle", slug: "p", index: 1 }, day("2026-10-20T12:00:00")).state;
     const done = applyProgress(s, { type: "project/complete", slug: "p", title: "P", totalCriteria: 2, url: "https://github.com/x" }, day("2026-10-20T12:00:00"));
-    expect(done.reward.xp).toBe(100);
+    // 100 do projeto + 50 da missão "Construtor" (primeiro projeto).
+    expect(done.reward.xp).toBe(100 + 50);
+    expect(done.reward.missions?.map((m) => m.slug)).toEqual(["construtor"]);
     expect(done.state.projects.p?.completedAt).not.toBeNull();
   });
 
@@ -132,7 +134,8 @@ describe("mesclagem de progresso (aparelho + conta)", () => {
     expect(Object.keys(m.lessons).sort()).toEqual(["a", "b"]);
     expect(m.lessons.a).toBe(remote.lessons.a);
     expect(m.quizzes.q).toMatchObject({ best: 90, passed: true });
-    expect(totalXp(m)).toBe(20 + 20 + 30);
+    // Aulas a e b, quiz q e a missão "Primeiros passos" (aula + quiz), cada um uma vez só.
+    expect(totalXp(m)).toBe(20 + 20 + 30 + 30);
     expect(m.createdAt).toBe(remote.createdAt);
     expect(parseProgress(JSON.parse(JSON.stringify(m)))).not.toBeNull();
   });

@@ -547,6 +547,14 @@ insert into public.xp_sources (key, amount, label) values
   ('challenge:sql-clientes-sem-pedido', 25, 'Desafio: Clientes que nunca compraram'),
   ('challenge:sql-grandes-compradores', 40, 'Desafio: Grandes compradores'),
   ('challenge:sql-categoria-campea', 40, 'Desafio: Categoria campeã de vendas'),
-  ('challenge:sql-mais-velho-por-cidade', 40, 'Desafio: O mais velho de cada cidade')
+  ('challenge:sql-mais-velho-por-cidade', 40, 'Desafio: O mais velho de cada cidade'),
+  ('mission:primeiros-passos', 30, 'Missão: Primeiros passos'),
+  ('mission:explorador', 30, 'Missão: Explorador'),
+  ('mission:estudante-dedicado', 30, 'Missão: Estudante dedicado'),
+  ('mission:cacador-de-bugs', 40, 'Missão: Caçador de bugs'),
+  ('mission:desafiante', 50, 'Missão: Desafiante'),
+  ('mission:construtor', 50, 'Missão: Construtor'),
+  ('mission:revisor', 50, 'Missão: Revisor'),
+  ('mission:semana-de-estudo', 50, 'Missão: Semana de estudo')
 on conflict (key) do update set amount = excluded.amount, label = excluded.label;
 commit;

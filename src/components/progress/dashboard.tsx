@@ -9,7 +9,9 @@ import { dispatchProgress, exportProgress, importProgress, resetProgress, useHyd
 import { Alert, Button, cx, EmptyState, ProgressBar } from "@/components/ui/primitives";
 import { AccountSection } from "@/components/auth/account-section";
 import { ContinueCard, type LessonOrderItem } from "./continue-card";
+import { MissionsPanel } from "./missions-panel";
 import { TrophyCase } from "./trophy-case";
+import { WeeklyGoals } from "./weekly-goals";
 
 interface CourseSummary {
   slug: string;
@@ -42,6 +44,7 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
   const { current, best } = streaks(progress.days, new Date());
   const history = historyOf(progress);
   const lessonsDone = Object.keys(progress.lessons).length;
+  const pendingMistakes = Object.values(progress.mistakes).filter((n) => n > 0).length;
   const stats = [
     { label: "Aulas concluídas", value: lessonsDone },
     { label: "Exercícios resolvidos", value: Object.values(progress.exercises).filter((e) => e === "solved").length },
@@ -133,6 +136,8 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
         </Link>
       </section>
 
+      <WeeklyGoals progress={progress} />
+
       {lessonsDone === 0 && history.length === 0 ? (
         <EmptyState title="Seu progresso começa na primeira aula" action={<ContinueCard order={order} />}>
           Conclua aulas, resolva exercícios, passe nos quizzes e jogue para ganhar XP. Tudo fica salvo neste navegador, sem cadastro.
@@ -140,6 +145,12 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
       ) : (
         <div className="flex flex-wrap items-center gap-3">
           <ContinueCard order={order} />
+          <Link href="/revisao" className="inline-flex min-h-12 items-center rounded-[var(--radius-md)] border border-line-strong px-5 font-semibold hover:border-muted">
+            Revisar erros{pendingMistakes ? ` (${pendingMistakes})` : ""}
+          </Link>
+          <Link href="/salvos" className="inline-flex min-h-12 items-center rounded-[var(--radius-md)] border border-line-strong px-5 font-semibold hover:border-muted">
+            Salvos e anotações
+          </Link>
         </div>
       )}
 
@@ -182,6 +193,8 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
           })}
         </ul>
       </section>
+
+      <MissionsPanel progress={progress} />
 
       <TrophyCase progress={progress} />
 

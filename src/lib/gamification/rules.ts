@@ -17,6 +17,10 @@ export const XP_RULES = {
 export const DAILY_GOALS = [10, 20, 30, 50] as const;
 export type DailyGoal = (typeof DAILY_GOALS)[number];
 
+/** Tipos de meta semanal (detalhes em src/lib/progress/weekly.ts). */
+export const WEEKLY_TYPES = ["dias", "aulas", "exercicios", "quizzes", "desafios"] as const;
+export type WeeklyType = (typeof WEEKLY_TYPES)[number];
+
 /** Vidas por treino: cada erro tira uma; sem vidas, o treino termina sem XP. */
 export const PRACTICE_HEARTS = 3;
 export const PRACTICE_SIZE = 10;

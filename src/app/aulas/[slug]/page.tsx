@@ -4,7 +4,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Clock, Target } from "lucide-react";
 import { headingsOf, Markdown } from "@/components/content/markdown";
 import { VideoCourses } from "@/components/content/video-courses";
+import { CodeBlock } from "@/components/content/code-block";
+import { FavoriteButton } from "@/components/learn/favorite-button";
+import { LessonNotes } from "@/components/learn/lesson-notes";
 import { CompleteLessonButton, ExercisePanel, LessonQuiz } from "@/components/learn/lesson-practice";
+import { lessonExample } from "@/lib/tutor/tutor";
 import { Container } from "@/components/ui/primitives";
 import { allLessons, getLessonPage } from "@/lib/catalog";
 
@@ -25,7 +29,8 @@ export default async function AulaPage(props: PageProps<"/aulas/[slug]">) {
   const page = getLessonPage(slug);
   if (!page) notFound();
   const { course, lesson, data, body, previous, next, nextCourse } = page;
-  const toc = [...headingsOf(body), { id: "pratica", text: "Pratique" }];
+  const toc = [...headingsOf(body), { id: "pratica", text: "Pratique" }, { id: "anotacoes", text: "Minhas anotações" }];
+  const example = lessonExample(body, data.exercise.accepted);
 
   return (
     <Container className="py-10">
@@ -45,7 +50,10 @@ export default async function AulaPage(props: PageProps<"/aulas/[slug]">) {
             <p className="font-mono text-xs text-subtle">
               Aula {lesson.number} de {course.lessons.length} · {lesson.moduleTitle}
             </p>
-            <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{lesson.title}</h1>
+            <div className="mt-2 flex items-start justify-between gap-4">
+              <h1 className="text-3xl font-bold sm:text-4xl">{lesson.title}</h1>
+              <FavoriteButton favKey={`lesson:${lesson.slug}`} title={lesson.title} className="mt-1 shrink-0" />
+            </div>
             <div className="mt-5 flex items-start gap-3 rounded-[var(--radius-md)] border border-line bg-navy/60 p-4">
               <Target aria-hidden className="mt-0.5 size-5 shrink-0 text-amber" />
               <p className="text-sm">
@@ -67,7 +75,17 @@ export default async function AulaPage(props: PageProps<"/aulas/[slug]">) {
             </h2>
             <div className="rounded-[var(--radius-lg)] border border-line bg-navy/60 p-5 sm:p-6">
               <h3 className="mb-4 font-semibold text-muted">Exercício</h3>
-              <ExercisePanel slug={lesson.slug} title={lesson.title} exercise={data.exercise} />
+              <ExercisePanel
+                slug={lesson.slug}
+                title={lesson.title}
+                exercise={data.exercise}
+                tutor={{
+                  objective: lesson.objective,
+                  summary: lesson.summary,
+                  example: example ? <CodeBlock code={example.code} language={example.lang} /> : null,
+                  sections: headingsOf(body),
+                }}
+              />
             </div>
             <div className="rounded-[var(--radius-lg)] border border-line bg-navy/60 p-5 sm:p-6">
               <h3 className="mb-6 font-semibold text-muted">Quiz de revisão</h3>
@@ -76,6 +94,10 @@ export default async function AulaPage(props: PageProps<"/aulas/[slug]">) {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <CompleteLessonButton slug={lesson.slug} title={lesson.title} />
             </div>
+          </section>
+
+          <section id="anotacoes" aria-label="Minhas anotações" className="mt-12 scroll-mt-24 rounded-[var(--radius-lg)] border border-line p-5 sm:p-6">
+            <LessonNotes slug={lesson.slug} />
           </section>
 
           <nav aria-label="Navegação entre aulas" className="mt-12 grid gap-3 border-t border-line pt-8 sm:grid-cols-2">

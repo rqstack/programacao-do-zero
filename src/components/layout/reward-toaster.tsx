@@ -68,7 +68,8 @@ export function RewardToaster() {
     () =>
       onReward((r: Reward) => {
         if (r.xp > 0) {
-          const t = { id: nextId++, title: `+${r.xp} XP`, detail: r.label };
+          const missions = r.missions?.length ? ` · Missão concluída: ${r.missions.map((m) => m.title).join(", ")}` : "";
+          const t = { id: nextId++, title: `+${r.xp} XP`, detail: `${r.label}${r.label.startsWith("Missão") ? "" : missions}` };
           setXpToasts((all) => [...all, t].slice(-3));
           timers.current.push(window.setTimeout(() => setXpToasts((all) => all.filter((x) => x.id !== t.id)), 3600));
         }

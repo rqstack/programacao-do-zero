@@ -18,6 +18,15 @@ Arquivo: `2026-10-26_atividades_python_csharp_aws.sql` (69 linhas em `xp_sources
 - Sem isso, concluir aulas dessas trilhas não soma XP no ranking (o resto do site funciona).
 - Teste: `tests/db/pending-production.test.ts`.
 
+## 3. Missões (PENDENTE — ainda não aplicado)
+
+Arquivo: `2026-10-27_missoes.sql` (equivale à migração `20261027000009_missoes.sql` + 8 linhas em `xp_sources`).
+
+- Só amplia a regra de formato das chaves de XP para aceitar `mission:` e cadastra as 8 missões (30 a 50 XP cada). Nenhum dado existente muda.
+- Sem isso, o site funciona normalmente, mas o XP das missões fica só no navegador e não entra no ranking.
+- Teste: `tests/db/missions.test.ts` e `tests/db/pending-production.test.ts`.
+- Depois de aplicar: `select count(*) from public.xp_sources;` deve dar 554.
+
 ## Como conferir depois de aplicar (somente leitura)
 
 ```sql

@@ -2,7 +2,7 @@
 
 import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { onReward, resetProgress } from "@/lib/progress/store";
+import { onProgressChange, resetProgress } from "@/lib/progress/store";
 import { syncProgress } from "@/lib/progress/sync";
 import { BASE_PATH, getSupabase, isGoogleEnabled, isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -109,12 +109,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const userId = session?.user.id ?? null;
 
-  // Novas recompensas: sincroniza alguns segundos depois (agrupa ações seguidas).
+  // Mudanças no progresso (recompensas, anotações, favoritos, metas): sincroniza alguns
+  // segundos depois, agrupando ações seguidas num único envio.
   useEffect(() => {
     if (!userId) return;
-    const off = onReward(() => {
+    const off = onProgressChange(() => {
       if (pending.current) window.clearTimeout(pending.current);
-      pending.current = window.setTimeout(() => runSync(userId), 2500);
+      pending.current = window.setTimeout(() => runSync(userId), 3000);
     });
     return () => {
       off();

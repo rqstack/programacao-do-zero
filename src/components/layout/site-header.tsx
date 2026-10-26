@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
-import { BookOpen, Flame, Heart, Menu, X } from "lucide-react";
+import { BookOpen, Flame, Heart, Menu, Search, X } from "lucide-react";
 import { levelFromXp } from "@/lib/gamification/rules";
 import { dailyXp, streaks, totalXp } from "@/lib/progress/model";
 import { useHydrated, useProgress } from "@/lib/progress/store";
@@ -96,6 +96,15 @@ export function SiteHeader() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <Link
+            href="/busca"
+            aria-current={isActive(pathname, "/busca") ? "page" : undefined}
+            title="Buscar no site"
+            aria-label="Buscar no site"
+            className="grid size-10 place-items-center rounded-full border border-line-strong text-muted hover:border-muted hover:text-fg"
+          >
+            <Search aria-hidden className="size-4" />
+          </Link>
+          <Link
             href="/ebook"
             aria-current={isActive(pathname, "/ebook") ? "page" : undefined}
             title="E-book do autor"
@@ -150,7 +159,7 @@ export function SiteHeader() {
             </Link>
           </div>
           <ul className="space-y-1">
-            {[{ href: "/", label: "Início" }, ...NAV, { href: "/glossario", label: "Glossário" }, { href: "/progresso", label: "Meu progresso" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
+            {[{ href: "/", label: "Início" }, ...NAV, { href: "/glossario", label: "Glossário" }, { href: "/progresso", label: "Meu progresso" }, { href: "/revisao", label: "Revisar erros" }, { href: "/salvos", label: "Salvos e anotações" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

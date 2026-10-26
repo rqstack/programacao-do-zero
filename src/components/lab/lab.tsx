@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorHelp } from "@/components/learn/error-help";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Play, RotateCcw, Trash2 } from "lucide-react";
 import { Button, cx } from "@/components/ui/primitives";
@@ -272,6 +273,14 @@ export function Lab() {
                 ))
               )}
             </div>
+            {(() => {
+              const lastError = [...logs].reverse().find((l) => l.level === "error");
+              return lastError ? (
+                <div className="border-t border-line px-3 pb-3">
+                  <ErrorHelp message={lastError.text} />
+                </div>
+              ) : null;
+            })()}
           </div>
         </div>
       </div>
