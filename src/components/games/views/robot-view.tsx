@@ -49,7 +49,7 @@ export function RobotView({ payload, onAnswer, feedback }: { payload: RobotPaylo
       if (run.outcome === "goal") {
         onAnswer({ program });
       } else {
-        setMessage(run.outcome === "crash" ? "💥 O robô bateu na parede! Ajuste o programa e tente de novo." : "O robô parou antes da bandeira. Faltam comandos.");
+        setMessage(run.outcome === "crash" ? "O robô bateu na parede! Ajuste o programa e tente de novo." : "O robô parou antes da bandeira. Faltam comandos.");
         timer.current = window.setTimeout(() => setPos(initial), 900);
       }
     };

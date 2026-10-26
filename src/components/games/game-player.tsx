@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { ArrowDown, ArrowRight, ArrowUp, Flame, GripVertical, Heart, Play, RotateCcw, Star, Trophy } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, Bug, CarFront, Flag, Flame, GripVertical, Heart, Play, RotateCcw, Star, Trophy } from "lucide-react";
 import type { SeedGame } from "@content/schema";
 import { InlineMd } from "@/components/content/inline-md";
 import { Alert, Button, cx, ProgressBar } from "@/components/ui/primitives";
@@ -298,7 +298,7 @@ function BugView({ payload, onAnswer, feedback }: { payload: BugPayload; onAnswe
   const correctLine = feedback?.kind === "bug_hunt" ? feedback.correctLine : null;
   return (
     <div>
-      <p className="text-lg font-semibold">🔍 {payload.prompt}</p>
+      <p className="text-lg font-semibold">{payload.prompt}</p>
       <p className="mt-1 text-sm text-muted">Toque na linha com o bug.</p>
       <ol className="code-surface mt-4 overflow-x-auto rounded-md border border-line bg-[#040a17] py-2 font-mono text-[0.85rem]">
         {lines.map((line, i) => {
@@ -326,7 +326,7 @@ function BugView({ payload, onAnswer, feedback }: { payload: BugPayload; onAnswe
                   {n}
                 </span>
                 <span className="text-[#d6e2f5]">{line || " "}</span>
-                {isCorrect && <span className="ml-auto pl-3 text-xs text-ok">🐞 bug</span>}
+                {isCorrect && <span className="ml-auto inline-flex items-center gap-1 pl-3 text-xs text-ok"><Bug aria-hidden className="size-3.5" /> bug</span>}
               </button>
             </li>
           );
@@ -504,7 +504,7 @@ function MemoryView({ payload, onAnswer }: { payload: MemoryPayload; onAnswer: (
 
   return (
     <div>
-      <p className="text-lg font-semibold">🃏 Encontre os pares: {payload.prompt}</p>
+      <p className="text-lg font-semibold">Encontre os pares: {payload.prompt}</p>
       <p className="mt-1 text-sm text-muted" aria-live="polite">
         {matched.length / 2} de {payload.cards.length / 2} pares · {attempts} tentativa{attempts === 1 ? "" : "s"}
       </p>
@@ -565,15 +565,13 @@ function TypingView({ payload, onAnswer, feedback }: { payload: TypingPayload; o
 
   return (
     <div>
-      <p className="text-lg font-semibold">🏁 {payload.prompt}</p>
+      <p className="text-lg font-semibold">{payload.prompt}</p>
       {/* Pista */}
       <div aria-hidden className="relative mt-4 h-12 overflow-hidden rounded-full border border-line bg-[#040a17]">
         <div className="absolute inset-y-0 left-0 bg-electric/15" style={{ width: `${carPos * 100}%` }} />
         <div className="absolute inset-x-4 top-1/2 border-t-2 border-dashed border-line-strong" />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xl">🏁</span>
-        <span className="absolute top-1/2 -translate-y-1/2 text-2xl transition-[left] duration-150" style={{ left: `calc(${carPos * 100}% * 0.88)` }}>
-          🏎️
-        </span>
+        <Flag aria-hidden className="absolute right-3 top-1/2 size-5 -translate-y-1/2 text-amber" />
+        <CarFront aria-hidden className="absolute top-1/2 size-6 -translate-y-1/2 text-electric-hi transition-[left] duration-150" style={{ left: `calc(${carPos * 100}% * 0.88)` }} />
       </div>
       <div className="mt-4 overflow-x-auto rounded-md border border-line bg-[#040a17] p-3 font-mono text-[1rem]" aria-label={`Texto para digitar: ${target}`}>
         {target.split("").map((ch, i) => {
