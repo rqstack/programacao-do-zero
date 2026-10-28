@@ -33,7 +33,7 @@ export function AccountSection() {
           Seu XP ainda não conta no ranking
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted">Entre com o Google para levar este progresso para a sua conta, entrar no ranking e na liga da semana.</p>
-        <Link href="/entrar" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-electric px-4 font-semibold text-white hover:bg-electric-hi">
+        <Link href="/entrar" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-electric px-4 font-semibold text-white hover:bg-electric-strong">
           <LogIn aria-hidden className="size-4" /> Entrar com Google
         </Link>
       </section>

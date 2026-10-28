@@ -30,7 +30,7 @@ export function EbookSection({ page = false }: { page?: boolean }) {
             href={EBOOK_URL}
             target="_blank"
             rel="noopener"
-            className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md bg-electric px-5 font-semibold text-white hover:bg-electric-hi"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md bg-electric px-5 font-semibold text-white hover:bg-electric-strong"
           >
             Quero dar o próximo passo <ArrowUpRight aria-hidden className="size-4" />
             <span className="sr-only">(abre em nova aba)</span>

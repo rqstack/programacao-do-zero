@@ -131,7 +131,7 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
             ))}
           </div>
         </div>
-        <Link href="/treino" className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-5 font-semibold text-white hover:bg-electric-hi">
+        <Link href="/treino" className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-5 font-semibold text-white hover:bg-electric-strong">
           <Dumbbell aria-hidden className="size-5" /> Treino de hoje
         </Link>
       </section>

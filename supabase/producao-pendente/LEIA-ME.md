@@ -45,6 +45,12 @@ Arquivo: `supabase/migrations/20261028000011_portfolio.sql`. Aplicar antes de pu
 - Adiciona `profiles.portfolio` (preferências das seções) e a função `get_portfolio`.
 - Teste: `tests/db/portfolio.test.ts` (e `tests/db/profiles.test.ts` atualizado).
 
+## 6. Relatos dos alunos (PENDENTE — ainda não aplicado)
+
+Arquivo: `supabase/migrations/20261028000012_feedback.sql`. Cria a tabela `feedback` (ninguém lê pelo site) e a função `submit_feedback`, com validação e limite. Teste: `tests/db/feedback.test.ts`.
+
+Os relatos aparecem no painel: Supabase → Table Editor → `feedback`.
+
 ## Como conferir depois de aplicar (somente leitura)
 
 ```sql

@@ -23,7 +23,7 @@ export function ContinueCard({ order, fallbackLabel = "Começar pela primeira au
     return (
       <Link
         href={`/aulas/${first.slug}`}
-        className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-6 font-semibold text-white hover:bg-electric-hi"
+        className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-6 font-semibold text-white hover:bg-electric-strong"
       >
         {fallbackLabel} <ArrowRight aria-hidden className="size-4" />
       </Link>
@@ -31,7 +31,7 @@ export function ContinueCard({ order, fallbackLabel = "Começar pela primeira au
   }
   if (!next) {
     return (
-      <Link href="/progresso" className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-6 font-semibold text-white hover:bg-electric-hi">
+      <Link href="/progresso" className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-6 font-semibold text-white hover:bg-electric-strong">
         Você concluiu todas as aulas — ver progresso <ArrowRight aria-hidden className="size-4" />
       </Link>
     );
@@ -39,7 +39,7 @@ export function ContinueCard({ order, fallbackLabel = "Começar pela primeira au
   return (
     <Link
       href={`/aulas/${next.slug}`}
-      className="inline-flex min-h-12 max-w-full items-center gap-2 rounded-[var(--radius-md)] bg-electric px-6 font-semibold text-white hover:bg-electric-hi"
+      className="inline-flex min-h-12 max-w-full items-center gap-2 rounded-[var(--radius-md)] bg-electric px-6 font-semibold text-white hover:bg-electric-strong"
     >
       <span className="truncate">Continuar: {next.title}</span> <ArrowRight aria-hidden className="size-4 shrink-0" />
     </Link>

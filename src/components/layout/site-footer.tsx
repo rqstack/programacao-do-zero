@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReportLink } from "@/components/feedback/report-link";
 import { LogoMark } from "./logo";
 
 const COLUMNS = [
@@ -62,9 +63,12 @@ export function SiteFooter() {
         ))}
       </div>
       <div className="border-t border-line">
-        <p className="mx-auto w-full max-w-6xl px-4 py-5 text-xs text-subtle sm:px-6">
-          Conteúdo educacional gratuito. O aprendizado depende do estudo e da prática de cada pessoa. Seu progresso fica salvo apenas neste navegador.
-        </p>
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
+          <p className="text-xs text-subtle">
+            Conteúdo educacional gratuito. O aprendizado depende do estudo e da prática de cada pessoa. Sem login, seu progresso fica neste navegador; com login, também na sua conta.
+          </p>
+          <ReportLink />
+        </div>
       </div>
     </footer>
   );

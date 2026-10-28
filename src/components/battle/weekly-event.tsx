@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CalendarRange, Medal } from "lucide-react";
 import { ARENAS } from "@battle/battle-core.ts";
-import { EVENTS, type BattleEvent } from "@battle/battle-sql.ts";
+import { EVENTS, type BattleEvent } from "@battle/battle-events.ts";
 import { cx } from "@/components/ui/primitives";
 import { eventSummary, type EventSummary } from "@/lib/battle/api";
 

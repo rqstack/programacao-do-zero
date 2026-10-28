@@ -10,7 +10,7 @@ export function AccountButton() {
   if (!configured || loading) return null;
   if (!session) {
     return (
-      <Link href="/entrar" className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-electric px-3.5 text-sm font-semibold text-white hover:bg-electric-hi">
+      <Link href="/entrar" className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-electric px-3.5 text-sm font-semibold text-white hover:bg-electric-strong">
         <LogIn aria-hidden className="size-4" /> Entrar
       </Link>
     );

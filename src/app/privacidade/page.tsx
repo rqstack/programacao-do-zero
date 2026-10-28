@@ -41,14 +41,23 @@ export default function PrivacidadePage() {
         <p>Ao entrar com o Google, recebemos do Google apenas o seu nome, e-mail e foto de perfil. Com a conta, o site guarda:</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>nome, foto e e-mail da conta Google;</li>
-          <li>o progresso de estudo e o XP de cada atividade concluída;</li>
+          <li>o progresso de estudo e o XP de cada atividade concluída, incluindo anotações das aulas, favoritos, metas e as respostas da &ldquo;Minha trilha&rdquo; (só você lê);</li>
           <li>os dados de perfil que você escolher preencher (nome de usuário, título, bio, GitHub, LinkedIn e site);</li>
           <li>quem você segue e quem segue você;</li>
           <li>se você jogar a Batalha de Código: partidas, códigos enviados, resultados, troféus e posição no ranking.</li>
         </ul>
         <p>
-          <strong className="text-fg">O que fica público:</strong> nome, foto, XP e posição no ranking; e o perfil público, se você não o deixar
-          privado. O e-mail nunca é exibido.
+          <strong className="text-fg">O que fica público:</strong> nome, foto, XP e posição no ranking; e o portfólio, só se você o publicar
+          (contas novas começam com ele privado) e só com as seções que você escolher. O e-mail, as anotações, os favoritos e os erros nunca são
+          exibidos.
+        </p>
+        <p>
+          <strong className="text-fg">Relatos de problemas:</strong> o texto que você enviar em{" "}
+          <Link href="/feedback" className="text-electric-hi underline underline-offset-2">
+            Relatar um problema
+          </Link>{" "}
+          e a página de onde veio ficam guardados para quem mantém o site ler. Com login, o relato fica ligado à conta só para limitar abusos;
+          sem login, vai sem dados seus. Relatos não são públicos.
         </p>
         <p>Usamos esses dados só para fazer o site funcionar: salvar o seu progresso, mostrar rankings e perfis e organizar as partidas.</p>
       </Section>

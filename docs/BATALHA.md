@@ -120,11 +120,19 @@ npm run battle:validate                             # 29 desafios × 10 linguage
 npx tsx scripts/battle-validate.mts - rust          # só uma linguagem (ou um id de desafio no lugar do -)
 ```
 
+## Amigos, revanche, eventos e revisão
+
+- **Convite**: `battle_invite_create` gera um código de 8 caracteres (15 min); o amigo usa `battle_invite_accept`. Link: `/batalha?convite=CODIGO`.
+- **Revanche**: `battle_rematch(partida, 'pedir' | 'aceitar' | 'recusar')`; cria uma partida nova (`rematch_of`), uma por partida, se o adversário ainda estiver na tela.
+- **Amistosas** (convite e revanche): mesma correção, mas não mudam troféus, vitórias do perfil, temporada nem eventos.
+- **Sorteio**: `battle_pick_challenge` evita desafios que um dos dois jogou nos últimos 30 dias.
+- **Revisão**: `battle_challenges.review_data` (de `battle-review.ts`) só sai em `battle_state` depois do fim.
+- **Eventos**: configurados em `_shared/battle-events.ts` (vão para `battle-config.sql`); placar em `battle_event_summary`, só com partidas ranqueadas.
+
 ## Ideias para melhorar
 
 - Usar **Supabase Realtime** (broadcast) para o status do adversário em vez de consulta a cada 1,5 s.
 - Subir uma **instância própria do Judge0** (por exemplo numa VM gratuita) para não depender do limite da instância pública.
-- Mais desafios por nível e um sorteio que evite repetir o mesmo problema para a mesma pessoa.
-- Partidas privadas com código de convite para jogar com amigos.
+- Mais desafios por nível (o sorteio já evita repetir, mas há cerca de 3 por arena).
 - Desbloquear de fato as molduras de perfil de cada arena.
 - Replays: mostrar a linha do tempo dos envios de cada jogador no fim da partida.

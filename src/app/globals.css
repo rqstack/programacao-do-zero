@@ -14,8 +14,10 @@
   --color-line-strong: #2c3d62;
   --color-fg: #eaf0fa;
   --color-muted: #95a3bc;
-  --color-subtle: #66748f;
-  --color-electric: #3d7bff;
+  /* Contraste AA (4.5:1) em todos os fundos: subtle ≥ 4.88; branco sobre electric = 4.69; sobre electric-strong = 5.73. */
+  --color-subtle: #8090aa;
+  --color-electric: #2f6bf0;
+  --color-electric-strong: #285ed6;
   --color-electric-hi: #6b9bff;
   --color-electric-lo: #1b3f99;
   --color-amber: #ffb547;

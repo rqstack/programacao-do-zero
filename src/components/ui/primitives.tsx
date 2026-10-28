@@ -12,7 +12,7 @@ type Size = "sm" | "md" | "lg";
 const base =
   "inline-flex items-center justify-center gap-2 font-semibold rounded-[var(--radius-md)] transition-colors duration-150 disabled:opacity-50 disabled:pointer-events-none select-none whitespace-nowrap";
 const variants: Record<Variant, string> = {
-  primary: "bg-electric text-white hover:bg-electric-hi active:bg-electric-lo",
+  primary: "bg-electric text-white hover:bg-electric-strong active:bg-electric-lo",
   secondary: "border border-line-strong text-fg hover:border-muted hover:bg-panel",
   ghost: "text-muted hover:text-fg hover:bg-panel",
   danger: "border border-bad/50 text-bad hover:bg-bad/10",

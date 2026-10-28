@@ -235,7 +235,7 @@ export default function HomePage() {
                 <span className="font-mono text-electric-hi">03</span> Resolva o desafio, ganhe troféus e suba de arena.
               </li>
             </ol>
-            <Link href="/batalha" className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-5 font-semibold text-white hover:bg-electric-hi">
+            <Link href="/batalha" className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-electric px-5 font-semibold text-white hover:bg-electric-strong">
               Ir para a Batalha <ArrowRight aria-hidden className="size-4" />
             </Link>
           </div>

@@ -9,6 +9,7 @@ import { FavoriteButton } from "@/components/learn/favorite-button";
 import { LessonNotes } from "@/components/learn/lesson-notes";
 import { CompleteLessonButton, ExercisePanel, LessonQuiz } from "@/components/learn/lesson-practice";
 import { lessonExample } from "@/lib/tutor/tutor";
+import { ReportLink } from "@/components/feedback/report-link";
 import { Container } from "@/components/ui/primitives";
 import { allLessons, getLessonPage } from "@/lib/catalog";
 
@@ -93,6 +94,7 @@ export default async function AulaPage(props: PageProps<"/aulas/[slug]">) {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <CompleteLessonButton slug={lesson.slug} title={lesson.title} />
+              <ReportLink label="Algo errado ou confuso nesta aula?" />
             </div>
           </section>
 

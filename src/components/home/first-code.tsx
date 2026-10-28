@@ -195,7 +195,7 @@ export function FirstCode() {
           <button
             type="button"
             onClick={() => setOutput(run(program, values))}
-            className="inline-flex min-h-10 items-center gap-2 rounded-md bg-electric px-4 text-sm font-semibold text-white hover:bg-electric-hi"
+            className="inline-flex min-h-10 items-center gap-2 rounded-md bg-electric px-4 text-sm font-semibold text-white hover:bg-electric-strong"
           >
             <Play aria-hidden className="size-4" /> Executar
           </button>
