@@ -6,9 +6,10 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 next-env.d.ts
+# Variáveis de ambiente: nenhum .env vai para o Git (só o exemplo, sem valores reais).
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 .vercel
 .DS_Store
 .claude/
