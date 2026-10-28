@@ -18,16 +18,16 @@ Arquivo: `2026-10-26_atividades_python_csharp_aws.sql` (69 linhas em `xp_sources
 - Sem isso, concluir aulas dessas trilhas não soma XP no ranking (o resto do site funciona).
 - Teste: `tests/db/pending-production.test.ts`.
 
-## 3. Missões (PENDENTE — ainda não aplicado)
+## 3. Missões (aplicado em 28/10/2026, com autorização)
 
 Arquivo: `2026-10-27_missoes.sql` (equivale à migração `20261027000009_missoes.sql` + 8 linhas em `xp_sources`).
 
 - Só amplia a regra de formato das chaves de XP para aceitar `mission:` e cadastra as 8 missões (30 a 50 XP cada). Nenhum dado existente muda.
 - Sem isso, o site funciona normalmente, mas o XP das missões fica só no navegador e não entra no ranking.
 - Teste: `tests/db/missions.test.ts` e `tests/db/pending-production.test.ts`.
-- Depois de aplicar: `select count(*) from public.xp_sources;` deve dar 554.
+- Conferido: `select count(*) from public.xp_sources;` = 554.
 
-## 4. Batalha com amigos, revanche, eventos (PENDENTE — ainda não aplicado)
+## 4. Batalha com amigos, revanche, eventos (aplicado em 28/10/2026, com autorização)
 
 Aplicar NESTA ORDEM, antes de publicar o site novo (o site novo chama funções que só existem depois disso):
 
@@ -37,7 +37,7 @@ Aplicar NESTA ORDEM, antes de publicar o site novo (o site novo chama funções 
 
 A Edge Function `battle-submit` não muda. Testes: `tests/db/battle-friends.test.ts` (14) e `tests/db/battle.test.ts`.
 
-## 5. Portfólio público (PENDENTE — ainda não aplicado)
+## 5. Portfólio público (aplicado em 28/10/2026, com autorização)
 
 Arquivo: `supabase/migrations/20261028000011_portfolio.sql`. Aplicar antes de publicar o site novo (a página de perfil lê a coluna `portfolio`).
 
@@ -45,7 +45,7 @@ Arquivo: `supabase/migrations/20261028000011_portfolio.sql`. Aplicar antes de pu
 - Adiciona `profiles.portfolio` (preferências das seções) e a função `get_portfolio`.
 - Teste: `tests/db/portfolio.test.ts` (e `tests/db/profiles.test.ts` atualizado).
 
-## 6. Relatos dos alunos (PENDENTE — ainda não aplicado)
+## 6. Relatos dos alunos (aplicado em 28/10/2026, com autorização)
 
 Arquivo: `supabase/migrations/20261028000012_feedback.sql`. Cria a tabela `feedback` (ninguém lê pelo site) e a função `submit_feedback`, com validação e limite. Teste: `tests/db/feedback.test.ts`.
 

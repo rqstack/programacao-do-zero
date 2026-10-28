@@ -1,6 +1,6 @@
 # Relatório da evolução (fases 1 a 5)
 
-Situação em 28/10/2026: **tudo commitado localmente, nada publicado.** Nenhum push, deploy ou migração em produção foi feito nesta evolução.
+Situação em 28/10/2026: **publicado.** As 4 migrações foram aplicadas em produção e o site foi publicado, com autorização do dono.
 
 ## 1. Funcionalidades novas
 
@@ -28,7 +28,7 @@ Situação em 28/10/2026: **tudo commitado localmente, nada publicado.** Nenhum 
 - Sincronização com a conta também depois de mudanças sem XP (anotações, favoritos, metas).
 - Desafios aceitam link direto (`/desafios?id=`).
 
-## 3. Migrações criadas (todas PENDENTES em produção)
+## 3. Migrações criadas (aplicadas em produção em 28/10/2026)
 
 Ordem de aplicação (detalhes em `supabase/producao-pendente/LEIA-ME.md`):
 
@@ -37,7 +37,7 @@ Ordem de aplicação (detalhes em `supabase/producao-pendente/LEIA-ME.md`):
 3. `20261028000011_portfolio.sql`
 4. `20261028000012_feedback.sql`
 
-Nenhuma apaga ou altera dados existentes. **O site novo só deve ser publicado depois delas** (ele chama funções e colunas que elas criam).
+Nenhuma apaga ou altera dados existentes. Conferido depois: 554 atividades de XP, 8 eventos, 29 desafios com revisão, contas novas privadas, nenhuma tabela sem RLS. A revisão dos desafios foi gravada só na coluna `review_data` (o resto de `battle-challenges.sql` já estava em produção).
 
 ## 4. Testes
 
@@ -62,7 +62,6 @@ Também: `tsc` sem erros, ESLint sem erros, build de produção ok, 20 páginas 
 
 ## 6. Configurações manuais pendentes
 
-- Aplicar as migrações acima (painel do Supabase ou com autorização).
 - Rotacionar o segredo do webhook da Syncpay (pendência anterior).
 - Ler os relatos: Supabase → Table Editor → `feedback` (não há tela no site, de propósito).
 - Perfis antigos continuam públicos; se quiser, avise os usuários ou aplique uma mudança com o consentimento deles.

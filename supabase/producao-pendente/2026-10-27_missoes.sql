@@ -1,4 +1,4 @@
--- Missões (8 chaves de XP). NÃO APLICADO em produção: aguarda autorização do dono.
+-- Missões (8 chaves de XP). Aplicado em produção em 28/10/2026, com autorização.
 -- Igual à migração 20261027000009_missoes.sql + as linhas das missões do seed. Idempotente.
 begin;
 alter table public.xp_sources drop constraint xp_sources_key_check;
