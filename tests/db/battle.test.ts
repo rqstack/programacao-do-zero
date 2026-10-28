@@ -2,7 +2,7 @@ import type { PGlite } from "@electric-sql/pglite";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { arenaFor, ARENAS, trophyDelta } from "@battle/battle-core.ts";
+import { arenaFor, ARENAS, trophyDelta, type BattleChallenge } from "@battle/battle-core.ts";
 import { battleChallengesSql, battleConfigSql } from "@battle/battle-sql.ts";
 import { asRole, createTestDb, createUser } from "./harness";
 
@@ -47,7 +47,9 @@ describe("configuração da Batalha", () => {
   it("o SQL de configuração e o de desafios estão atualizados com o código", async () => {
     expect(readFileSync(path.join(ROOT, "supabase/battle-config.sql"), "utf8")).toBe(battleConfigSql());
     if (existsSync(path.join(ROOT, "supabase/functions/_shared/battle-bank.ts"))) {
-      const { battleBank } = await import("@battle/battle-bank.ts");
+      // Caminho montado em tempo de execução: o banco é privado (fora do Git) e o CI não o tem.
+      const bankModule = "@battle/" + "battle-bank.ts";
+      const { battleBank } = (await import(/* @vite-ignore */ bankModule)) as { battleBank: BattleChallenge[] };
       expect(readFileSync(path.join(ROOT, "supabase/battle-challenges.sql"), "utf8")).toBe(battleChallengesSql(battleBank));
       for (const a of ARENAS) expect(battleBank.some((c) => c.tier === a.tier), `nível ${a.tier}`).toBe(true);
       const { BATTLE_REVIEWS } = await import("@battle/battle-review.ts");

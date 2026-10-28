@@ -39,6 +39,18 @@ const syncpay = new SyncpayClient(
 );
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 
+// Diagnóstico sem expor nada: registra nos logs PRIVADOS da função só se cada segredo existe
+// (verdadeiro/falso), nunca o valor. Ajuda a separar "token ausente" de "token diferente".
+console.log(
+  JSON.stringify({
+    config: {
+      syncpay_api: enabled,
+      webhook_token_configurado: (Deno.env.get("SYNCPAY_WEBHOOK_TOKEN") ?? "").trim().length > 0,
+      ip_salt_configurado: (Deno.env.get("PIX_IP_SALT") ?? "").length > 0,
+    },
+  }),
+);
+
 interface Row {
   id: string;
   idempotency_key: string;
@@ -102,7 +114,8 @@ const store: DonationStore = {
 
 async function ipHash(req: Request): Promise<string> {
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0]!.trim() || "desconhecido";
-  const salt = Deno.env.get("PIX_IP_SALT") ?? "programacao-do-zero";
+  // Sem PIX_IP_SALT, usa um valor derivado de um segredo que a função já tem (nunca um padrão público).
+  const salt = Deno.env.get("PIX_IP_SALT") || `derivado:${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""}`;
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${salt}:${ip}`));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }

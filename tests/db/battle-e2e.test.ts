@@ -49,7 +49,8 @@ async function newMatch(langA: BattleLang, langB: BattleLang) {
 
 describe.skipIf(!RUN)("Batalha de ponta a ponta (Judge0 real)", () => {
   beforeAll(async () => {
-    bank = (await import("@battle/battle-bank.ts")).battleBank;
+    const bankModule = "@battle/" + "battle-bank.ts"; // privado: fora do Git e do CI
+    bank = ((await import(/* @vite-ignore */ bankModule)) as { battleBank: BattleChallenge[] }).battleBank;
     db = await createTestDb({ battle: true });
     await createUser(db, ANA, { full_name: "Ana" });
     await createUser(db, BETO, { full_name: "Beto" });

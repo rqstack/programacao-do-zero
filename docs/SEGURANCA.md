@@ -49,16 +49,32 @@ Teste permanente: `tests/unit/repo-hygiene.test.ts` falha se algum `.env` (além
 - Varredura de segredos e proteção de push do GitHub: **ligadas**.
 - Ramo `main` sem proteção; alertas e atualizações de segurança do Dependabot desligados.
 
-## G. Pendências que dependem de você (todas gratuitas)
+## G. Segunda rodada (28/10/2026, à noite)
 
-1. **Supabase → Authentication → Sign In / Providers → Email: desligar.** O site só usa Google; com e-mail ligado, dá para criar contas descartáveis pela API (farmar XP dentro dos limites, partidas ranqueadas contra si mesmo).
-2. **Syncpay → webhook**: gerar um token novo no painel da Syncpay e salvar o mesmo valor em Supabase → Edge Functions → Secrets → `SYNCPAY_WEBHOOK_TOKEN`. Hoje os avisos chegam e são recusados (401); o pagamento ainda pode ser confirmado pela consulta da página, mas o aviso automático não funciona.
-3. **Supabase → Edge Functions → Secrets → `PIX_IP_SALT`**: conferir se existe; se não, criar um valor aleatório (sem ele, o hash do IP usa um valor padrão público).
-4. **Supabase → Authentication → URL Configuration**: conferir se o Site URL e as Redirect URLs aceitam só `https://rqstack.github.io/programacao-do-zero/**` e `http://localhost:3000/**`.
-5. **GitHub → Settings → Code security**: ligar *Dependabot alerts* e *Dependabot security updates*.
-6. **GitHub → Settings → Branches**: proteger o `main` (bloquear force push e exclusão).
-7. **GitHub → Settings → Actions**: como não há workflows, restringir a "Allow rqstack actions" ou desativar.
+Feito e verificado:
+- **Dependabot**: alertas e atualizações de segurança **ligados** (conferido pela API); `.github/dependabot.yml` com atualização semanal do npm (menores agrupadas) e mensal das Actions. Nada é mesclado sozinho.
+- **CI gratuito**: `.github/workflows/testes.yml` roda tipos, lint e testes em todo PR (inclusive do Dependabot) e em push na `main`; permissão só de leitura, sem segredos, ações oficiais fixadas por commit. Simulado sem o banco privado da Batalha (como no CI): tipos e testes passam.
+- **Branch `main` protegida**: sem force push e sem exclusão; sem exigir PR (o seu fluxo de push direto continua). `gh-pages` fica livre de propósito (o deploy faz push forçado nela).
+- **Actions**: só ações da própria GitHub; token dos workflows só leitura.
+- **Webhook da Syncpay**: a autenticação recusa sem token, com token errado e com corpo falso de "pago" (401, nada muda nas doações). A causa do 401 dos avisos reais é o token salvo no Supabase não ser o que a Syncpay envia (ou estar vazio); os logs não mostram o cabeçalho, então só o painel resolve.
+- **PIX_IP_SALT**: usado só no hash do IP (limite de 5 cobranças por hora). A presença não dá para ler de fora. O código novo (`support-pix`) usa um valor derivado de um segredo existente se ele faltar, e registra nos logs privados só "configurado: sim/não" de cada segredo. **Essa versão ainda não foi publicada** (aguarda sua autorização).
 
-## H. Orçamento
+## H. Pendências que dependem de você (todas gratuitas)
+
+1. **Autorizar a publicação da nova `support-pix`** (diagnóstico sim/não + salt derivado). Depois, os logs da função mostram se `SYNCPAY_WEBHOOK_TOKEN` e `PIX_IP_SALT` existem.
+2. **Rotacionar o token do webhook da Syncpay**:
+   1. Painel da Syncpay → Webhooks → o webhook "Recebimento - Cash in" que aponta para `.../functions/v1/support-pix?webhook=1` → copie o token (ou gere um novo).
+   2. Supabase → Edge Functions → Secrets → `SYNCPAY_WEBHOOK_TOKEN` → cole o mesmo valor, sem espaços, e salve.
+   3. Teste seguro (não mexe em nenhuma doação: o id não existe), no seu terminal, digitando o token quando pedir:
+      ```bash
+      read -rs -p "Token do webhook: " T; echo; curl -s -X POST "https://kaylnsleygeysszomudd.supabase.co/functions/v1/support-pix?webhook=1" -H "Authorization: Bearer $T" -H "Content-Type: application/json" -d '{"id":"teste-rotacao-inexistente"}'; unset T
+      ```
+      Esperado: `{"ok":true,"message":"ignorado"}`. Se vier `não autorizado`, o valor salvo não é o mesmo.
+3. **`PIX_IP_SALT`**: se não existir, crie em Supabase → Edge Functions → Secrets um valor aleatório longo (por exemplo, gerado com `openssl rand -hex 32`). Não precisa anotar.
+4. **Supabase → Authentication → Providers → Email: desligar** (o site só usa Google).
+5. **Supabase → Authentication → URL Configuration**: Site URL e Redirect URLs só com `https://rqstack.github.io/programacao-do-zero/**` e `http://localhost:3000/**`.
+6. **Testes com duas contas**: seguir `docs/TESTE-DUAS-CONTAS.md`.
+
+## I. Orçamento
 
 Nenhuma compra, assinatura, upgrade ou recurso pago foi ativado. Tudo acima é gratuito.
