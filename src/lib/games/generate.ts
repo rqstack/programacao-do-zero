@@ -1,7 +1,10 @@
 import type { SeedGame, SeedGameRound } from "@content/schema";
 import { minimumBlocks, type RobotPayload } from "./robot";
 import { runQuery, toSql, type SqlQuery, type SqlTable } from "./sql-mini";
-import { seededShuffle, validateRound, type GameKind } from "./engine";
+import { BUGS } from "@content/games/bugs";
+import { buildWave, RULES_BY_DIFFICULTY } from "@content/games/catch";
+import { bugRound, waveRound } from "@content/games/rounds";
+import { validateRound, type GameKind } from "./engine";
 
 /**
  * Monta as fases de uma partida. Cada partida sorteia fases entre as cadastradas e
@@ -95,83 +98,6 @@ const TYPING: Record<Difficulty, TypingTpl[]> = {
       return { prompt: "Uma função tipada em TypeScript", language: "ts", text: `function ${f}(n: number): number { return n * ${int(r, 2, 9)}; }`, explanation: "Os tipos vêm depois dos dois-pontos: no parâmetro e no retorno." };
     },
   ],
-};
-
-const typing: Generator = (r, d) => {
-  const t = pick(r, TYPING[d])(r);
-  return { difficulty: d, payload: { prompt: t.prompt, language: t.language, text: t.text }, solution: {}, explanation: t.explanation };
-};
-
-/* --------------------------- Chuva de código --------------------------- */
-
-type RainTpl = (r: Rand) => { code: string; correct: string; wrong: string; explanation: string; codeLang?: string };
-const RAIN: Record<Difficulty, RainTpl[]> = {
-  1: [
-    (r) => {
-      const a = int(r, 2, 30);
-      const b = int(r, 2, 30);
-      return { code: `${a} + ${b}`, correct: String(a + b), wrong: String(a + b + pick(r, [-2, -1, 1, 2, 10])), explanation: `${a} + ${b} = ${a + b}.` };
-    },
-    (r) => {
-      const n = int(r, 2, 6);
-      const items = Array.from({ length: n }, () => int(r, 1, 9));
-      return { code: `[${items.join(", ")}].length`, correct: String(n), wrong: String(n - 1), explanation: `length conta os itens: são ${n}. O último índice é ${n - 1}.` };
-    },
-    (r) => {
-      const w = pick(r, ["casa", "python", "codigo", "teste", "banco", "site"]);
-      return { code: `len("${w}")`, codeLang: "python", correct: String(w.length), wrong: String(w.length + 1), explanation: `len conta os caracteres: "${w}" tem ${w.length}.` };
-    },
-  ],
-  2: [
-    (r) => {
-      const a = int(r, 10, 40);
-      const b = int(r, 3, 7);
-      return { code: `${a} % ${b}`, correct: String(a % b), wrong: String(Math.floor(a / b)), explanation: `% é o resto da divisão: ${a} dividido por ${b} sobra ${a % b}.` };
-    },
-    (r) => {
-      const a = int(r, 1, 9);
-      const b = int(r, 1, 9);
-      return { code: `"${a}" + ${b}`, correct: `"${a}${b}"`, wrong: String(a + b), explanation: `Com um texto no +, os valores são concatenados: "${a}${b}".` };
-    },
-    (r) => {
-      const xs = [int(r, 1, 50), int(r, 1, 50), int(r, 1, 50)];
-      const max = Math.max(...xs);
-      const min = Math.min(...xs);
-      return { code: `Math.max(${xs.join(", ")})`, correct: String(max), wrong: String(min === max ? max + 1 : min), explanation: `Math.max devolve o maior valor: ${max}.` };
-    },
-  ],
-  3: [
-    (r) => {
-      const a = int(r, 1, 9);
-      const b = int(r, 2, 9);
-      const c = int(r, 2, 9);
-      return { code: `${a} + ${b} * ${c}`, correct: String(a + b * c), wrong: String((a + b) * c), explanation: `A multiplicação vem antes: ${b} * ${c} = ${b * c}, mais ${a} dá ${a + b * c}.` };
-    },
-    (r) => {
-      const n = int(r, 1, 99);
-      return { code: `${n} === "${n}"`, correct: "false", wrong: "true", explanation: "=== compara valor e tipo: número e texto nunca são estritamente iguais." };
-    },
-    (r) => {
-      const a = int(r, 1, 30);
-      const b = int(r, 1, 30);
-      const c = int(r, 1, 30);
-      const v = a > b && b > c;
-      return { code: `${a} > ${b} && ${b} > ${c}`, correct: String(v), wrong: String(!v), explanation: `&& só é true quando as duas partes são: ${a} > ${b} é ${a > b} e ${b} > ${c} é ${b > c}.` };
-    },
-  ],
-};
-
-const rain: Generator = (r, d) => {
-  const t = pick(r, RAIN[d])(r);
-  const truth = r() < 0.5;
-  const shown = truth ? t.correct : t.wrong;
-  if (!truth && t.wrong === t.correct) return null;
-  return {
-    difficulty: d,
-    payload: { statement: `O resultado é ${shown}:`, code: t.code, ...(t.codeLang ? { codeLang: t.codeLang } : {}) },
-    solution: { truth },
-    explanation: t.explanation,
-  };
 };
 
 /* ------------------------------ SQL ------------------------------ */
@@ -304,8 +230,7 @@ const MEMORY: Record<Difficulty, Array<{ theme: string; pairs: Array<[string, st
   ],
 };
 
-const memory: Generator = (r, d) => {
-  const set = pick(r, MEMORY[d]);
+const memoryFrom = (r: Rand, d: Difficulty, set: { theme: string; pairs: Array<[string, string]> }): Generated => {
   const pairs = sample(r, set.pairs, 4);
   const cards = pairs.flatMap(([term, def], i) => [
     { id: `t${i + 1}`, text: term },
@@ -410,86 +335,6 @@ const cssGen: Generator = (r, d) => {
   };
 };
 
-/* ------------------------------ Caça aos bugs ------------------------------ */
-
-type BugTpl = (r: Rand) => { prompt: string; code: string[]; line: number; explanation: string; language?: string };
-const BUGS: Record<Difficulty, BugTpl[]> = {
-  1: [
-    (r) => {
-      const v = pick(r, VARS);
-      const typo = v.slice(0, -1);
-      return { prompt: `Deveria mostrar o dobro de ${v}.`, code: [`const ${v} = ${int(r, 2, 50)};`, `console.log(${typo} * 2);`], line: 2, explanation: `A variável se chama \`${v}\`, mas a linha 2 usa \`${typo}\` (ReferenceError).` };
-    },
-    (r) => {
-      const n = int(r, 10, 60);
-      return { prompt: `Deveria avisar só quando a idade for ${n}.`, code: [`const idade = ${n + int(r, 1, 9)};`, `if (idade = ${n}) {`, `  console.log("Tem ${n} anos");`, "}"], line: 2, explanation: "`=` tenta atribuir a uma constante (TypeError). Para comparar, use `===`." };
-    },
-    (r) => {
-      const a = int(r, 2, 9);
-      const b = int(r, 2, 9);
-      return { prompt: `Deveria mostrar ${a + b}.`, code: [`const a = "${a}";`, `const b = ${b};`, "console.log(a + b);"], line: 1, explanation: `Com aspas, \`a\` é texto e o + junta: aparece "${a}${b}". Tire as aspas da linha 1.` };
-    },
-  ],
-  2: [
-    (r) => {
-      const xs = [int(r, 1, 9), int(r, 10, 19), int(r, 20, 29)];
-      return { prompt: "Deveria mostrar o último item da lista.", code: [`const lista = [${xs.join(", ")}];`, "const ultimo = lista[3];", "console.log(ultimo);"], line: 2, explanation: "A lista tem 3 itens (índices 0 a 2): `lista[3]` é undefined. Use `lista[lista.length - 1]`." };
-    },
-    (r) => ({
-      prompt: "A função deveria calcular a média.",
-      code: ["function media(notas) {", "  let soma = 0;", "  for (const n of notas) soma += n;", "  return soma / notas.lenght;", "}", `console.log(media([${int(r, 5, 9)}, ${int(r, 5, 9)}]));`],
-      line: 4,
-      explanation: "`lenght` está escrito errado: o resultado é NaN. O correto é `length`.",
-    }),
-    (r) => {
-      const f = pick(r, FUNCS);
-      const k = int(r, 2, 9);
-      return { prompt: `${f}(4) deveria devolver ${4 * k}.`, code: [`function ${f}(n) {`, `  n * ${k};`, "}", `console.log(${f}(4));`], line: 2, explanation: "Sem `return`, a função devolve undefined. Corrija com `return n * " + k + ";`." };
-    },
-  ],
-  3: [
-    (r) => {
-      const xs = [int(r, 1, 9), int(r, 1, 9), int(r, 1, 9)];
-      return {
-        prompt: `Deveria somar todos os números (${xs.reduce((a, b) => a + b, 0)}).`,
-        code: [`const numeros = [${xs.join(", ")}];`, "let soma = 0;", "for (let i = 0; i <= numeros.length; i++) {", "  soma += numeros[i];", "}", "console.log(soma);"],
-        line: 3,
-        explanation: "Com `<=`, o laço lê `numeros[3]`, que é undefined, e a soma vira NaN. Use `<`.",
-      };
-    },
-    (r) => {
-      const n = int(r, 1, 99);
-      return {
-        prompt: `Deveria mostrar "achou" quando o código for ${n}.`,
-        code: [`const codigo = ${n};`, `if (codigo === "${n}") {`, '  console.log("achou");', "}"],
-        line: 2,
-        explanation: "`===` compara o tipo também: número nunca é igual a texto. Compare com `" + n + "` sem aspas.",
-      };
-    },
-    (r) => {
-      const res = pick(r, RESOURCES);
-      return {
-        prompt: `Deveria buscar e devolver a lista de ${res}.`,
-        code: ["async function carregar() {", `  const resposta = fetch("/api/${res}");`, "  const dados = await resposta.json();", "  return dados;", "}"],
-        line: 2,
-        explanation: "Sem `await`, `resposta` é uma Promise e `.json()` gera TypeError. Use `await fetch(...)`.",
-      };
-    },
-  ],
-};
-
-const bugGen: Generator = (r, d) => {
-  const t = pick(r, BUGS[d])(r);
-  // Às vezes começa com um comentário, para a linha do bug mudar de lugar.
-  const comment = r() < 0.4 ? [`// ${pick(r, ["Exercício", "Versão 1", "Revisar", "Código do colega"])}`] : [];
-  return {
-    difficulty: d,
-    payload: { prompt: t.prompt, language: t.language ?? "js", code: [...comment, ...t.code].join("\n") },
-    solution: { line: t.line + comment.length },
-    explanation: t.explanation,
-  };
-};
-
 /* ------------------------------ Monte o código ------------------------------ */
 
 type OrderTpl = (r: Rand) => { prompt: string; lines: string[]; explanation: string };
@@ -556,8 +401,8 @@ const ORDER: Record<Difficulty, OrderTpl[]> = {
 };
 
 const IDS = "abcdefghijkl";
-const orderGen: Generator = (r, d) => {
-  const t = pick(r, ORDER[d])(r);
+const orderFrom = (r: Rand, d: Difficulty, tpl: OrderTpl): Generated => {
+  const t = tpl(r);
   const ids = t.lines.map((_, i) => IDS[i]!);
   return { difficulty: d, payload: { prompt: t.prompt, blocks: t.lines.map((code, i) => ({ id: ids[i]!, code })) }, solution: { order: ids }, explanation: t.explanation };
 };
@@ -597,8 +442,7 @@ const FLOWS: Array<{ prompt: string; steps: string[]; explanation: string }> = [
   },
 ];
 
-const flowGen: Generator = (r, d) => {
-  const flow = pick(r, FLOWS);
+const flowFrom = (r: Rand, d: Difficulty, flow: (typeof FLOWS)[number]): Generated => {
   const size = Math.min(flow.steps.length, d === 1 ? 4 : d === 2 ? 5 : 6);
   // Um subconjunto que mantém a ordem original continua sendo um fluxo válido.
   const keep = sample(r, flow.steps.map((_, i) => i), size).sort((a, b) => a - b);
@@ -611,44 +455,173 @@ const flowGen: Generator = (r, d) => {
   };
 };
 
-const GENERATORS: Partial<Record<GameKind, Generator>> = {
-  typing,
-  lightning: rain,
-  sql: sqlGen,
-  logic: robot,
-  memory,
-  css: cssGen,
-  bug_hunt: bugGen,
-  code_order: orderGen,
-  fullstack: flowGen,
-};
+/* ------------------------------ Conteúdo extra ------------------------------ */
+// Situações novas (conceitos diferentes, não as mesmas com outros nomes).
 
-/** Fases extras geradas por dificuldade (além das cadastradas). */
-const EXTRA_PER_DIFFICULTY = 6;
+MEMORY[1].push(
+  { theme: "Comandos do terminal", pairs: [["cd", "Entrar em uma pasta"], ["ls", "Listar arquivos"], ["mkdir", "Criar pasta"], ["pwd", "Mostrar a pasta atual"], ["rm", "Apagar arquivo"], ["cp", "Copiar arquivo"]] },
+  { theme: "Tipos de dados", pairs: [["string", "Texto"], ["number", "Número"], ["boolean", "Verdadeiro ou falso"], ["array", "Lista ordenada"], ["object", "Pares de chave e valor"], ["null", "Ausência intencional de valor"]] },
+);
+MEMORY[2].push(
+  { theme: "React", pairs: [["useState", "Estado do componente"], ["props", "Dados vindos do componente pai"], ["useEffect", "Efeito depois de renderizar"], ["key", "Identifica itens de uma lista"], ["JSX", "Marcação dentro do JavaScript"], ["componente", "Função que devolve interface"]] },
+  { theme: "Métodos HTTP", pairs: [["GET", "Buscar dados"], ["POST", "Criar um recurso"], ["PUT", "Substituir um recurso"], ["PATCH", "Alterar parte de um recurso"], ["DELETE", "Apagar um recurso"], ["header", "Metadado da requisição"]] },
+);
+MEMORY[3].push(
+  { theme: "Complexidade", pairs: [["O(1)", "Tempo constante"], ["O(n)", "Cresce junto com a entrada"], ["O(n²)", "Laço dentro de laço"], ["O(log n)", "Corta o problema pela metade"], ["O(n log n)", "Boa ordenação"], ["Memoização", "Guardar resultados já calculados"]] },
+  { theme: "Estruturas de dados", pairs: [["Pilha", "Último a entrar, primeiro a sair"], ["Fila", "Primeiro a entrar, primeiro a sair"], ["Mapa (hash)", "Busca rápida por chave"], ["Árvore", "Hierarquia de nós"], ["Grafo", "Nós ligados por arestas"], ["Conjunto", "Itens sem repetição"]] },
+);
 
-/** Fases de uma partida: mesma quantidade por dificuldade, conteúdo sorteado a cada partida. */
-export function buildPlayRounds(game: SeedGame, seed: string): SeedGameRound[] {
-  const r = seededRandom(`${game.slug}:${seed}`);
-  const gen = GENERATORS[game.kind as GameKind];
-  const out: SeedGameRound[] = [];
-  for (const d of [1, 2, 3] as const) {
-    const fixed = game.rounds.filter((x) => x.difficulty === d);
-    if (fixed.length === 0) continue;
-    const points = fixed[0]!.points;
-    const pool: SeedGameRound[] = [...fixed];
-    const seen = new Set(fixed.map((x) => JSON.stringify(x.payload)));
-    if (gen) {
-      for (let tries = 0, added = 0; added < EXTRA_PER_DIFFICULTY && tries < EXTRA_PER_DIFFICULTY * 8; tries++) {
-        const g = gen(r, d, game);
-        if (!g) continue;
-        const key = JSON.stringify(g.payload);
-        if (seen.has(key) || !validateRound(game.kind as GameKind, g.payload, g.solution).ok) continue;
-        seen.add(key);
-        pool.push(points === undefined ? g : { ...g, points });
-        added++;
+TYPING[1].push(
+  () => ({ prompt: "Um botão de formulário", language: "html", text: '<button type="submit">Enviar</button>', explanation: "type=\"submit\" faz o botão enviar o formulário." }),
+  (r) => ({ prompt: "Registrar uma mudança no Git", language: "bash", text: `git commit -m "${pick(r, ["Adiciona menu", "Corrige busca", "Cria rodapé"])}"`, explanation: "-m traz a mensagem do commit entre aspas." }),
+);
+TYPING[2].push(
+  () => ({ prompt: "Desestruturar um objeto", language: "js", text: "const { nome, idade } = pessoa;", explanation: "As chaves criam variáveis com os mesmos nomes das propriedades." }),
+  () => ({ prompt: "Contar linhas em SQL", language: "sql", text: "SELECT COUNT(*) FROM pedidos WHERE status = 'pago';", explanation: "COUNT(*) conta as linhas que passaram pelo WHERE." }),
+);
+TYPING[3].push(
+  () => ({ prompt: "Um componente React", language: "jsx", text: "export default function App() { return <h1>Olá</h1>; }", explanation: "Um componente é uma função que devolve JSX." }),
+  () => ({ prompt: "Uma função em Python", language: "python", text: "def media(v): return sum(v) / len(v)", explanation: "sum soma a lista e len conta os itens." }),
+  () => ({ prompt: "Uma rota de API com Express", language: "js", text: 'app.get("/api/cursos", (req, res) => res.json(cursos));', explanation: "A rota recebe o pedido (req) e responde (res) com JSON." }),
+);
+
+ORDER[1].push((r) => {
+  const pergunta = pick(r, ["Seu nome: ", "Como você se chama? "]);
+  return {
+    prompt: "Em Python: pergunte o nome e mostre uma saudação.",
+    lines: [`nome = input("${pergunta}")`, 'saudacao = "Olá, " + nome', "print(saudacao)"],
+    explanation: "Primeiro a entrada, depois a conta com ela e, por fim, a saída.",
+  };
+});
+ORDER[2].push((r) => {
+  const n = int(r, 3, 5);
+  return {
+    prompt: `Mostre os números de 1 a ${n} e, depois, a palavra fim.`,
+    lines: [`for (let i = 1; i <= ${n}; i++) {`, "  console.log(i);", "}", 'console.log("fim");'],
+    explanation: "O que está dentro das chaves repete; o que vem depois roda uma vez, no final.",
+  };
+});
+ORDER[3].push((r) => {
+  const branch = pick(r, ["nova-busca", "menu-mobile", "corrige-login"]);
+  return {
+    prompt: "Crie uma branch, registre a mudança e envie ao GitHub.",
+    lines: [`git checkout -b ${branch}`, "git add .", 'git commit -m "Implementa a mudança"', `git push -u origin ${branch}`],
+    explanation: "A branch vem antes da mudança; add prepara, commit registra e push envia.",
+  };
+});
+
+/* ------------------------------ Seleção das fases ------------------------------ */
+
+type Keyed = SeedGameRound & { key: string };
+
+/**
+ * Candidatos de uma dificuldade, cada um com a CHAVE da situação. Variações do mesmo
+ * modelo (outros nomes ou números) têm a mesma chave: contam como a mesma situação.
+ */
+function candidates(game: SeedGame, d: Difficulty, r: Rand): Keyed[] {
+  const out: Keyed[] = [];
+  const add = (key: string, g: Generated | SeedGameRound | null) => {
+    if (g) out.push({ ...g, key });
+  };
+  switch (game.kind as GameKind) {
+    case "typing":
+      TYPING[d].forEach((tpl, i) => {
+        const t = tpl(r);
+        add(`dig:${d}:${i}`, { difficulty: d, payload: { prompt: t.prompt, language: t.language, text: t.text }, solution: {}, explanation: t.explanation });
+      });
+      break;
+    case "lightning":
+      for (const rule of RULES_BY_DIFFICULTY[d]) {
+        const w = buildWave(r, d, rule);
+        if (w) out.push(waveRound(w, d) as Keyed);
       }
+      break;
+    case "bug_hunt":
+      for (const b of BUGS) if (b.difficulty === d) out.push(bugRound(b) as Keyed);
+      break;
+    case "memory":
+      MEMORY[d].forEach((set) => add(`mem:${set.theme}`, memoryFrom(r, d, set)));
+      break;
+    case "code_order":
+      ORDER[d].forEach((tpl, i) => add(`ordem:${d}:${i}`, orderFrom(r, d, tpl)));
+      break;
+    case "fullstack":
+      FLOWS.forEach((f, i) => add(`fluxo:${d}:${i}`, flowFrom(r, d, f)));
+      break;
+    case "logic":
+      for (let i = 0; i < 40 && out.length < 8; i++) {
+        const g = robot(r, d, game);
+        if (g) add(`robo:${(g.payload as { grid: string[] }).grid.join("/")}`, g);
+      }
+      break;
+    case "sql":
+      for (let i = 0; i < 60 && out.length < 10; i++) {
+        const g = sqlGen(r, d, game);
+        if (!g) continue;
+        const q = (g.solution as { query: SqlQuery }).query;
+        add(`sql:${q.table}:${q.columns.join(",")}:${q.where?.column ?? ""}${q.where?.op ?? ""}:${q.orderBy?.column ?? ""}:${q.limit ? "l" : ""}`, g);
+      }
+      break;
+    case "css":
+      for (let i = 0; i < 40 && out.length < 10; i++) {
+        const g = cssGen(r, d, game);
+        if (g) add(`css:${(g.solution as { selector: string }).selector}`, g);
+      }
+      break;
+  }
+  return out;
+}
+
+export interface PlayOptions {
+  /** Chaves das situações já jogadas, da mais antiga para a mais recente. */
+  recent?: readonly string[];
+  /** Quem já domina o jogo recebe uma fase difícil no lugar de uma fácil. */
+  advanced?: boolean;
+}
+
+/**
+ * Fases de uma partida. Por dificuldade, junta as fases cadastradas e as geradas e escolhe
+ * primeiro as situações que a pessoa nunca viu; depois, as vistas há mais tempo. O sorteio
+ * só desempata. Assim a partida seguinte não repete a anterior enquanto houver conteúdo.
+ */
+export function buildPlayRounds(game: SeedGame, seed: string, options: PlayOptions = {}): Keyed[] {
+  const r = seededRandom(`${game.slug}:${seed}`);
+  const recent = options.recent ?? [];
+  const lastSeen = new Map<string, number>();
+  recent.forEach((k, i) => lastSeen.set(k, i));
+
+  const counts: Record<Difficulty, number> = { 1: 0, 2: 0, 3: 0 };
+  for (const x of game.rounds) counts[x.difficulty]++;
+  const points = (d: Difficulty) => game.rounds.find((x) => x.difficulty === d)?.points;
+  if (options.advanced && counts[1] > 1 && counts[3] > 0) {
+    counts[1]--;
+    counts[3]++;
+  }
+
+  const out: Keyed[] = [];
+  const used = new Set<string>();
+  for (const d of [1, 2, 3] as const) {
+    if (counts[d] === 0) continue;
+    const pool = new Map<string, Keyed>();
+    game.rounds.forEach((x, i) => {
+      if (x.difficulty === d) {
+        const key = x.key ?? (game.kind === "memory" ? `mem:${(x.payload as { prompt: string }).prompt}` : `${game.slug}:f${i}`);
+        pool.set(key, { ...x, key });
+      }
+    });
+    for (const c of candidates(game, d, r)) {
+      if (pool.has(c.key) || !validateRound(game.kind as GameKind, c.payload, c.solution).ok) continue;
+      const p = points(d);
+      pool.set(c.key, p === undefined ? c : { ...c, points: p });
     }
-    out.push(...seededShuffle(pool, `${seed}:${d}`).slice(0, fixed.length));
+    const ranked = [...pool.values()]
+      .filter((c) => !used.has(c.key))
+      .map((c) => ({ c, seen: lastSeen.get(c.key) ?? -1, tie: r() }))
+      .sort((a, b) => a.seen - b.seen || a.tie - b.tie)
+      .slice(0, counts[d])
+      .map((x) => x.c);
+    for (const c of ranked) used.add(c.key);
+    out.push(...ranked);
   }
   return out;
 }

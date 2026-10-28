@@ -26,6 +26,18 @@ describe("relatos dos alunos", () => {
     expect(rows[0]!.page).toBe("/aulas/variaveis");
   });
 
+  it("clique duplo ou reenvio não grava o mesmo relato duas vezes", async () => {
+    const msg = "A pergunta 3 da aula de laços está com a resposta errada.";
+    const [a, b] = await Promise.all([send(ANA, "resposta_errada", msg), send(ANA, "resposta_errada", msg)]);
+    expect([a, b].every((r) => r.ok)).toBe(true);
+    await send(null, "outro", "Relato sem login repetido.");
+    await send(null, "outro", "Relato sem login repetido.");
+    const n = (await db.query<{ n: number }>("select count(*)::int as n from public.feedback")).rows[0]!.n;
+    expect(n).toBe(2);
+    // Outro texto da mesma pessoa continua entrando normalmente.
+    expect((await send(ANA, "resposta_errada", "Outra pergunta com problema na aula 4.")).ok).toBe(true);
+  });
+
   it("valida tipo, tamanho e página", async () => {
     expect((await send(ANA, "spam", "mensagem qualquer aqui")).ok).toBe(false);
     expect((await send(ANA, "outro", "curto")).ok).toBe(false);

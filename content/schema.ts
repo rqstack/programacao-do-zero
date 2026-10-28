@@ -49,6 +49,8 @@ export interface SeedCourse {
 }
 
 export interface SeedGameRound {
+  /** Identidade da situação (para não repetir entre partidas). Sem chave, vale a posição na lista. */
+  key?: string;
   difficulty: 1 | 2 | 3;
   points?: number;
   payload: Record<string, unknown>;

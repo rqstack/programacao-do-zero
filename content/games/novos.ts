@@ -1,4 +1,5 @@
 import type { SeedGame } from "../schema";
+import { fixedWaves } from "./rounds";
 
 export const robo: SeedGame = {
   slug: "robo-programador",
@@ -22,23 +23,10 @@ export const chuva: SeedGame = {
   kind: "lightning",
   lives: 3,
   title: "Chuva de código",
-  description: "Afirmações sobre programação caem do céu. Verdadeiro ou falso antes que cheguem ao chão!",
+  description: "Expressões de código caem em três pistas. Mova o coletor e pegue só as que obedecem à regra da onda.",
   rules:
-    "Cada afirmação cai pela tela. Responda Verdadeiro (tecla V ou seta ←) ou Falso (tecla F ou seta →) antes que ela chegue ao chão. Errar ou deixar cair custa uma vida. Elas caem cada vez mais rápido.",
-  rounds: [
-    { difficulty: 1, points: 5, payload: { statement: "const impede reatribuir a variável." }, solution: { truth: true }, explanation: "Com const, `x = 2` depois de `const x = 1` gera TypeError." },
-    { difficulty: 1, points: 5, payload: { statement: "Arrays em JavaScript começam no índice 1." }, solution: { truth: false }, explanation: "O primeiro item fica no índice 0." },
-    { difficulty: 1, points: 5, payload: { statement: "O resultado é 6:", code: "\"5\" + 1" }, solution: { truth: false }, explanation: "Com um texto no +, os valores são concatenados: \"51\"." },
-    { difficulty: 1, points: 5, payload: { statement: "padding é o espaço interno de um elemento." }, solution: { truth: true }, explanation: "padding fica entre o conteúdo e a borda; margin fica do lado de fora." },
-    { difficulty: 2, points: 5, payload: { statement: "O status HTTP 404 significa sucesso." }, solution: { truth: false }, explanation: "404 é \"não encontrado\"; sucesso é 200." },
-    { difficulty: 2, points: 5, payload: { statement: "0 é um valor falsy em JavaScript." }, solution: { truth: true }, explanation: "false, 0, \"\", null, undefined e NaN são falsy." },
-    { difficulty: 2, points: 5, payload: { statement: "git push envia commits ao repositório remoto." }, solution: { truth: true }, explanation: "commit registra localmente; push envia para o remoto." },
-    { difficulty: 2, points: 5, payload: { statement: "SELECT apaga linhas de uma tabela." }, solution: { truth: false }, explanation: "SELECT só consulta. Quem apaga é o DELETE." },
-    { difficulty: 3, points: 5, payload: { statement: "O resultado é \"object\":", code: "typeof []" }, solution: { truth: true }, explanation: "Arrays são objetos. Para testar se é array, use Array.isArray." },
-    { difficulty: 3, points: 5, payload: { statement: "Mudar o estado com useState faz o componente renderizar de novo." }, solution: { truth: true }, explanation: "É assim que o React atualiza a tela." },
-    { difficulty: 3, points: 5, payload: { statement: "JSON.parse transforma um objeto em texto." }, solution: { truth: false }, explanation: "É o contrário: parse lê texto; JSON.stringify gera texto." },
-    { difficulty: 3, points: 5, payload: { statement: "A chave de API secreta pode ficar no código do front-end." }, solution: { truth: false }, explanation: "Tudo que vai ao navegador pode ser lido. Segredos ficam no servidor." },
-  ],
+    "Cada onda tem uma regra, como \"pegue as que dão número par\". Mova o coletor com ← e → (ou A e D, ou tocando nas pistas) e pegue só as expressões certas. Pegar uma isca ou deixar passar muitas certas faz perder a onda (e uma vida). As ondas ficam mais rápidas e as expressões, mais traiçoeiras.",
+  rounds: fixedWaves(),
 };
 
 const produtos = {

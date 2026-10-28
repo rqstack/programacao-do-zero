@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { ArrowDown, ArrowRight, ArrowUp, Bug, CarFront, Flag, Flame, GripVertical, Heart, Play, RotateCcw, Star, Trophy } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, CarFront, Flag, Flame, GripVertical, Heart, Play, RotateCcw, Star, Trophy } from "lucide-react";
 import type { SeedGame } from "@content/schema";
 import { InlineMd } from "@/components/content/inline-md";
 import { Alert, Button, cx, ProgressBar } from "@/components/ui/primitives";
@@ -21,8 +21,9 @@ import {
   type TypingPayload,
 } from "@/lib/games/engine";
 import { buildPlayRounds } from "@/lib/games/generate";
-import { dispatchProgress, useHydrated, useProgress } from "@/lib/progress/store";
+import { dispatchProgress, getProgress, useHydrated, useProgress } from "@/lib/progress/store";
 import { CssLiveView } from "./views/css-live-view";
+import { BugFixView } from "./views/bug-fix-view";
 import { RainView } from "./views/rain-view";
 import { RobotView } from "./views/robot-view";
 import { SqlBuilderView } from "./views/sql-builder-view";
@@ -63,8 +64,11 @@ export function GamePlayer({ game }: { game: SeedGame }) {
   const live = useRef({ score: 0, correct: 0, lives: game.lives ?? 0, current: 0 });
 
   const family = familyOf(game.kind);
-  /** Fases desta partida: sorteadas de novo a cada "Jogar" / "Jogar de novo". */
-  const playRounds = useMemo(() => buildPlayRounds(game, seed), [game, seed]);
+  /**
+   * Fases desta partida. Montadas no "Jogar" / "Jogar de novo" a partir do histórico do jogador
+   * (situações nunca vistas primeiro), e não a cada renderização.
+   */
+  const [playRounds, setPlayRounds] = useState(() => buildPlayRounds(game, "inicial"));
   const rounds: PreparedRound[] = useMemo(
     () => playRounds.map((r, index) => ({ index, difficulty: r.difficulty, points: r.points ?? 10, payload: publicPayload(game.kind, r.payload, `${seed}:${index}`) })),
     [game.kind, playRounds, seed],
@@ -91,7 +95,14 @@ export function GamePlayer({ game }: { game: SeedGame }) {
 
   function start() {
     finished.current = false;
-    setSeed(String(Math.random()).slice(2, 10));
+    const newSeed = String(Math.random()).slice(2, 10);
+    const saved = getProgress();
+    const rec = saved.games[game.slug];
+    const advanced = Boolean(rec?.completed && rec.max > 0 && rec.best / rec.max >= 0.8);
+    const next = buildPlayRounds(game, newSeed, { recent: saved.gameSeen[game.slug] ?? [], advanced });
+    setPlayRounds(next);
+    dispatchProgress({ type: "game/seen", slug: game.slug, keys: next.map((r) => r.key) });
+    setSeed(newSeed);
     setCurrent(0);
     setStates({});
     setFeedback(null);
@@ -203,7 +214,7 @@ export function GamePlayer({ game }: { game: SeedGame }) {
   }
 
   const round = rounds[current]!;
-  const autoNext = family === "rain";
+  const autoNext = false;
   return (
     <div>
       {/* HUD */}
@@ -238,10 +249,10 @@ export function GamePlayer({ game }: { game: SeedGame }) {
 
       <div className="rounded-[var(--radius-xl)] border border-line bg-navy/60 p-4 sm:p-6">
         {family === "robot" && <RobotView key={`${seed}-${current}`} payload={round.payload as RobotPayload} onAnswer={answer} feedback={feedback} />}
-        {family === "rain" && <RainView key={`${seed}-${current}`} payload={round.payload as RainPayload} difficulty={round.difficulty} onAnswer={answer} onAutoNext={next} />}
+        {family === "rain" && <RainView key={`${seed}-${current}`} payload={round.payload as RainPayload} onAnswer={answer} feedback={feedback} />}
         {family === "css_live" && <CssLiveView key={`${seed}-${current}`} payload={round.payload as CssPayload} onAnswer={answer} feedback={feedback} />}
         {family === "sql_builder" && <SqlBuilderView key={`${seed}-${current}`} payload={round.payload as SqlPayload} onAnswer={answer} feedback={feedback} />}
-        {family === "bug_hunt" && <BugView key={`${seed}-${current}`} payload={round.payload as BugPayload} onAnswer={answer} feedback={feedback} />}
+        {family === "bug_hunt" && <BugFixView key={`${seed}-${current}`} payload={round.payload as BugPayload} onAnswer={answer} feedback={feedback} />}
         {family === "code_order" && (
           <OrderView key={`${seed}-${current}`} payload={round.payload as OrderPayload} onAnswer={answer} feedback={feedback} variant={game.kind === "fullstack" ? "flow" : "code"} />
         )}
@@ -280,6 +291,8 @@ function FeedbackLine({ feedback }: { feedback: RoundFeedback }) {
   const ok = feedback.kind === "memory" ? true : feedback.correct;
   let title = ok ? "Certo!" : "Não foi dessa vez.";
   if (feedback.kind === "memory") title = `Todos os pares em ${feedback.attempts} tentativas.`;
+  if (feedback.kind === "bug_hunt") title = feedback.correct ? (feedback.runs <= 1 ? "Todos os testes passaram de primeira!" : `Todos os testes passaram (${feedback.runs} execuções).`) : "O bug venceu desta vez.";
+  if (feedback.kind === "rain") title = feedback.correct ? `Onda vencida: ${feedback.hits} de ${feedback.targets}.` : `Onda perdida: ${feedback.hits} de ${feedback.targets} certas e ${feedback.wrong} isca(s).`;
   if (feedback.kind === "typing") title = `${Math.round(feedback.accuracy * 100)}% de precisão${feedback.errors ? ` · ${feedback.errors} erro(s)` : ""}.`;
   if (feedback.kind === "robot")
     title = feedback.correct ? (feedback.blocks <= feedback.par ? "Bandeira! Programa enxuto: pontuação máxima." : `Bandeira! Dá para fazer com ${feedback.par} blocos.`) : "Fase não concluída.";
@@ -287,52 +300,6 @@ function FeedbackLine({ feedback }: { feedback: RoundFeedback }) {
     <Alert tone={ok ? "success" : "warning"} title={title}>
       {feedback.explanation && <InlineMd text={feedback.explanation} />}
     </Alert>
-  );
-}
-
-/* ---------------------------- Caça aos bugs ---------------------------- */
-
-function BugView({ payload, onAnswer, feedback }: { payload: BugPayload; onAnswer: (v: unknown) => RoundFeedback | null; feedback: RoundFeedback | null }) {
-  const [picked, setPicked] = useState<number | null>(null);
-  const lines = payload.code.split("\n");
-  const correctLine = feedback?.kind === "bug_hunt" ? feedback.correctLine : null;
-  return (
-    <div>
-      <p className="text-lg font-semibold">{payload.prompt}</p>
-      <p className="mt-1 text-sm text-muted">Toque na linha com o bug.</p>
-      <ol className="code-surface mt-4 overflow-x-auto rounded-md border border-line bg-[#040a17] py-2 font-mono text-[0.85rem]">
-        {lines.map((line, i) => {
-          const n = i + 1;
-          const isCorrect = correctLine === n;
-          const isWrong = feedback !== null && picked === n && !isCorrect;
-          return (
-            <li key={i}>
-              <button
-                type="button"
-                disabled={feedback !== null}
-                onClick={() => {
-                  setPicked(n);
-                  onAnswer({ line: n });
-                }}
-                aria-label={`Linha ${n}: ${line.trim() || "vazia"}`}
-                className={cx(
-                  "flex min-h-10 w-full items-center gap-4 whitespace-pre px-3 text-left transition-colors",
-                  feedback === null && "hover:bg-electric/15",
-                  isCorrect && "bg-ok/20",
-                  isWrong && "shake bg-bad/20",
-                )}
-              >
-                <span aria-hidden className="w-5 shrink-0 text-right text-subtle">
-                  {n}
-                </span>
-                <span className="text-[#d6e2f5]">{line || " "}</span>
-                {isCorrect && <span className="ml-auto inline-flex items-center gap-1 pl-3 text-xs text-ok"><Bug aria-hidden className="size-3.5" /> bug</span>}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
   );
 }
 

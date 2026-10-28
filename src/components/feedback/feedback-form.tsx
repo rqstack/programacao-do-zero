@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { Alert, Button, cx } from "@/components/ui/primitives";
 import { useAuth } from "@/lib/auth/auth-provider";
@@ -23,6 +23,8 @@ export function FeedbackForm() {
   const [page, setPage] = useState<string | null>(null);
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
+  // Trava imediata: o botão só fica desabilitado depois de renderizar; o clique duplo chegava antes.
+  const sending = useRef(false);
 
   // Página de onde a pessoa veio (/feedback?de=/aulas/x), para facilitar achar o problema.
   useEffect(() => {
@@ -60,8 +62,11 @@ export function FeedbackForm() {
     if (message.trim().length < 10) return setError("Conte um pouco mais (pelo menos 10 caracteres).");
     const supabase = getSupabase();
     if (!supabase) return setError("Envio indisponível agora.");
+    if (sending.current) return;
+    sending.current = true;
     setState("sending");
     const { data, error: rpcError } = await supabase.rpc("submit_feedback", { p_category: category, p_message: message, p_page: page });
+    sending.current = false;
     if (rpcError || !data?.ok) {
       setState("idle");
       setError((data as { error?: string } | null)?.error ?? "Não foi possível enviar agora. Tente de novo em instantes.");

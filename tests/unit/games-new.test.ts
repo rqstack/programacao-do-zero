@@ -85,13 +85,19 @@ describe("mini SQL", () => {
   });
 });
 
-describe("chuva de código", () => {
-  const round = { payload: { statement: "x" }, solution: { truth: true }, points: 5, explanation: "" };
-  it("acerta, erra e deixa cair", () => {
-    expect(gradeRound("lightning", round, null, { value: true }).ok && true).toBe(true);
-    const caiu = gradeRound("lightning", round, null, { value: null });
-    expect(caiu.ok && caiu.correctDelta).toBe(0);
-    expect(caiu.ok && caiu.feedback.kind === "rain" && caiu.feedback.timedOut).toBe(true);
+describe("chuva de código (coletar)", () => {
+  it("vence pegando a maioria das certas; perde pegando iscas", () => {
+    const wave = {
+      payload: { rule: "r", explain: "", tickMs: 700, drops: ["a", "b", "c", "d", "e", "f", "g"].map((id, i) => ({ id, code: `x${i}`, lane: i % 3 })) },
+      solution: { targets: ["a", "b", "c", "d"], values: {} },
+      points: 10,
+      explanation: "",
+    };
+    const ok = gradeRound("lightning", wave, null, { caught: ["a", "b", "c"] });
+    expect(ok.ok && ok.correctDelta).toBe(1);
+    const iscas = gradeRound("lightning", wave, null, { caught: ["a", "b", "c", "e", "f"] });
+    expect(iscas.ok && iscas.correctDelta).toBe(0);
+    expect(iscas.ok && iscas.feedback.kind === "rain" && iscas.feedback.wrong).toBe(2);
   });
 });
 

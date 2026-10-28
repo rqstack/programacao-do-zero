@@ -13,6 +13,8 @@ const iso = z.string().max(40);
 
 /** Limites que mantêm o progresso abaixo do teto de 256 KB da tabela user_progress. */
 export const NOTE_MAX_CHARS = 1500;
+/** Quantas situações recentes por jogo o histórico guarda. */
+export const GAME_SEEN_MAX = 120;
 /** Limites de uso (anotações com texto e favoritos ativos). */
 export const NOTES_MAX = 80;
 export const FAVORITES_MAX = 300;
@@ -72,6 +74,11 @@ export const progressSchema = z.object({
   resolved: z.record(z.string().max(160), iso).refine(maxKeys(5000)).default({}),
   /** Missões concluídas. */
   missions: z.record(z.string().max(60), iso).default({}),
+  /** Situações já jogadas em cada jogo (mais recente por último), para a próxima partida não repetir. */
+  gameSeen: z
+    .record(z.string().max(60), z.array(z.string().max(200)).max(GAME_SEEN_MAX))
+    .refine((r) => Object.keys(r).length <= 40)
+    .default({}),
   /** Respostas do começo (trilha personalizada). skipped = a pessoa pulou as perguntas. */
   onboarding: z
     .object({
@@ -108,6 +115,7 @@ export function emptyProgress(now: Date): ProgressState {
     resolved: {},
     missions: {},
     onboarding: null,
+    gameSeen: {},
   };
 }
 
@@ -127,6 +135,7 @@ export type ProgressAction =
   | { type: "note/save"; slug: string; text: string }
   | { type: "review/answer"; id: string; correct: boolean }
   | { type: "settings/weekly"; goals: Array<{ type: (typeof WEEKLY_TYPES)[number]; target: number }> }
+  | { type: "game/seen"; slug: string; keys: string[] }
   | { type: "onboarding/save"; answers: Omit<NonNullable<ProgressState["onboarding"]>, "at" | "skipped"> | null };
 
 export interface Reward {
@@ -282,6 +291,15 @@ export function applyProgress(prev: ProgressState, action: ProgressAction, now: 
       if (text.trim() && !hasText && active >= NOTES_MAX) return refuse;
       if (!exists && Object.keys(state.notes).length >= NOTES_KEYS_CAP) return refuse;
       state.notes[action.slug] = { text: text.trim() ? text : "", at };
+      activity = false;
+      break;
+    }
+    case "game/seen": {
+      // Registra as situações desta partida (sem XP). Repetidas vão para o fim da fila.
+      if (!/^[a-z0-9-]{1,60}$/.test(action.slug)) return { state: prev, reward: { xp: 0, label: "", achievements: [] } };
+      const fresh = action.keys.filter((k) => typeof k === "string" && k.length <= 200).slice(0, 40);
+      const old = (state.gameSeen[action.slug] ?? []).filter((k) => !fresh.includes(k));
+      state.gameSeen[action.slug] = [...old, ...fresh].slice(-GAME_SEEN_MAX);
       activity = false;
       break;
     }
@@ -490,6 +508,10 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     }
     for (const [k, v] of Object.entries(src.resolved)) out.resolved[k] = earliest(out.resolved[k], v)!;
     for (const [k, v] of Object.entries(src.missions)) out.missions[k] = earliest(out.missions[k], v)!;
+    for (const [slug, keys] of Object.entries(src.gameSeen)) {
+      const merged = [...(out.gameSeen[slug] ?? []).filter((k) => !keys.includes(k)), ...keys];
+      out.gameSeen[slug] = merged.slice(-GAME_SEEN_MAX);
+    }
     if (src.onboarding && (!out.onboarding || src.onboarding.at > out.onboarding.at)) out.onboarding = { ...src.onboarding, langs: [...src.onboarding.langs] };
   }
   return out;

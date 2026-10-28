@@ -25,13 +25,22 @@ const choicePayload = z.object({
 const choiceSolution = z.object({ index: z.number().int().min(0) });
 const choiceAnswer = z.object({ index: z.number().int().min(0).max(10) });
 
+/**
+ * Caça aos bugs: o código roda de verdade (Web Worker) contra os casos de teste; a pessoa
+ * acha a linha, corrige e roda de novo. `expected` é o resultado (JSON) da versão correta.
+ */
 const bugPayload = z.object({
   prompt: z.string().min(1).max(2000),
-  language: z.string().min(1).max(20),
+  language: z.literal("js"),
+  fn: z.string().regex(/^[A-Za-z_$][A-Za-z0-9_$]{0,40}$/),
   code: z.string().min(1).max(4000),
+  cases: z.array(z.array(z.unknown()).max(6)).min(1).max(8),
+  expected: z.array(z.string().max(2000)).min(1).max(8),
+  maxRuns: z.number().int().min(1).max(5),
+  concept: z.string().max(60),
 });
-const bugSolution = z.object({ line: z.number().int().min(1) });
-const bugAnswer = z.object({ line: z.number().int().min(1).max(200) });
+const bugSolution = z.object({ line: z.number().int().min(1), fix: z.string().min(1).max(400) });
+const bugAnswer = z.object({ passed: z.boolean(), runs: z.number().int().min(0).max(5) });
 
 const blockId = z.string().regex(/^[a-z0-9-]{1,20}$/);
 const orderPayload = z.object({
@@ -56,13 +65,18 @@ const typingPayload = z.object({
 const typingSolution = z.object({});
 const typingAnswer = z.object({ typed: z.string().max(800) });
 
+/**
+ * Chuva de código (coletar): expressões caem em 3 pistas; a pessoa move o coletor e pega só
+ * as que obedecem à regra. A correção compara o que foi pego com os alvos.
+ */
 const rainPayload = z.object({
-  statement: z.string().min(1).max(200),
-  code: z.string().max(200).optional(),
-  codeLang: z.string().max(20).optional(),
+  rule: z.string().min(1).max(120),
+  explain: z.string().max(200),
+  drops: z.array(z.object({ id: blockId, code: z.string().min(1).max(80), lane: z.number().int().min(0).max(2) })).min(4).max(16),
+  tickMs: z.number().int().min(250).max(1500),
 });
-const rainSolution = z.object({ truth: z.boolean() });
-const rainAnswer = z.object({ value: z.boolean().nullable() });
+const rainSolution = z.object({ targets: z.array(blockId).min(2).max(16), values: z.record(z.string(), z.string().max(80)) });
+const rainAnswer = z.object({ caught: z.array(blockId).max(16) });
 
 const cssPayload = z.object({
   prompt: z.string().min(1).max(500),
@@ -142,13 +156,19 @@ export function validateRound(kind: GameKind, payload: unknown, solution: unknow
     const pl = p.data as ChoicePayload;
     if ((s.data as { index: number }).index >= pl.options.length) return { ok: false, error: "índice correto fora das opções" };
   } else if (family === "bug_hunt") {
-    const lines = (p.data as BugPayload).code.split("\n").length;
-    if ((s.data as { line: number }).line > lines) return { ok: false, error: "linha do bug fora do código" };
+    const pl = p.data as BugPayload;
+    if ((s.data as { line: number }).line > pl.code.split("\n").length) return { ok: false, error: "linha do bug fora do código" };
+    if (pl.cases.length !== pl.expected.length) return { ok: false, error: "cada caso precisa de um resultado esperado" };
   } else if (family === "code_order") {
     const ids = (p.data as OrderPayload).blocks.map((b) => b.id);
     const order = (s.data as { order: string[] }).order;
     if (!isPermutation(order, ids)) return { ok: false, error: "a ordem correta precisa usar todos os blocos uma vez" };
-  } else if (family === "typing" || family === "rain") {
+  } else if (family === "rain") {
+    const ids = new Set((p.data as RainPayload).drops.map((d) => d.id));
+    const t = (s.data as { targets: string[] }).targets;
+    if (!t.every((id) => ids.has(id))) return { ok: false, error: "alvo que não está na onda" };
+    if (ids.size - t.length < 2) return { ok: false, error: "a onda precisa de iscas (expressões que não valem)" };
+  } else if (family === "typing") {
     return { ok: true };
   } else if (family === "robot") {
     const pl = p.data as RobotPayload;
@@ -196,11 +216,20 @@ export type RoundState =
 
 export type RoundFeedback =
   | { kind: "choice"; correct: boolean; correctIndex: number; explanation: string }
-  | { kind: "bug_hunt"; correct: boolean; correctLine: number; explanation: string }
+  | { kind: "bug_hunt"; correct: boolean; correctLine: number; fix: string; runs: number; explanation: string }
   | { kind: "code_order"; correct: boolean; correctOrder: string[]; explanation: string }
   | { kind: "typing"; correct: boolean; accuracy: number; errors: number; explanation: string }
   | { kind: "robot"; correct: boolean; run: RobotRun; blocks: number; par: number; explanation: string }
-  | { kind: "rain"; correct: boolean; truth: boolean; timedOut: boolean; explanation: string }
+  | {
+      kind: "rain";
+      correct: boolean;
+      hits: number;
+      wrong: number;
+      missed: number;
+      targets: number;
+      details: Array<{ code: string; value: string; target: boolean; caught: boolean }>;
+      explanation: string;
+    }
   | { kind: "css_live"; correct: boolean; reference: string; explanation: string }
   | {
       kind: "sql_builder";
@@ -312,10 +341,26 @@ export function gradeRound(
 
   if (family === "rain") {
     const parsed = rainAnswer.safeParse(answer);
-    if (!parsed.success) return { ok: false, error: "invalid_answer" };
-    const truth = (round.solution as { truth: boolean }).truth;
-    const correct = parsed.data.value === truth;
-    return finish(round, correct, { kind: "rain", correct, truth, timedOut: parsed.data.value === null, explanation: round.explanation });
+    const pl = round.payload as RainPayload;
+    const ids = new Set(pl.drops.map((d) => d.id));
+    if (!parsed.success || !parsed.data.caught.every((id) => ids.has(id))) return { ok: false, error: "invalid_answer" };
+    const sol = round.solution as { targets: string[]; values: Record<string, string> };
+    const targets = new Set(sol.targets);
+    const caught = new Set(parsed.data.caught);
+    const hits = [...caught].filter((id) => targets.has(id)).length;
+    const wrong = caught.size - hits;
+    const missed = targets.size - hits;
+    // Acerto: pegou pelo menos 70% dos alvos e no máximo 1 isca.
+    const correct = hits >= Math.ceil(targets.size * 0.7) && wrong <= 1;
+    const points = Math.max(0, Math.round((round.points * (hits - wrong)) / targets.size));
+    const details = pl.drops.map((d) => ({ code: d.code, value: sol.values[d.id] ?? "?", target: targets.has(d.id), caught: caught.has(d.id) }));
+    return {
+      ok: true,
+      state: { done: true, correct, points },
+      pointsDelta: points,
+      correctDelta: correct ? 1 : 0,
+      feedback: { kind: "rain", correct, hits, wrong, missed, targets: targets.size, details, explanation: round.explanation },
+    };
   }
 
   if (family === "css_live") {
@@ -357,11 +402,20 @@ export function gradeRound(
 
   if (family === "bug_hunt") {
     const parsed = bugAnswer.safeParse(answer);
-    const lines = (round.payload as BugPayload).code.split("\n").length;
-    if (!parsed.success || parsed.data.line > lines) return { ok: false, error: "invalid_answer" };
-    const correctLine = (round.solution as { line: number }).line;
-    const correct = parsed.data.line === correctLine;
-    return finish(round, correct, { kind: "bug_hunt", correct, correctLine, explanation: round.explanation });
+    const pl = round.payload as BugPayload;
+    if (!parsed.success || parsed.data.runs > pl.maxRuns || (parsed.data.passed && parsed.data.runs < 1)) return { ok: false, error: "invalid_answer" };
+    const sol = round.solution as { line: number; fix: string };
+    const correct = parsed.data.passed;
+    // Corrigir na primeira execução vale tudo; cada execução a mais vale um pouco menos.
+    const factor = [1, 1, 0.8, 0.6, 0.5, 0.4][parsed.data.runs] ?? 0.4;
+    const points = correct ? Math.round(round.points * factor) : 0;
+    return {
+      ok: true,
+      state: { done: true, correct, points },
+      pointsDelta: points,
+      correctDelta: correct ? 1 : 0,
+      feedback: { kind: "bug_hunt", correct, correctLine: sol.line, fix: sol.fix, runs: parsed.data.runs, explanation: round.explanation },
+    };
   }
 
   const parsed = orderAnswer.safeParse(answer);

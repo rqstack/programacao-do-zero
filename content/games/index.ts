@@ -1,5 +1,7 @@
 import type { SeedGame } from "../schema";
+import { BUGS } from "./bugs";
 import { chuva, css, fullstack, robo, sql } from "./novos";
+import { bugRound } from "./rounds";
 
 /**
  * Jogos de revisão. As alternativas são embaralhadas na hora de jogar, então a
@@ -11,96 +13,10 @@ const classicos: SeedGame[] = [
     kind: "bug_hunt",
     lives: 3,
     title: "Caça aos bugs",
-    description: "Encontre a linha com o erro e entenda por que ela quebra o programa.",
-    rules: "Leia o código e toque na linha que contém o bug. Você tem 3 vidas: cada linha errada custa uma. Depois de cada resposta, a explicação mostra o que acontece e como corrigir.",
-    rounds: [
-      {
-        difficulty: 1,
-        payload: { prompt: "O programa deveria cumprimentar a Ana.", language: "js", code: 'const nome = "Ana";\nconsole.log("Olá, " + nme);' },
-        solution: { line: 2 },
-        explanation: "A variável se chama `nome`, mas a linha 2 usa `nme`. O resultado é `ReferenceError: nme is not defined`.",
-      },
-      {
-        difficulty: 1,
-        payload: {
-          prompt: "Deveria mostrar \"Tem 18 anos\" apenas quando idade for 18.",
-          language: "js",
-          code: 'const idade = 20;\nif (idade = 18) {\n  console.log("Tem 18 anos");\n}',
-        },
-        solution: { line: 2 },
-        explanation: "`=` tenta atribuir 18 a uma constante (TypeError). Para comparar, use `===`.",
-      },
-      {
-        difficulty: 1,
-        payload: {
-          prompt: "Deveria mostrar 6 (1 + 2 + 3).",
-          language: "js",
-          code: "let soma = 0;\nfor (let i = 1; i <= 3; i++) {\n  let soma = soma + i;\n}\nconsole.log(soma);",
-        },
-        solution: { line: 3 },
-        explanation: "A linha 3 declara um novo `soma` dentro do bloco e tenta lê-lo antes de existir (ReferenceError). Remova o `let`: `soma = soma + i;`.",
-      },
-      {
-        difficulty: 2,
-        payload: {
-          prompt: "A função deveria calcular a média das notas.",
-          language: "js",
-          code: "function media(notas) {\n  let soma = 0;\n  for (const n of notas) {\n    soma += n;\n  }\n  return soma / notas.lenght;\n}",
-        },
-        solution: { line: 6 },
-        explanation: "`lenght` está escrito errado. `notas.lenght` é undefined, e a divisão resulta em NaN. O correto é `length`.",
-      },
-      {
-        difficulty: 2,
-        payload: {
-          prompt: "Deveria mostrar o maior número da lista.",
-          language: "js",
-          code: "const lista = [3, 1, 2];\nconst ordenada = [...lista].sort((a, b) => a - b);\nconst maior = ordenada[3];\nconsole.log(maior);",
-        },
-        solution: { line: 3 },
-        explanation: "A lista tem 3 itens, com índices 0, 1 e 2. `ordenada[3]` é undefined. Use `ordenada[ordenada.length - 1]`.",
-      },
-      {
-        difficulty: 2,
-        payload: {
-          prompt: "Deveria buscar e devolver a lista de produtos.",
-          language: "js",
-          code: 'async function carregar() {\n  const resposta = fetch("/api/produtos");\n  const dados = await resposta.json();\n  return dados;\n}',
-        },
-        solution: { line: 2 },
-        explanation: "Sem `await`, `resposta` é uma Promise, não a resposta. Chamar `.json()` nela gera TypeError. Corrija com `await fetch(...)`.",
-      },
-      {
-        difficulty: 3,
-        payload: {
-          prompt: "Deveria salvar só quando o botão for clicado.",
-          language: "js",
-          code: 'const botao = document.querySelector("#salvar");\nbotao.addEventListener("click", salvar());\n\nfunction salvar() {\n  console.log("salvo");\n}',
-        },
-        solution: { line: 2 },
-        explanation: "`salvar()` executa a função na hora e passa `undefined` ao ouvinte. Passe a referência: `addEventListener(\"click\", salvar)`.",
-      },
-      {
-        difficulty: 3,
-        payload: {
-          prompt: "desconto(200, 10) deveria devolver 180.",
-          language: "js",
-          code: "function desconto(preco, percentual) {\n  if (percentual > 100) {\n    return preco;\n  }\n  return preco - preco * percentual;\n}",
-        },
-        solution: { line: 5 },
-        explanation: "O percentual precisa ser dividido por 100. Do jeito que está, desconto(200, 10) devolve 200 − 2000 = −1800. Correção: `preco * (percentual / 100)`.",
-      },
-      {
-        difficulty: 3,
-        payload: {
-          prompt: "Em Java, deveria mostrar \"iguais\" quando os textos forem iguais.",
-          language: "java",
-          code: 'String a = "oi";\nString b = new String("oi");\nif (a == b) {\n  System.out.println("iguais");\n}',
-        },
-        solution: { line: 3 },
-        explanation: "Em Java, `==` compara referências (se é o mesmo objeto), não o conteúdo. Para comparar textos, use `a.equals(b)`.",
-      },
-    ],
+    description: "O código roda e os testes falham. Ache a linha com o bug, corrija e rode de novo até todos passarem.",
+    rules:
+      "Rode os testes, veja quais falham e compare o que saiu com o esperado. Toque na linha suspeita, edite e rode de novo. Você tem 3 execuções por bug; se não conseguir, perde uma vida e vê a correção explicada. Corrigir na primeira tentativa vale mais pontos.",
+    rounds: ([1, 2, 3] as const).flatMap((d) => BUGS.filter((b) => b.difficulty === d).slice(0, 2).map(bugRound)),
   },
   {
     slug: "monte-o-codigo",

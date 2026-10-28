@@ -52,22 +52,41 @@ describe("níveis e conquistas", () => {
 
 describe("motor de jogos", () => {
 
+  const wave = {
+    payload: { rule: "Pegue as que dão true", explain: "", tickMs: 700, drops: ["a", "b", "c", "d", "e", "f"].map((id, i) => ({ id, code: `x${i}`, lane: i % 3 })) },
+    solution: { targets: ["a", "b", "c"], values: { a: "true", b: "true", c: "true", d: "false", e: "false", f: "false" } },
+    points: 10,
+    explanation: "",
+  };
   it("impede responder a mesma rodada duas vezes", () => {
-    const rain = { payload: { statement: "x" }, solution: { truth: false }, points: 5, explanation: "" };
-    const r = gradeRound("lightning", rain, null, { value: false });
-    expect(r.ok && r.pointsDelta).toBe(5);
+    const r = gradeRound("lightning", wave, null, { caught: ["a", "b", "c"] });
+    expect(r.ok && r.pointsDelta).toBe(10);
     if (!r.ok) throw new Error();
-    expect(gradeRound("lightning", rain, r.state, { value: false })).toEqual({ ok: false, error: "already_answered" });
+    expect(gradeRound("lightning", wave, r.state, { caught: ["a", "b", "c"] })).toEqual({ ok: false, error: "already_answered" });
   });
-  it("pontuação nunca vem do cliente", () => {
-    const rain = { payload: { statement: "x" }, solution: { truth: true }, points: 5, explanation: "" };
-    const r = gradeRound("lightning", rain, null, { value: false, score: 1000 });
+  it("pontuação nunca vem do cliente: vem do que foi pego", () => {
+    const r = gradeRound("lightning", wave, null, { caught: ["d", "e"], score: 1000 });
     expect(r.ok && r.pointsDelta).toBe(0);
+    expect(r.ok && r.correctDelta).toBe(0);
+    expect(gradeRound("lightning", wave, null, { caught: ["zz"] })).toEqual({ ok: false, error: "invalid_answer" });
   });
-  it("caça aos bugs por linha", () => {
-    const round = { payload: { prompt: "?", language: "js", code: "a\nb\nc" }, solution: { line: 2 }, points: 10, explanation: "" };
-    expect(gradeRound("bug_hunt", round, null, { line: 2 }).ok && true).toBe(true);
-    expect(gradeRound("bug_hunt", round, null, { line: 4 })).toEqual({ ok: false, error: "invalid_answer" });
+  it("caça aos bugs: corrigir e rodar; mais execuções valem menos; desistir não pontua", () => {
+    const round = {
+      payload: { prompt: "?", language: "js", fn: "f", code: "function f() {\n  return 1;\n}", cases: [[]], expected: ["2"], maxRuns: 3, concept: "x" },
+      solution: { line: 2, fix: "return 2;" },
+      points: 10,
+      explanation: "",
+    };
+    const first = gradeRound("bug_hunt", round, null, { passed: true, runs: 1 });
+    expect(first.ok && first.pointsDelta).toBe(10);
+    const third = gradeRound("bug_hunt", round, null, { passed: true, runs: 3 });
+    expect(third.ok && third.pointsDelta).toBe(6);
+    const gaveUp = gradeRound("bug_hunt", round, null, { passed: false, runs: 0 });
+    expect(gaveUp.ok && gaveUp.pointsDelta).toBe(0);
+    expect(gaveUp.ok && gaveUp.feedback.kind === "bug_hunt" && gaveUp.feedback.fix).toBe("return 2;");
+    // Mais execuções que o permitido, ou "passou" sem rodar, são recusados.
+    expect(gradeRound("bug_hunt", round, null, { passed: true, runs: 4 })).toEqual({ ok: false, error: "invalid_answer" });
+    expect(gradeRound("bug_hunt", round, null, { passed: true, runs: 0 })).toEqual({ ok: false, error: "invalid_answer" });
   });
   it("monte o código exige permutação válida", () => {
     const round = {
