@@ -23,6 +23,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Tipos das rotas e next-env.d.ts são gerados (e ignorados pelo Git): crie antes de checar.
+      - run: npx next typegen
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
