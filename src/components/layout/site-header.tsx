@@ -159,7 +159,7 @@ export function SiteHeader() {
             </Link>
           </div>
           <ul className="space-y-1">
-            {[{ href: "/", label: "Início" }, ...NAV, { href: "/glossario", label: "Glossário" }, { href: "/progresso", label: "Meu progresso" }, { href: "/revisao", label: "Revisar erros" }, { href: "/salvos", label: "Salvos e anotações" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
+            {[{ href: "/", label: "Início" }, ...NAV, { href: "/glossario", label: "Glossário" }, { href: "/progresso", label: "Meu progresso" }, { href: "/comecar", label: "Minha trilha" }, { href: "/revisao", label: "Revisar erros" }, { href: "/salvos", label: "Salvos e anotações" }, { href: "/sobre", label: "Sobre o projeto" }].map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

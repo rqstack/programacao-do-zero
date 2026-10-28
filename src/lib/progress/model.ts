@@ -72,6 +72,18 @@ export const progressSchema = z.object({
   resolved: z.record(z.string().max(160), iso).refine(maxKeys(5000)).default({}),
   /** Missões concluídas. */
   missions: z.record(z.string().max(60), iso).default({}),
+  /** Respostas do começo (trilha personalizada). skipped = a pessoa pulou as perguntas. */
+  onboarding: z
+    .object({
+      skipped: z.boolean(),
+      level: z.enum(["nunca", "basico", "projetos"]).nullable(),
+      goal: z.enum(["logica", "linguagem", "projetos", "estagio", "hobby"]).nullable(),
+      langs: z.array(z.enum(["web", "javascript", "typescript", "python", "java", "csharp", "sql"])).max(7),
+      minutes: z.union([z.literal(10), z.literal(20), z.literal(30), z.literal(60)]).nullable(),
+      at: iso,
+    })
+    .nullable()
+    .default(null),
 });
 
 export type ProgressState = z.infer<typeof progressSchema>;
@@ -95,6 +107,7 @@ export function emptyProgress(now: Date): ProgressState {
     notes: {},
     resolved: {},
     missions: {},
+    onboarding: null,
   };
 }
 
@@ -113,7 +126,8 @@ export type ProgressAction =
   | { type: "favorite/set"; key: string; on: boolean }
   | { type: "note/save"; slug: string; text: string }
   | { type: "review/answer"; id: string; correct: boolean }
-  | { type: "settings/weekly"; goals: Array<{ type: (typeof WEEKLY_TYPES)[number]; target: number }> };
+  | { type: "settings/weekly"; goals: Array<{ type: (typeof WEEKLY_TYPES)[number]; target: number }> }
+  | { type: "onboarding/save"; answers: Omit<NonNullable<ProgressState["onboarding"]>, "at" | "skipped"> | null };
 
 export interface Reward {
   xp: number;
@@ -271,6 +285,13 @@ export function applyProgress(prev: ProgressState, action: ProgressAction, now: 
       activity = false;
       break;
     }
+    case "onboarding/save":
+      // null = pulou. As respostas podem ser trocadas a qualquer momento.
+      state.onboarding = action.answers
+        ? { skipped: false, ...action.answers, langs: [...new Set(action.answers.langs)].slice(0, 7), at }
+        : { skipped: true, level: null, goal: null, langs: [], minutes: null, at };
+      activity = false;
+      break;
     case "review/answer":
       // Refazer uma pergunta na revisão não dá XP, só atualiza o que falta revisar.
       if (action.correct) trackMistakes(state, [], [action.id], at);
@@ -469,6 +490,7 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     }
     for (const [k, v] of Object.entries(src.resolved)) out.resolved[k] = earliest(out.resolved[k], v)!;
     for (const [k, v] of Object.entries(src.missions)) out.missions[k] = earliest(out.missions[k], v)!;
+    if (src.onboarding && (!out.onboarding || src.onboarding.at > out.onboarding.at)) out.onboarding = { ...src.onboarding, langs: [...src.onboarding.langs] };
   }
   return out;
 }

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BookOpen, Code, Globe, Lock, Pencil, Rocket, Trophy, Users } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { levelFromXp, levelTitle } from "@/lib/gamification/rules";
 import { getFollowList, getPublicProfile, type PersonRow, type PublicProfile } from "@/lib/profiles/api";
+import { verifiedAchievements, type PortfolioCatalog, type PortfolioData } from "@/lib/profiles/portfolio";
+import { PortfolioSections } from "./portfolio-sections";
 import { githubUrl, linkedinUrl } from "@/lib/profiles/fields";
 import { Alert, cx, EmptyState, ProgressBar, Spinner } from "@/components/ui/primitives";
 import { Avatar } from "./avatar";
@@ -28,13 +30,15 @@ function LinkedinMark() {
   );
 }
 
-export function PublicProfileView() {
+export function PublicProfileView({ catalog }: { catalog: PortfolioCatalog }) {
   const params = useSearchParams();
   const username = (params.get("n") ?? "").trim().toLowerCase();
   const { configured, session } = useAuth();
   const [data, setData] = useState<PublicProfile | null | "erro" | undefined>(undefined);
   const [tab, setTab] = useState<"seguindo" | "seguidores" | null>(null);
   const [list, setList] = useState<PersonRow[] | null>(null);
+  const [pf, setPf] = useState<PortfolioData | null>(null);
+  const onPrefs = useCallback((d: PortfolioData) => setPf(d), []);
 
   useEffect(() => {
     if (!configured || !username) return;
@@ -73,8 +77,10 @@ export function PublicProfileView() {
     { icon: BookOpen, label: "aulas", value: p.lessons },
     { icon: Code, label: "desafios", value: p.challenges },
     { icon: Rocket, label: "projetos", value: p.projects },
-    { icon: Trophy, label: "troféus", value: p.trophies },
+    // Conquistas conferíveis pelo servidor (as do navegador não contam no perfil público).
+    { icon: Trophy, label: "conquistas", value: pf ? verifiedAchievements(pf, catalog).length : "—" },
   ];
+  const showXp = pf ? pf.prefs.show_xp : true;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[22rem_minmax(0,1fr)]">
@@ -141,7 +147,7 @@ export function PublicProfileView() {
       </aside>
 
       <div className="space-y-8">
-        <section aria-label="Nível" className="rounded-[var(--radius-lg)] border border-line p-6">
+        {showXp && <section aria-label="Nível" className="rounded-[var(--radius-lg)] border border-line p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="font-mono text-xs text-subtle">Nível {lvl.level}</p>
@@ -155,7 +161,7 @@ export function PublicProfileView() {
             </div>
           </div>
           <ProgressBar className="mt-4" value={lvl.progress} label={`Progresso para o nível ${lvl.level + 1}`} />
-        </section>
+        </section>}
 
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {stats.map((s) => (
@@ -166,6 +172,8 @@ export function PublicProfileView() {
             </li>
           ))}
         </ul>
+
+        <PortfolioSections username={p.username} catalog={catalog} onPrefs={onPrefs} />
 
         {tab && (
           <section aria-labelledby="lista-pessoas">

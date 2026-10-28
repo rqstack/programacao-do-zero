@@ -1,5 +1,6 @@
 "use client";
 
+import { PORTFOLIO_KEYS, PORTFOLIO_LABEL } from "@/lib/profiles/portfolio";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Copy, ExternalLink, Search } from "lucide-react";
@@ -22,6 +23,7 @@ interface Form {
   linkedin: string;
   website: string;
   is_public: boolean;
+  portfolio: Record<string, boolean>;
 }
 
 export function ProfileEditor() {
@@ -38,7 +40,7 @@ export function ProfileEditor() {
     let alive = true;
     getMyProfile(userId).then((p: MyProfileFields | null) => {
       if (!alive || !p) return;
-      setForm({ username: p.username, display_name: p.display_name, headline: p.headline, bio: p.bio, github: p.github ?? "", linkedin: p.linkedin ?? "", website: p.website ?? "", is_public: p.is_public });
+      setForm({ username: p.username, display_name: p.display_name, headline: p.headline, bio: p.bio, github: p.github ?? "", linkedin: p.linkedin ?? "", website: p.website ?? "", is_public: p.is_public, portfolio: (p.portfolio ?? {}) as Record<string, boolean> });
     });
     return () => {
       alive = false;
@@ -88,6 +90,8 @@ export function ProfileEditor() {
       linkedin: l.value,
       website: w.value,
       is_public: form.is_public,
+      // Só guarda o que foi desligado; o resto fica visível por padrão.
+      portfolio: Object.fromEntries(PORTFOLIO_KEYS.filter((k) => form.portfolio[k] === false).map((k) => [k, false])),
     });
     setSaving(false);
     if (result === "usuario-em-uso") {
@@ -141,10 +145,34 @@ export function ProfileEditor() {
           <label className="flex cursor-pointer items-start gap-3 text-sm">
             <input type="checkbox" className="mt-0.5 size-4 accent-[#3d7bff]" checked={form.is_public} onChange={(e) => set("is_public", e.target.checked)} />
             <span>
-              <span className="font-medium">Perfil público</span>
-              <span className="block text-muted">Qualquer pessoa com o link vê seu perfil e pode te adicionar. Desmarcado, só você vê.</span>
+              <span className="font-medium">Publicar meu portfólio</span>
+              <span className="block text-muted">
+                Desmarcado (padrão para contas novas), só você vê. Marcado, qualquer pessoa com o link vê o que você escolher abaixo e pode te adicionar. Seu e-mail, anotações, favoritos e erros
+                nunca aparecem.
+              </span>
             </span>
           </label>
+          {form.is_public && (
+            <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
+              <legend className="px-1 text-sm font-medium">O que mostrar no portfólio</legend>
+              <div className="mt-1 grid gap-2 sm:grid-cols-2">
+                {PORTFOLIO_KEYS.map((k) => (
+                  <label key={k} className="flex cursor-pointer items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 size-4 accent-[#3d7bff]"
+                      checked={form.portfolio[k] !== false}
+                      onChange={(e) => set("portfolio", { ...form.portfolio, [k]: e.target.checked })}
+                    />
+                    {PORTFOLIO_LABEL[k]}
+                  </label>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-subtle">
+                Aparece só o que o servidor registrou quando você estava com a conta conectada. Para mostrar o link do repositório de um projeto, informe-o ao concluir o projeto.
+              </p>
+            </fieldset>
+          )}
           {message && (
             <p role="status" className={message.tone === "success" ? "text-sm text-ok" : "text-sm text-bad"}>
               {message.text}

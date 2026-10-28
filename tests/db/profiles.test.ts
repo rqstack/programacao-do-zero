@@ -31,8 +31,10 @@ describe("perfil público", () => {
   });
 
   it("a pessoa edita o próprio perfil, com validação de usuário, GitHub, LinkedIn e site", async () => {
-    await as(ANA, "update public.profiles set username = 'ana_dev', headline = 'Estudando React', github = 'ana-souza', linkedin = 'ana-souza-123', website = 'https://ana.dev' where id = $1", [ANA]);
-    await as(BETO, "update public.profiles set username = 'beto' where id = $1", [BETO]);
+    // Perfis nascem privados (20261028000011_portfolio.sql): Ana e Beto escolhem publicar.
+    expect((await db.query<{ n: number }>("select count(*)::int as n from public.profiles where is_public")).rows[0]!.n).toBe(0);
+    await as(ANA, "update public.profiles set username = 'ana_dev', headline = 'Estudando React', github = 'ana-souza', linkedin = 'ana-souza-123', website = 'https://ana.dev', is_public = true where id = $1", [ANA]);
+    await as(BETO, "update public.profiles set username = 'beto', is_public = true where id = $1", [BETO]);
     await as(CAIO, "update public.profiles set username = 'caio', is_public = false where id = $1", [CAIO]);
     await expect(as(BETO, "update public.profiles set username = 'ana_dev' where id = $1", [BETO])).rejects.toThrow(/unique|duplicate/);
     await expect(as(BETO, "update public.profiles set username = 'Com Espaço' where id = $1", [BETO])).rejects.toThrow(/check/);

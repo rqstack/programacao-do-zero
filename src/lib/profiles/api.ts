@@ -108,6 +108,8 @@ export interface MyProfileFields {
   website: string | null;
   is_public: boolean;
   show_in_ranking: boolean;
+  /** Seções do portfólio desligadas ({ show_projects: false, ... }). */
+  portfolio: Record<string, unknown>;
 }
 
 export async function getMyProfile(userId: string): Promise<MyProfileFields | null> {
@@ -115,7 +117,7 @@ export async function getMyProfile(userId: string): Promise<MyProfileFields | nu
   if (!supabase) return null;
   const { data } = await supabase
     .from("profiles")
-    .select("username, display_name, headline, bio, github, linkedin, website, is_public, show_in_ranking")
+    .select("username, display_name, headline, bio, github, linkedin, website, is_public, show_in_ranking, portfolio")
     .eq("id", userId)
     .maybeSingle();
   return (data as MyProfileFields | null) ?? null;

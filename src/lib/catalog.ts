@@ -241,3 +241,30 @@ export function searchIndex(): SearchEntry[] {
   SEARCH = out;
   return out;
 }
+
+/** Catálogo mínimo para o portfólio público (títulos e aulas de cada trilha). */
+export function portfolioCatalog() {
+  return {
+    courses: COURSES.map((c) => ({ slug: c.slug, title: c.title, lessons: c.lessons.map((l) => l.slug) })),
+    projects: Object.fromEntries(projects.map((p) => [p.slug, p.title])),
+    challenges: Object.fromEntries([...codeChallenges, ...sqlChallenges].map((c) => [c.id, { title: c.title, difficulty: c.difficulty }])),
+  };
+}
+
+/** Dados da trilha personalizada e das recomendações (só o necessário, para o navegador). */
+export function pathData() {
+  const courses = COURSES.map((c) => ({
+    slug: c.slug,
+    title: c.title,
+    level: c.level,
+    position: c.position,
+    totalMinutes: c.totalMinutes,
+    lessons: c.lessons.map((l) => ({ slug: l.slug, title: l.title })),
+  }));
+  const adaptive = {
+    lessons: COURSES.flatMap((c) => c.lessons.map((l) => ({ slug: l.slug, title: l.title, courseSlug: c.slug, courseTitle: c.title }))),
+    challenges: [...codeChallenges, ...sqlChallenges].map((c) => ({ id: c.id, title: c.title, difficulty: c.difficulty, topics: c.topics })),
+    courses: COURSES.map((c) => ({ slug: c.slug, title: c.title, lessons: c.lessons.map((l) => l.slug) })),
+  };
+  return { courses, adaptive };
+}

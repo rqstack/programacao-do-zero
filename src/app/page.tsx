@@ -6,6 +6,7 @@ import { LEVEL_TITLES } from "@/lib/gamification/rules";
 import { DemoQuiz } from "@/components/home/demo-quiz";
 import { EbookSection } from "@/components/home/ebook-section";
 import { FirstCode } from "@/components/home/first-code";
+import { OnboardingPrompt } from "@/components/path/onboarding-prompt";
 import { ContinueCard } from "@/components/progress/continue-card";
 import { Container } from "@/components/ui/primitives";
 import { allCourses, allGames, allLessons, allProjects, allQuizzes, CATEGORY_LABEL } from "@/lib/catalog";
@@ -122,6 +123,7 @@ export default function HomePage() {
                 Ver todas as trilhas
               </Link>
             </div>
+            <OnboardingPrompt />
           </div>
           <FirstCode />
         </Container>

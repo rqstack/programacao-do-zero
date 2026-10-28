@@ -148,6 +148,9 @@ export function ProgressDashboard({ courses, order }: { courses: CourseSummary[]
           <Link href="/revisao" className="inline-flex min-h-12 items-center rounded-[var(--radius-md)] border border-line-strong px-5 font-semibold hover:border-muted">
             Revisar erros{pendingMistakes ? ` (${pendingMistakes})` : ""}
           </Link>
+          <Link href="/comecar" className="inline-flex min-h-12 items-center rounded-[var(--radius-md)] border border-line-strong px-5 font-semibold hover:border-muted">
+            Minha trilha
+          </Link>
           <Link href="/salvos" className="inline-flex min-h-12 items-center rounded-[var(--radius-md)] border border-line-strong px-5 font-semibold hover:border-muted">
             Salvos e anotações
           </Link>

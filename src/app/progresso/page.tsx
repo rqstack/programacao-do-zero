@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { ProgressDashboard } from "@/components/progress/dashboard";
 import { Container, PageHeader } from "@/components/ui/primitives";
-import { allCourses, allLessons } from "@/lib/catalog";
+import { AdaptivePanel } from "@/components/path/adaptive-panel";
+import { allCourses, allLessons, pathData } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Meu progresso",
@@ -16,6 +17,9 @@ export default function ProgressoPage() {
       <PageHeader title="Meu progresso" description="Tudo o que você conquistou até aqui. Sem conta: os dados ficam neste navegador." />
       <div className="mt-10">
         <ProgressDashboard courses={courses} order={order} />
+      </div>
+      <div className="mt-12">
+        <AdaptivePanel data={pathData().adaptive} />
       </div>
     </Container>
   );

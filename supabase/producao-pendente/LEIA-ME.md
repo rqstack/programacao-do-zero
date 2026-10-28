@@ -37,6 +37,14 @@ Aplicar NESTA ORDEM, antes de publicar o site novo (o site novo chama funções 
 
 A Edge Function `battle-submit` não muda. Testes: `tests/db/battle-friends.test.ts` (14) e `tests/db/battle.test.ts`.
 
+## 5. Portfólio público (PENDENTE — ainda não aplicado)
+
+Arquivo: `supabase/migrations/20261028000011_portfolio.sql`. Aplicar antes de publicar o site novo (a página de perfil lê a coluna `portfolio`).
+
+- Contas NOVAS passam a nascer com perfil privado. As que já existem continuam como estão.
+- Adiciona `profiles.portfolio` (preferências das seções) e a função `get_portfolio`.
+- Teste: `tests/db/portfolio.test.ts` (e `tests/db/profiles.test.ts` atualizado).
+
 ## Como conferir depois de aplicar (somente leitura)
 
 ```sql
