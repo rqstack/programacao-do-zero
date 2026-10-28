@@ -51,7 +51,7 @@ Arquivo: `supabase/migrations/20261028000012_feedback.sql`. Cria a tabela `feedb
 
 Os relatos aparecem no painel: Supabase → Table Editor → `feedback`.
 
-## 7. Relatos sem duplicar (PENDENTE — aguarda autorização)
+## 7. Relatos sem duplicar (aplicado em 28/10/2026, com autorização)
 
 Arquivo: `supabase/migrations/20261028000013_feedback_sem_duplicar.sql`. Só substitui `submit_feedback` (mesmos parâmetros e permissões): o mesmo relato da mesma pessoa em até 2 minutos não é gravado de novo. Motivo: no teste em produção, um clique duplo gravou dois relatos iguais. O site já tem uma trava no formulário; esta é a segunda camada, no banco. Teste: `tests/db/feedback.test.ts`.
 
