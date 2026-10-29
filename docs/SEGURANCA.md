@@ -6,7 +6,7 @@ Feita com ferramentas gratuitas: Git, `npm audit`, testes do projeto (Vitest + P
 
 - **Nenhuma vulnerabilidade crítica ou alta encontrada.**
 - Nenhuma credencial privada no repositório nem no histórico (62 commits, todos os ramos).
-- Riscos médios: cadastro por e-mail ligado no Supabase sem uso no site; XP e conquistas dependem de correção no navegador (limitado pelo banco); webhook da Syncpay recusando avisos (token divergente).
+- Riscos médios: cadastro por e-mail ligado no Supabase sem uso no site; XP e conquistas dependem de correção no navegador (limitado pelo banco); webhook da Syncpay recusando avisos (segredo `SYNCPAY_WEBHOOK_TOKEN` ausente no Supabase).
 
 ## B. Segredos e arquivos
 
@@ -18,7 +18,7 @@ Feita com ferramentas gratuitas: Git, `npm audit`, testes do projeto (Vitest + P
 | Histórico Git | Varredura por chave secreta do Supabase, JWT, chave privada, tokens do GitHub/Google/AWS, segredos da Syncpay/Judge0 e URLs de banco com senha: **nada real**. Só exemplos didáticos (`usuario:...@localhost`) nas aulas. |
 | Site publicado | Sem sourcemaps; o JavaScript só contém a chave *publishable* (o texto `sb_secret_` que aparece é uma verificação interna da biblioteca supabase-js). |
 | Banco privado da Batalha | Fora do Git e do build (`.gitignore`). |
-| Credenciais a rotacionar | **Nenhuma por vazamento.** O token do webhook da Syncpay precisa ser reconfigurado por estar divergente (ver G). |
+| Credenciais a rotacionar | **Nenhuma por vazamento.** O token do webhook da Syncpay precisa ser cadastrado no Supabase, pois está ausente (ver G). |
 
 Teste permanente: `tests/unit/repo-hygiene.test.ts` falha se algum `.env` (além do exemplo) voltar ao Git ou se algum arquivo versionado tiver padrão de credencial.
 
@@ -56,13 +56,14 @@ Feito e verificado:
 - **CI gratuito**: `.github/workflows/testes.yml` roda tipos, lint e testes em todo PR (inclusive do Dependabot) e em push na `main`; permissão só de leitura, sem segredos, ações oficiais fixadas por commit. Simulado sem o banco privado da Batalha (como no CI): tipos e testes passam.
 - **Branch `main` protegida**: sem force push e sem exclusão; sem exigir PR (o seu fluxo de push direto continua). `gh-pages` fica livre de propósito (o deploy faz push forçado nela).
 - **Actions**: só ações da própria GitHub; token dos workflows só leitura.
-- **Webhook da Syncpay**: a autenticação recusa sem token, com token errado e com corpo falso de "pago" (401, nada muda nas doações). A causa do 401 dos avisos reais é o token salvo no Supabase não ser o que a Syncpay envia (ou estar vazio); os logs não mostram o cabeçalho, então só o painel resolve.
-- **PIX_IP_SALT**: usado só no hash do IP (limite de 5 cobranças por hora). A presença não dá para ler de fora. O código novo (`support-pix`) usa um valor derivado de um segredo existente se ele faltar, e registra nos logs privados só "configurado: sim/não" de cada segredo. **Essa versão ainda não foi publicada** (aguarda sua autorização).
+- **`support-pix` v4 publicada em 29/10/2026** (com autorização): registra nos logs privados só "configurado: sim/não" de cada segredo e, sem `PIX_IP_SALT`, usa um valor derivado de um segredo existente (nunca um padrão público). Depois da publicação: GET responde `enabled: true`; sem token, com token errado e com corpo falso de "pago" → 401.
+- **Webhook da Syncpay — causa confirmada**: os logs da v4 mostram `webhook_token_configurado: false`. O segredo `SYNCPAY_WEBHOOK_TOKEN` **não existe (ou está vazio)** no Supabase, então todo aviso real é recusado com 401. Os pagamentos continuam seguros: a confirmação só acontece consultando a Syncpay no servidor (a tela de doação faz isso sozinha), o webhook só acelera.
+- **PIX_IP_SALT**: `ip_salt_configurado: true` (já existe; nada a fazer).
 
 ## H. Pendências que dependem de você (todas gratuitas)
 
-1. **Autorizar a publicação da nova `support-pix`** (diagnóstico sim/não + salt derivado). Depois, os logs da função mostram se `SYNCPAY_WEBHOOK_TOKEN` e `PIX_IP_SALT` existem.
-2. **Rotacionar o token do webhook da Syncpay**:
+1. ~~Autorizar a publicação da nova `support-pix`~~ — feito em 29/10/2026.
+2. **Cadastrar o token do webhook da Syncpay** (está ausente no Supabase):
    1. Painel da Syncpay → Webhooks → o webhook "Recebimento - Cash in" que aponta para `.../functions/v1/support-pix?webhook=1` → copie o token (ou gere um novo).
    2. Supabase → Edge Functions → Secrets → `SYNCPAY_WEBHOOK_TOKEN` → cole o mesmo valor, sem espaços, e salve.
    3. Teste seguro (não mexe em nenhuma doação: o id não existe), no seu terminal, digitando o token quando pedir:
@@ -70,7 +71,7 @@ Feito e verificado:
       read -rs -p "Token do webhook: " T; echo; curl -s -X POST "https://kaylnsleygeysszomudd.supabase.co/functions/v1/support-pix?webhook=1" -H "Authorization: Bearer $T" -H "Content-Type: application/json" -d '{"id":"teste-rotacao-inexistente"}'; unset T
       ```
       Esperado: `{"ok":true,"message":"ignorado"}`. Se vier `não autorizado`, o valor salvo não é o mesmo.
-3. **`PIX_IP_SALT`**: se não existir, crie em Supabase → Edge Functions → Secrets um valor aleatório longo (por exemplo, gerado com `openssl rand -hex 32`). Não precisa anotar.
+3. ~~`PIX_IP_SALT`~~ — já configurado (conferido pelos logs da v4).
 4. **Supabase → Authentication → Providers → Email: desligar** (o site só usa Google).
 5. **Supabase → Authentication → URL Configuration**: Site URL e Redirect URLs só com `https://rqstack.github.io/programacao-do-zero/**` e `http://localhost:3000/**`.
 6. **Testes com duas contas**: seguir `docs/TESTE-DUAS-CONTAS.md`.
