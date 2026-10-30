@@ -127,12 +127,11 @@ Também: removida uma diretiva `eslint-disable` sem uso (lint agora sem avisos).
 | `npm run build` (base `/programacao-do-zero`) | ok; pré-carregamento: 403 arquivos criados; varredura de segredos no `out/` limpa |
 | Produção (somente leitura e escritas recusadas) | ver J.2 |
 
-### J.4 Publicação: aguardando sua revisão
+### J.4 Publicação (30/10/2026, com sua autorização)
 
-Nada desta auditoria foi publicado. Pendentes de autorização:
-1. **`support-pix` v5** (correções 1–6). Diferença para a v4 publicada conferida linha a linha: só as correções acima, sem segredos no pacote.
-2. **`battle-submit`** (correção 8). Precisa do banco privado no pacote, como nas publicações anteriores.
-3. **Site** (correções 7, 9 e 10) via `npm run deploy`.
+1. **`support-pix` v5 publicada.** Pacote refeito a partir do commit 976d516 e idêntico ao revisado (diferença para a v4: só as correções 1–6, sem segredos). Depois: GET `enabled: true`; webhook sem token, com token errado e com "pago" falso → 401; valor abaixo do mínimo recusado antes de chamar a Syncpay; logs sem erro (`booted`, `webhook_token_configurado: false`, `ip_salt_configurado: true`).
+2. **Site publicado** (`npm run deploy`, gh-pages c1d185c; CI do commit verde). Conferido no site no ar, em aba limpa: 0 erros no console (inclusive `/ranking/`, que mostra "3 dias"), 0 pedidos com falha em início, ranking, apoiar, batalha, jogos, trilhas e progresso; pré-carregamento 15/15 com 200.
+3. **`battle-submit` (correção 8) ainda não publicada**: precisa do banco privado no pacote; fica para quando você autorizar.
 
 ### J.5 Pendências que dependem de você (painéis, gratuitas)
 
