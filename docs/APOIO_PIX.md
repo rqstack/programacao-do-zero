@@ -1,6 +1,8 @@
 # Apoio voluntário via Pix (Syncpay)
 
-Status: **ativo desde 25/10/2026**. Chave de API com permissões só de Consulta e Venda (sem Saque), secrets `SYNCPAY_CLIENT_ID`, `SYNCPAY_CLIENT_SECRET`, `PIX_IP_SALT` e `SYNCPAY_WEBHOOK_TOKEN` cadastrados, e webhook "Recebimento - Cash in" apontando para a função. Receber Pix não exige IP liberado (a restrição de IP da Syncpay vale só para saques). Nenhum plano ou cartão foi contratado.
+Status: **ativo desde 25/10/2026**. Chave de API com permissões só de Consulta e Venda (sem Saque), secrets `SYNCPAY_CLIENT_ID`, `SYNCPAY_CLIENT_SECRET` e `PIX_IP_SALT` cadastrados e webhook "Recebimento - Cash in" apontando para a função. Receber Pix não exige IP liberado (a restrição de IP da Syncpay vale só para saques). Nenhum plano ou cartão foi contratado.
+
+> **Pendente (30/10/2026):** `SYNCPAY_WEBHOOK_TOKEN` **não está cadastrado** no Supabase (os logs da função mostram `webhook_token_configurado: false`), por isso todo aviso da Syncpay recebe 401. Enquanto isso, a doação só é confirmada pela tela de quem pagou (que consulta a Syncpay a cada 5 s). Passo a passo em "Cadastrar o token do webhook", abaixo.
 
 ## O que a documentação oficial da Syncpay informa (consultada em out/2026)
 
@@ -15,7 +17,7 @@ Fontes: [documentação da API](https://syncpay.apidog.io/) e [site da Syncpay](
 | Conta | Precisa estar aprovada (contas não aprovadas recebem erro 422) |
 | IP | A cobrança "exige IP e chave autorizados". As Edge Functions do Supabase não têm IP fixo: **confirme com a Syncpay** se é preciso liberar IP; se for, esta arquitetura gratuita não atende e o recurso deve continuar desligado |
 | Dados do pagador | Opcionais. O site **não** pede nome nem CPF |
-| Webhook | Autenticado só com `Authorization: Bearer <token do webhook>` (sem assinatura HMAC) |
+| Webhook | Autenticado só com `Authorization: Bearer <token do webhook>` ("sem assinatura HMAC"). O token aparece **uma única vez**, na criação do webhook; se perdeu, gere outro com "rotacionar segredo" (`POST /webhooks/{id}/rotate-secret`), que invalida o anterior |
 | Notificação no celular | O site não depende de push. Avisos do app/painel da Syncpay são separados do webhook |
 
 Exemplo: um apoio de R$ 5,00 deixa R$ 4,25 líquidos (antes de eventual taxa de saque).
@@ -35,14 +37,21 @@ Nenhum XP, troféu, conteúdo ou vantagem é concedido por apoiar.
 
 1. Crie e aprove a conta na Syncpay; gere **Client ID** e **Client Secret** (o secret aparece uma vez).
 2. Pergunte à Syncpay se a API exige IP liberado. Se exigir, pare aqui.
-3. No Supabase → Edge Functions → `support-pix` → Secrets, cadastre:
+3. No Supabase → Edge Functions → **Secrets** (vale para o projeto todo, não por função), cadastre:
    - `SYNCPAY_CLIENT_ID`
    - `SYNCPAY_CLIENT_SECRET`
    - `PIX_IP_SALT` (um texto aleatório longo)
 4. Crie o webhook na Syncpay (painel ou `POST /webhooks`) com evento `cashin` e URL:
    `https://kaylnsleygeysszomudd.supabase.co/functions/v1/support-pix?webhook=1`
-   e cadastre o token devolvido como secret `SYNCPAY_WEBHOOK_TOKEN`.
+   e cadastre o token devolvido como secret `SYNCPAY_WEBHOOK_TOKEN` (não precisa publicar a função de novo).
 5. Teste com um Pix pequeno seu (R$ 5,00) e confira em `/apoiar` a mudança para "confirmado".
+
+## Cadastrar o token do webhook (sem compartilhar o valor com ninguém)
+
+1. Syncpay → Webhooks: confira que existe **um** webhook com URL `https://kaylnsleygeysszomudd.supabase.co/functions/v1/support-pix?webhook=1` e evento `cashin` ("Recebimento - Cash in").
+2. Se você não tem o token guardado (ele só aparece na criação), use a opção de rotacionar/gerar novo segredo desse webhook, ou exclua e crie de novo com a mesma URL e evento. Copie o token que aparecer.
+3. Supabase → Edge Functions → Secrets (`https://supabase.com/dashboard/project/kaylnsleygeysszomudd/functions/secrets`): se já existir `SYNCPAY_WEBHOOK_TOKEN`, edite; senão, adicione com esse nome exato. Cole o token sem espaços nem `Bearer` e salve.
+4. Teste seguro, no seu terminal (o id não existe, então nada muda): veja `docs/SEGURANCA.md`, seção H, item 2. Esperado: `{"ok":true,"message":"ignorado"}`.
 
 ## Testes feitos
 
