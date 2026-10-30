@@ -1,0 +1,171 @@
+2:"$Sreact.fragment"
+3:"/programacao-do-zero/_next/static/chunks/0umf92h1sb77c.js"
+4:I[39756,["$3"],"default"]
+5:I[37457,["$3"],"default"]
+c:"/programacao-do-zero/_next/static/chunks/2wmq1md3c7hju.js"
+d:"/programacao-do-zero/_next/static/chunks/2uy5h57y-c9eh.js"
+e:"/programacao-do-zero/_next/static/chunks/17rz3vnnpsdql.js"
+f:"/programacao-do-zero/_next/static/chunks/07fhr23zsm479.js"
+10:"/programacao-do-zero/_next/static/chunks/19g75ixr0ao_f.js"
+11:"/programacao-do-zero/_next/static/chunks/1_vf8709r1sjl.js"
+12:I[22016,["$c","$d","$e","$f","$10","$11"],""]
+13:I[24710,["$c","$d","$e","$f","$10","$11"],"FavoriteButton"]
+14:I[5014,["$c","$d","$e","$f","$10","$11"],"default"]
+30:"ViewportBoundary"
+31:I[97367,["$3"],"$30"]
+32:"MetadataBoundary"
+33:I[97367,["$3"],"$32"]
+34:"$Sreact.suspense"
+35:I[27201,["$3"],"IconMark"]
+7:X
+7:C
+8:X
+b:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$2","c",{"children":[["$","div",null,{"className":"mx-auto w-full max-w-6xl px-4 sm:px-6 py-10","children":[["$","nav",null,{"aria-label":"Trilha de navegação","className":"text-sm text-muted","children":[["$","$L12",null,{"href":"/trilhas","className":"hover:text-fg","children":"Trilhas"}]," ","/"," ",["$","$L12",null,{"href":"/trilhas/python","className":"hover:text-fg","children":"Python do zero"}]]}],["$","div",null,{"className":"mt-6 grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem]","children":[["$","article",null,{"children":[["$","header",null,{"className":"border-b border-line pb-8","children":[["$","p",null,{"className":"font-mono text-xs text-subtle","children":["Aula ",6," de ",8," · ","Organizando programas de verdade"]}],["$","div",null,{"className":"mt-2 flex items-start justify-between gap-4","children":[["$","h1",null,{"className":"text-3xl font-bold sm:text-4xl","children":"Classes e objetos pythônicos"}],["$","$L13",null,{"favKey":"lesson:classes-e-objetos","title":"Classes e objetos pythônicos","className":"mt-1 shrink-0"}]]}],["$","div",null,{"className":"mt-5 flex items-start gap-3 rounded-[var(--radius-md)] border border-line bg-navy/60 p-4","children":[["$","$L14",null,{"icon":{"name":"target","size":24,"node":[["circle",{"cx":"12","cy":"12","r":"10","key":"1mglay"}],["circle",{"cx":"12","cy":"12","r":"6","key":"1vlfrh"}],["circle",{"cx":"12","cy":"12","r":"2","key":"1c9p78"}]]},"className":"mt-0.5 size-5 shrink-0 text-amber","aria-hidden":true}],["$","p",null,{"className":"text-sm","children":[["$","span",null,{"className":"font-semibold","children":"Objetivo:"}]," ",["$","span",null,{"className":"text-muted","children":"Criar classes com __init__, métodos, propriedades, métodos especiais, herança e dataclasses."}]]}]]}],["$","p",null,{"className":"mt-3 inline-flex items-center gap-1.5 text-xs text-subtle","children":[["$","$L14",null,{"icon":{"name":"clock","size":24,"node":[["circle",{"cx":"12","cy":"12","r":"10","key":"1mglay"}],["path",{"d":"M12 6v6l4 2","key":"mmk7yg"}]]},"className":"size-3.5","aria-hidden":true}]," cerca de ",16," minutos"]}]]}],["$","div",null,{"className":"prose-lesson mt-8","children":[["$","h2","h2-0",{"id":"por-que-isso-importa","children":"Por que isso importa"}],"\n",["$","p","p-0",{"children":["Quando o programa cresce, faz sentido agrupar dados e as ações sobre eles: uma conta bancária tem titular e saldo e sabe depositar. Classes fazem isso. Em Python, elas são simples de escrever e combinam com recursos \"pythônicos\" como propriedades, métodos especiais e ",["$","code","code-0",{"children":"dataclasses"}],"."]}],"\n",["$","h2","h2-1",{"id":"conceitos-fundamentais","children":"Conceitos fundamentais"}],"\n",["$","ul","ul-0",{"children":["\n",["$","li","li-0",{"children":[["$","strong","strong-0",{"children":"Classe"}]," é o molde; ",["$","strong","strong-1",{"children":"objeto"}]," (instância) é algo criado a partir dela: ",["$","code","code-0",{"children":"conta = ContaBancaria(\"Bia\")"}],"."]}],"\n",["$","li","li-1",{"children":[["$","strong","strong-0",{"children":["$","code","code-0",{"children":"__init__"}]}]," é o método que prepara o objeto; ",["$","strong","strong-1",{"children":["$","code","code-0",{"children":"self"}]}]," é o próprio objeto (sempre o primeiro parâmetro dos métodos)."]}],"\n",["$","li","li-2",{"children":[["$","strong","strong-0",{"children":"Atributos"}]," guardam dados (",["$","code","code-0",{"children":"self.titular"}],"); ",["$","strong","strong-1",{"children":"métodos"}]," são funções da classe."]}],"\n",["$","li","li-3",{"children":[["$","strong","strong-0",{"children":"Encapsulamento por convenção"}],": um nome começando com ",["$","code","code-0",{"children":"_"}]," (como ",["$","code","code-1",{"children":"_saldo"}],") indica \"uso interno\". Uma ",["$","strong","strong-1",{"children":["$","code","code-0",{"children":"@property"}]}]," expõe o valor só para leitura."]}],"\n",["$","li","li-4",{"children":[["$","strong","strong-0",{"children":"Métodos especiais"}]," (",["$","em","em-0",{"children":"dunder"}],"): ",["$","code","code-0",{"children":"__str__"}]," define como o objeto aparece no ","$L15","; ","$L16",", ","$L17"," e outros integram a classe com a linguagem."]}],"\n","$L18","\n","$L19","\n","$L1a","\n"]}],"\n","$L1b","\n","$L1c","\n","$L1d","\n","$L1e","\n","$L1f","\n","$L20","\n","$L21","\n","$L22","\n","$L23","\n","$L24","\n","$L25","\n","$L26"]}],"$L27","$L28","$L29","$L2a"]}],"$L2b"]}]]}],["$L2c","$L2d"],"$L2e"]}],"p":"$@2f","v":null,"s":"$8"}}]]
+9:[["children",{"s":{"n":"slug","t":"d","k":"classes-e-objetos","s":[]},"h":65632,"d":{"r":["$","$2","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]]}],"p":"$@a","v":"$7","s":"$8"},"c":"$Qb"}]]
+1:[["children",{"s":"aulas","h":131136,"d":{"r":["$","$2","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]]}],"p":"$@6","v":"$7","s":"$8"},"c":"$Q9"}]]
+0:{"t":{"t":{"s":"","h":131088,"c":"$Q1"},"h":{"r":["$","$2","h",{"children":[null,["$","$L31",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#060a13"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L33",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$34",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Classes e objetos pythônicos · Programação do Zero"}],["$","meta","1",{"name":"description","content":"Criar classes com __init__, métodos, propriedades, métodos especiais, herança e dataclasses."}],["$","meta","2",{"name":"application-name","content":"Programação do Zero"}],["$","meta","3",{"property":"og:title","content":"Classes e objetos pythônicos · Programação do Zero"}],["$","meta","4",{"property":"og:description","content":"Criar classes com __init__, métodos, propriedades, métodos especiais, herança e dataclasses."}],["$","meta","5",{"property":"og:site_name","content":"Programação do Zero"}],["$","meta","6",{"property":"og:locale","content":"pt_BR"}],["$","meta","7",{"property":"og:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","8",{"property":"og:image:type","content":"image/png"}],["$","meta","9",{"property":"og:image:width","content":"1200"}],["$","meta","10",{"property":"og:image:height","content":"630"}],["$","meta","11",{"property":"og:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","12",{"property":"og:type","content":"website"}],["$","meta","13",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","14",{"name":"twitter:title","content":"Classes e objetos pythônicos · Programação do Zero"}],["$","meta","15",{"name":"twitter:description","content":"Criar classes com __init__, métodos, propriedades, métodos especiais, herança e dataclasses."}],["$","meta","16",{"name":"twitter:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","17",{"name":"twitter:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","18",{"name":"twitter:image:type","content":"image/png"}],["$","meta","19",{"name":"twitter:image:width","content":"1200"}],["$","meta","20",{"name":"twitter:image:height","content":"630"}],["$","link","21",{"rel":"icon","href":"/programacao-do-zero/icon.svg?icon.3-y0e7v9k7rth.svg","sizes":"any","type":"image/svg+xml"}],["$","link","22",{"rel":"apple-touch-icon","href":"/programacao-do-zero/apple-icon.png?apple-icon.2g0dt5upmkjcz.png","sizes":"180x180","type":"image/png"}],["$","$L35","23",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@36","v":null,"s":"$8"}},"a":"$@37","u":"$@38","b":"qn3yKvhYMq-_SZPtTVzXe"}
+39:I[74393,["$c","$d","$e","$f","$10","$11"],"CopyButton"]
+3c:I[59515,["$c","$d","$e","$f","$10","$11"],"ExercisePanel"]
+3d:I[59515,["$c","$d","$e","$f","$10","$11"],"LessonQuiz"]
+3e:"CompleteLessonButton"
+3f:I[59515,["$c","$d","$e","$f","$10","$11"],"$3e"]
+40:I[34684,["$c","$d","$e","$f","$10","$11"],"ReportLink"]
+41:I[99607,["$c","$d","$e","$f","$10","$11"],"LessonNotes"]
+42:I[97367,["$3"],"OutletBoundary"]
+15:["$","code","code-1",{"children":"print"}]
+16:["$","code","code-2",{"children":"__len__"}]
+17:["$","code","code-3",{"children":"__eq__"}]
+18:["$","li","li-5",{"children":[["$","strong","strong-0",{"children":"Herança"}],": ",["$","code","code-0",{"children":"class ContaPoupanca(ContaBancaria)"}]," reaproveita tudo da classe-mãe e acrescenta o que for específico."]}]
+19:["$","li","li-6",{"children":[["$","strong","strong-0",{"children":["$","code","code-0",{"children":"@dataclass"}]}]," gera ",["$","code","code-0",{"children":"__init__"}],", ",["$","code","code-1",{"children":"__repr__"}]," e ",["$","code","code-2",{"children":"__eq__"}]," automaticamente para classes que guardam dados."]}]
+1a:["$","li","li-7",{"children":[["$","strong","strong-0",{"children":["$","code","code-0",{"children":"isinstance(obj, Classe)"}]}]," testa o tipo, considerando a herança."]}]
+1b:["$","h2","h2-2",{"id":"exemplo-pratico","children":"Exemplo prático"}]
+3a:T429,from dataclasses import dataclass
+
+
+class ContaBancaria:
+    def __init__(self, titular, saldo=0.0):
+        self.titular = titular
+        self._saldo = saldo
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    def depositar(self, valor):
+        if valor <= 0:
+            raise ValueError("O depósito precisa ser positivo")
+        self._saldo += valor
+
+    def __str__(self):
+        return f"Conta de {self.titular}: R$ {self._saldo:.2f}"
+
+
+class ContaPoupanca(ContaBancaria):
+    def render(self, taxa):
+        self._saldo = round(self._saldo * (1 + taxa), 2)
+
+
+@dataclass
+class Produto:
+    nome: str
+    preco: float
+    quantidade: int = 0
+
+    def total(self):
+        return self.preco * self.quantidade
+
+
+conta = ContaPoupanca("Bia", 100)
+conta.depositar(50)
+conta.render(0.01)
+print(conta)
+print(conta.saldo)
+print(isinstance(conta, ContaBancaria))
+
+try:
+    conta.depositar(-10)
+except ValueError as erro:
+    print("Recusado:", erro)
+
+p = Produto("Caderno", 18.5, 2)
+print(p)
+print(p.total())
+print(p == Produto("Caderno", 18.5, 2))3b:T429,from dataclasses import dataclass
+
+
+class ContaBancaria:
+    def __init__(self, titular, saldo=0.0):
+        self.titular = titular
+        self._saldo = saldo
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    def depositar(self, valor):
+        if valor <= 0:
+            raise ValueError("O depósito precisa ser positivo")
+        self._saldo += valor
+
+    def __str__(self):
+        return f"Conta de {self.titular}: R$ {self._saldo:.2f}"
+
+
+class ContaPoupanca(ContaBancaria):
+    def render(self, taxa):
+        self._saldo = round(self._saldo * (1 + taxa), 2)
+
+
+@dataclass
+class Produto:
+    nome: str
+    preco: float
+    quantidade: int = 0
+
+    def total(self):
+        return self.preco * self.quantidade
+
+
+conta = ContaPoupanca("Bia", 100)
+conta.depositar(50)
+conta.render(0.01)
+print(conta)
+print(conta.saldo)
+print(isinstance(conta, ContaBancaria))
+
+try:
+    conta.depositar(-10)
+except ValueError as erro:
+    print("Recusado:", erro)
+
+p = Produto("Caderno", 18.5, 2)
+print(p)
+print(p.total())
+print(p == Produto("Caderno", 18.5, 2))1c:["$","figure","pre-0,code-0",{"className":"code-surface not-prose my-6 overflow-hidden rounded-[var(--radius-md)] border border-line bg-[#040a17]","children":[["$","figcaption",null,{"className":"flex items-center justify-between border-b border-line px-4 py-2 text-xs text-subtle","children":[["$","span",null,{"children":"Python"}],["$","$L39",null,{"text":"$3a"}]]}],["$","pre",null,{"className":"overflow-x-auto p-4 text-[0.86rem] leading-relaxed","children":["$","code",null,{"className":"text-[#d6e2f5]","children":"$3b"}]}]]}]
+1d:["$","p","p-1",{"children":"Saída:"}]
+1e:["$","figure","pre-1,code-0",{"className":"code-surface not-prose my-6 overflow-hidden rounded-[var(--radius-md)] border border-line bg-[#040a17]","children":[["$","figcaption",null,{"className":"flex items-center justify-between border-b border-line px-4 py-2 text-xs text-subtle","children":[["$","span",null,{"children":"Texto"}],["$","$L39",null,{"text":"Conta de Bia: R$ 151.50\n151.5\nTrue\nRecusado: O depósito precisa ser positivo\nProduto(nome='Caderno', preco=18.5, quantidade=2)\n37.0\nTrue"}]]}],["$","pre",null,{"className":"overflow-x-auto p-4 text-[0.86rem] leading-relaxed","children":["$","code",null,{"className":"text-[#d6e2f5]","children":"Conta de Bia: R$ 151.50\n151.5\nTrue\nRecusado: O depósito precisa ser positivo\nProduto(nome='Caderno', preco=18.5, quantidade=2)\n37.0\nTrue"}]}]]}]
+1f:["$","h2","h2-3",{"id":"explicando-o-codigo","children":"Explicando o código"}]
+20:["$","ul","ul-1",{"children":["\n",["$","li","li-0",{"children":[["$","code","code-0",{"children":"ContaBancaria"}]," guarda o saldo em ",["$","code","code-1",{"children":"_saldo"}]," e só deixa alterá-lo pelo método ",["$","code","code-2",{"children":"depositar"}],", que recusa valores inválidos."]}],"\n",["$","li","li-1",{"children":["A ",["$","code","code-0",{"children":"@property saldo"}]," permite ler ",["$","code","code-1",{"children":"conta.saldo"}]," como se fosse um atributo, mas sem um jeito direto de escrever nele."]}],"\n",["$","li","li-2",{"children":[["$","code","code-0",{"children":"ContaPoupanca"}]," herda tudo e adiciona ",["$","code","code-1",{"children":"render"}],", que aplica a taxa e arredonda para centavos."]}],"\n",["$","li","li-3",{"children":[["$","code","code-0",{"children":"__str__"}]," controla o que o ",["$","code","code-1",{"children":"print(conta)"}]," mostra."]}],"\n",["$","li","li-4",{"children":["O ",["$","code","code-0",{"children":"try/except"}]," captura o erro do depósito negativo (exceções são o assunto da próxima aula)."]}],"\n",["$","li","li-5",{"children":["A ",["$","code","code-0",{"children":"dataclass Produto"}]," ganhou ",["$","code","code-1",{"children":"__init__"}],", uma representação legível no ",["$","code","code-2",{"children":"print"}]," e comparação por valor (",["$","code","code-3",{"children":"=="}],") sem escrever nada disso."]}],"\n"]}]
+21:["$","h2","h2-4",{"id":"erros-comuns","children":"Erros comuns"}]
+22:["$","ul","ul-2",{"children":["\n",["$","li","li-0",{"children":[["$","strong","strong-0",{"children":["Esquecer o ",["$","code","code-0",{"children":"self"}]]}]," como primeiro parâmetro do método, ou ao acessar atributos (",["$","code","code-0",{"children":"saldo"}]," em vez de ",["$","code","code-1",{"children":"self._saldo"}],")."]}],"\n",["$","li","li-1",{"children":[["$","strong","strong-0",{"children":["Criar atributos fora do ",["$","code","code-0",{"children":"__init__"}]]}]," sem necessidade, deixando objetos com formatos diferentes."]}],"\n",["$","li","li-2",{"children":[["$","strong","strong-0",{"children":"Herança para tudo"}],": se não existe uma relação \"é um\", prefira composição (um objeto guarda outro)."]}],"\n",["$","li","li-3",{"children":[["$","strong","strong-0",{"children":["Comparar objetos comuns com ",["$","code","code-0",{"children":"=="}]]}]," esperando comparar os dados: sem ",["$","code","code-0",{"children":"__eq__"}]," (ou ",["$","code","code-1",{"children":"dataclass"}],"), compara-se a identidade."]}],"\n"]}]
+23:["$","h2","h2-5",{"id":"resumo","children":"Resumo"}]
+24:["$","ul","ul-3",{"children":["\n",["$","li","li-0",{"children":["Classes juntam dados e comportamento; ",["$","code","code-0",{"children":"__init__"}]," prepara o objeto e ",["$","code","code-1",{"children":"self"}]," é ele mesmo."]}],"\n",["$","li","li-1",{"children":[["$","code","code-0",{"children":"_nome"}]," e ",["$","code","code-1",{"children":"@property"}]," protegem dados; métodos especiais integram a classe à linguagem."]}],"\n",["$","li","li-2",{"children":["Herança reaproveita código; ",["$","code","code-0",{"children":"@dataclass"}]," elimina repetição em classes de dados."]}],"\n"]}]
+25:["$","h2","h2-6",{"id":"proximo-passo","children":"Próximo passo"}]
+26:["$","p","p-2",{"children":["Programas encontram erros: arquivo que não existe, texto que não vira número. A próxima aula mostra como lidar com ",["$","strong","strong-0",{"children":"exceções e arquivos"}],"."]}]
+27:null
+28:["$","section",null,{"id":"pratica","aria-labelledby":"pratica-titulo","className":"mt-16 scroll-mt-24 space-y-12 border-t border-line pt-10","children":[["$","h2",null,{"id":"pratica-titulo","className":"text-2xl font-bold","children":"Pratique"}],["$","div",null,{"className":"rounded-[var(--radius-lg)] border border-line bg-navy/60 p-5 sm:p-6","children":[["$","h3",null,{"className":"mb-4 font-semibold text-muted","children":"Exercício"}],["$","$L3c",null,{"slug":"classes-e-objetos","title":"Classes e objetos pythônicos","exercise":{"prompt":"Qual é o nome do método que prepara um objeto quando ele é criado? (com os sublinhados)","hint":"Dois sublinhados de cada lado.","accepted":["__init__","init","__init__()"],"explanation":"__init__ recebe self e os dados iniciais do objeto."},"tutor":{"objective":"Criar classes com __init__, métodos, propriedades, métodos especiais, herança e dataclasses.","summary":"Classe é o molde; self é o objeto; @property, __str__, herança e @dataclass.","example":null,"sections":[{"id":"por-que-isso-importa","text":"Por que isso importa"},{"id":"conceitos-fundamentais","text":"Conceitos fundamentais"},{"id":"exemplo-pratico","text":"Exemplo prático"},{"id":"explicando-o-codigo","text":"Explicando o código"},{"id":"erros-comuns","text":"Erros comuns"},{"id":"resumo","text":"Resumo"},{"id":"proximo-passo","text":"Próximo passo"}]}}]]}],["$","div",null,{"className":"rounded-[var(--radius-lg)] border border-line bg-navy/60 p-5 sm:p-6","children":[["$","h3",null,{"className":"mb-6 font-semibold text-muted","children":"Quiz de revisão"}],["$","$L3d",null,{"slug":"classes-e-objetos","title":"Classes e objetos pythônicos","questions":[{"prompt":"Qual método especial define o texto mostrado por print(objeto)?","options":["__str__","__init__","__len__","__print__"],"correct":0,"explanation":"__str__ devolve a representação legível do objeto."},{"prompt":"O que @dataclass gera automaticamente?","options":["__init__, __repr__ e __eq__ a partir dos campos","Uma tabela no banco","Testes automáticos","Um módulo novo"],"correct":0,"explanation":"Ideal para classes que guardam dados."},{"kind":"true_false","prompt":"Um atributo com nome começando por _ (como _saldo) é bloqueado pelo Python para quem está fora da classe.","options":["Verdadeiro","Falso"],"correct":1,"explanation":"É uma convenção de \"uso interno\"; quem respeita é o programador."}]}]]}],["$","div",null,{"className":"flex flex-wrap items-center justify-between gap-4","children":[["$","$L3f",null,{"slug":"classes-e-objetos","title":"Classes e objetos pythônicos"}],["$","$L40",null,{"label":"Algo errado ou confuso nesta aula?"}]]}]]}]
+29:["$","section",null,{"id":"anotacoes","aria-label":"Minhas anotações","className":"mt-12 scroll-mt-24 rounded-[var(--radius-lg)] border border-line p-5 sm:p-6","children":["$","$L41",null,{"slug":"classes-e-objetos"}]}]
+2a:["$","nav",null,{"aria-label":"Navegação entre aulas","className":"mt-12 grid gap-3 border-t border-line pt-8 sm:grid-cols-2","children":[["$","$L12",null,{"href":"/aulas/funcoes-modulos-e-pacotes","className":"group rounded-[var(--radius-md)] border border-line p-4 hover:border-muted","children":[["$","span",null,{"className":"inline-flex items-center gap-1 text-xs text-subtle","children":[["$","$L14",null,{"icon":{"name":"arrow-left","size":24,"node":[["path",{"d":"m12 19-7-7 7-7","key":"1l729n"}],["path",{"d":"M19 12H5","key":"x3x0zl"}]]},"className":"size-3.5","aria-hidden":true}]," Aula anterior"]}],["$","span",null,{"className":"mt-1 block font-semibold group-hover:text-electric-hi","children":"Funções, módulos e pacotes"}]]}],["$","$L12",null,{"href":"/aulas/excecoes-e-arquivos","className":"group rounded-[var(--radius-md)] border border-electric/50 p-4 text-right hover:border-electric","children":[["$","span",null,{"className":"inline-flex items-center gap-1 text-xs text-subtle","children":["Próxima aula ",["$","$L14",null,{"icon":{"name":"arrow-right","size":24,"node":[["path",{"d":"M5 12h14","key":"1ays0h"}],["path",{"d":"m12 5 7 7-7 7","key":"xquz4c"}]]},"className":"size-3.5","aria-hidden":true}]]}],["$","span",null,{"className":"mt-1 block font-semibold group-hover:text-electric-hi","children":"Exceções e arquivos"}]]}]]}]
+2b:["$","aside",null,{"className":"hidden lg:block","children":["$","nav",null,{"aria-label":"Nesta aula","className":"sticky top-24","children":[["$","p",null,{"className":"text-xs font-semibold text-subtle","children":"Nesta aula"}],["$","ul",null,{"className":"mt-3 space-y-1.5 border-l border-line","children":[["$","li","por-que-isso-importa",{"children":["$","a",null,{"href":"#por-que-isso-importa","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Por que isso importa"}]}],["$","li","conceitos-fundamentais",{"children":["$","a",null,{"href":"#conceitos-fundamentais","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Conceitos fundamentais"}]}],["$","li","exemplo-pratico",{"children":["$","a",null,{"href":"#exemplo-pratico","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Exemplo prático"}]}],["$","li","explicando-o-codigo",{"children":["$","a",null,{"href":"#explicando-o-codigo","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Explicando o código"}]}],["$","li","erros-comuns",{"children":["$","a",null,{"href":"#erros-comuns","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Erros comuns"}]}],["$","li","resumo",{"children":["$","a",null,{"href":"#resumo","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Resumo"}]}],["$","li","proximo-passo",{"children":["$","a",null,{"href":"#proximo-passo","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Próximo passo"}]}],["$","li","pratica",{"children":["$","a",null,{"href":"#pratica","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Pratique"}]}],["$","li","anotacoes",{"children":["$","a",null,{"href":"#anotacoes","className":"-ml-px block border-l border-transparent pl-3 text-sm text-muted hover:border-electric hover:text-fg","children":"Minhas anotações"}]}]]}]]}]}]
+2c:["$","script","script-0",{"src":"/programacao-do-zero/_next/static/chunks/19g75ixr0ao_f.js","async":true}]
+2d:["$","script","script-1",{"src":"/programacao-do-zero/_next/static/chunks/1_vf8709r1sjl.js","async":true}]
+2e:["$","$L42",null,{"children":["$","$34",null,{"name":"Next.MetadataOutlet","children":"$@43"}]}]
+38:true
+8:300
+43:null
+8:C
+37:0
+a:"$undefined"
+6:"$undefined"
+36:"$undefined"
+2f:"$undefined"

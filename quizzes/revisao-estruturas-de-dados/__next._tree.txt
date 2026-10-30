@@ -1,0 +1,7 @@
+:HL["/programacao-do-zero/_next/static/chunks/1-9yog_cur3wq.css","style"]
+:HL["/programacao-do-zero/_next/static/media/31a9145ccb84606d-s.p.3j3x29wbycqkn.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/programacao-do-zero/_next/static/media/70bc3e132a0a741e-s.p.3t6q91iet4nsy.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+3:[["children",{"s":"__PAGE__","h":160}]]
+2:[["children",{"s":{"n":"slug","t":"d","k":"revisao-estruturas-de-dados","s":[]},"h":65632,"c":"$Q3"}]]
+1:[["children",{"s":"quizzes","h":131136,"c":"$Q2"}]]
+0:{"b":"qn3yKvhYMq-_SZPtTVzXe","t":{"t":{"s":"","h":131088,"c":"$Q1"}}}

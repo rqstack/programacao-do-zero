@@ -1,0 +1,35 @@
+2:"$Sreact.fragment"
+3:"/programacao-do-zero/_next/static/chunks/0umf92h1sb77c.js"
+4:I[39756,["$3"],"default"]
+5:I[37457,["$3"],"default"]
+c:"/programacao-do-zero/_next/static/chunks/2wmq1md3c7hju.js"
+d:"/programacao-do-zero/_next/static/chunks/2uy5h57y-c9eh.js"
+e:"/programacao-do-zero/_next/static/chunks/17rz3vnnpsdql.js"
+f:"/programacao-do-zero/_next/static/chunks/07fhr23zsm479.js"
+10:"/programacao-do-zero/_next/static/chunks/1czp8y4lziovr.js"
+11:"/programacao-do-zero/_next/static/chunks/1_vf8709r1sjl.js"
+12:I[22016,["$c","$d","$e","$f","$10","$11"],""]
+13:I[4976,["$c","$d","$e","$f","$10","$11"],"QuizRunner"]
+14:I[97367,["$3"],"OutletBoundary"]
+15:"$Sreact.suspense"
+18:"ViewportBoundary"
+19:I[97367,["$3"],"$18"]
+1a:"MetadataBoundary"
+1b:I[97367,["$3"],"$1a"]
+1c:I[27201,["$3"],"IconMark"]
+7:X
+7:C
+8:X
+b:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$2","c",{"children":[["$","div",null,{"className":"mx-auto w-full max-w-6xl px-4 sm:px-6 max-w-3xl py-10","children":[["$","nav",null,{"aria-label":"Trilha de navegação","className":"text-sm text-muted","children":[["$","$L12",null,{"href":"/quizzes","className":"hover:text-fg","children":"Quizzes"}]," ","/"," ",["$","$L12",null,{"href":"/trilhas/aws","className":"hover:text-fg","children":"AWS: computação em nuvem sem susto"}]]}],["$","h1",null,{"className":"mt-4 text-3xl font-bold","children":"Revisão: Bancos gerenciados: RDS e ElastiCache"}],["$","p",null,{"className":"mt-2 text-muted","children":["Perguntas sobre a aula \"Bancos gerenciados: RDS e ElastiCache\"."," Para passar: ",70,"% de acertos.",[" ",["$","$L12",null,{"href":"/aulas/bancos-gerenciados-rds-e-elasticache","className":"text-electric-hi underline underline-offset-2","children":"Rever a aula"}],"."]]}],["$","div",null,{"className":"mt-10","children":["$","$L13",null,{"slug":"revisao-bancos-gerenciados-rds-e-elasticache","title":"Revisão: Bancos gerenciados: RDS e ElastiCache","questions":[{"prompt":"De onde o grupo de segurança de um RDS deve aceitar conexões?","options":["Só do grupo de segurança da aplicação, na porta do banco","De 0.0.0.0/0","De qualquer IP brasileiro","De nenhum lugar"],"correct":0,"explanation":"E com o acesso público do RDS desligado."},{"prompt":"No padrão cache-aside, o que acontece quando o dado não está no cache?","options":["Busca no banco e guarda no cache com expiração","Devolve erro","Apaga o banco","Espera o cache encher sozinho"],"correct":0,"explanation":"As próximas leituras saem da memória até expirar."},{"kind":"true_false","prompt":"Ligar Multi-AZ num banco de estudos não altera o custo.","options":["Verdadeiro","Falso"],"correct":1,"explanation":"Multi-AZ mantém uma cópia em espera e praticamente dobra o custo."}],"questionIds":["bancos-gerenciados-rds-e-elasticache#0","bancos-gerenciados-rds-e-elasticache#1","bancos-gerenciados-rds-e-elasticache#2"],"passPercent":70}]}]]}],[["$","script","script-0",{"src":"/programacao-do-zero/_next/static/chunks/1czp8y4lziovr.js","async":true}],["$","script","script-1",{"src":"/programacao-do-zero/_next/static/chunks/1_vf8709r1sjl.js","async":true}]],["$","$L14",null,{"children":["$","$15",null,{"name":"Next.MetadataOutlet","children":"$@16"}]}]]}],"p":"$@17","v":null,"s":"$8"}}]]
+9:[["children",{"s":{"n":"slug","t":"d","k":"revisao-bancos-gerenciados-rds-e-elasticache","s":[]},"h":65632,"d":{"r":["$","$2","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]]}],"p":"$@a","v":"$7","s":"$8"},"c":"$Qb"}]]
+1:[["children",{"s":"quizzes","h":131136,"d":{"r":["$","$2","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]]}],"p":"$@6","v":"$7","s":"$8"},"c":"$Q9"}]]
+0:{"t":{"t":{"s":"","h":131088,"c":"$Q1"},"h":{"r":["$","$2","h",{"children":[null,["$","$L19",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#060a13"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L1b",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$15",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Revisão: Bancos gerenciados: RDS e ElastiCache · Programação do Zero"}],["$","meta","1",{"name":"description","content":"Perguntas sobre a aula \"Bancos gerenciados: RDS e ElastiCache\"."}],["$","meta","2",{"name":"application-name","content":"Programação do Zero"}],["$","meta","3",{"property":"og:title","content":"Revisão: Bancos gerenciados: RDS e ElastiCache · Programação do Zero"}],["$","meta","4",{"property":"og:description","content":"Perguntas sobre a aula \"Bancos gerenciados: RDS e ElastiCache\"."}],["$","meta","5",{"property":"og:site_name","content":"Programação do Zero"}],["$","meta","6",{"property":"og:locale","content":"pt_BR"}],["$","meta","7",{"property":"og:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","8",{"property":"og:image:type","content":"image/png"}],["$","meta","9",{"property":"og:image:width","content":"1200"}],["$","meta","10",{"property":"og:image:height","content":"630"}],["$","meta","11",{"property":"og:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","12",{"property":"og:type","content":"website"}],["$","meta","13",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","14",{"name":"twitter:title","content":"Revisão: Bancos gerenciados: RDS e ElastiCache · Programação do Zero"}],["$","meta","15",{"name":"twitter:description","content":"Perguntas sobre a aula \"Bancos gerenciados: RDS e ElastiCache\"."}],["$","meta","16",{"name":"twitter:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","17",{"name":"twitter:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","18",{"name":"twitter:image:type","content":"image/png"}],["$","meta","19",{"name":"twitter:image:width","content":"1200"}],["$","meta","20",{"name":"twitter:image:height","content":"630"}],["$","link","21",{"rel":"icon","href":"/programacao-do-zero/icon.svg?icon.3-y0e7v9k7rth.svg","sizes":"any","type":"image/svg+xml"}],["$","link","22",{"rel":"apple-touch-icon","href":"/programacao-do-zero/apple-icon.png?apple-icon.2g0dt5upmkjcz.png","sizes":"180x180","type":"image/png"}],["$","$L1c","23",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@1d","v":null,"s":"$8"}},"a":"$@1e","u":"$@1f","b":"qn3yKvhYMq-_SZPtTVzXe"}
+16:null
+1f:true
+8:300
+8:C
+1e:0
+a:"$undefined"
+6:"$undefined"
+1d:"$undefined"
+17:"$undefined"

@@ -1,0 +1,32 @@
+2:"$Sreact.fragment"
+3:"/programacao-do-zero/_next/static/chunks/0umf92h1sb77c.js"
+4:I[39756,["$3"],"default"]
+5:I[37457,["$3"],"default"]
+a:"/programacao-do-zero/_next/static/chunks/2wmq1md3c7hju.js"
+b:"/programacao-do-zero/_next/static/chunks/2uy5h57y-c9eh.js"
+c:"/programacao-do-zero/_next/static/chunks/17rz3vnnpsdql.js"
+d:"/programacao-do-zero/_next/static/chunks/07fhr23zsm479.js"
+e:"/programacao-do-zero/_next/static/chunks/3qfm0701y2z8z.js"
+f:"/programacao-do-zero/_next/static/chunks/1-g1-sq3mp616.js"
+10:I[91635,["$a","$b","$c","$d","$e","$f"],"ChallengeArena"]
+11:I[97367,["$3"],"OutletBoundary"]
+12:"$Sreact.suspense"
+15:"ViewportBoundary"
+16:I[97367,["$3"],"$15"]
+17:"MetadataBoundary"
+18:I[97367,["$3"],"$17"]
+19:I[27201,["$3"],"IconMark"]
+7:X
+7:C
+8:X
+9:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$2","c",{"children":[["$","div",null,{"className":"mx-auto w-full max-w-6xl px-4 sm:px-6 py-12","children":[["$","header",null,{"className":"flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between","children":[["$","div",null,{"className":"max-w-2xl","children":[["$","h1",null,{"className":"text-3xl font-bold sm:text-4xl","children":"Desafios de código"}],["$","div",null,{"className":"mt-2 text-muted","children":"Escolha a linguagem e a dificuldade e receba um problema para resolver programando. São 22 problemas de lógica, que podem ser resolvidos em até 10 linguagens, e 11 em SQL. JavaScript, TypeScript, Python e SQL rodam isolados no seu navegador; Java, C, C++, C#, Go, Rust e PHP são executados pelo Judge0 público, sem rede e com limite de tempo. Cada envio é testado com casos novos."}]]}],"$undefined"]}],["$","div",null,{"className":"mt-10","children":["$","$L10",null,{}]}]]}],[["$","script","script-0",{"src":"/programacao-do-zero/_next/static/chunks/3qfm0701y2z8z.js","async":true}],["$","script","script-1",{"src":"/programacao-do-zero/_next/static/chunks/1-g1-sq3mp616.js","async":true}]],["$","$L11",null,{"children":["$","$12",null,{"name":"Next.MetadataOutlet","children":"$@13"}]}]]}],"p":"$@14","v":null,"s":"$8"}}]]
+1:[["children",{"s":"desafios","h":64,"d":{"r":["$","$2","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]]}],"p":"$@6","v":"$7","s":"$8"},"c":"$Q9"}]]
+0:{"t":{"t":{"s":"","h":16,"c":"$Q1"},"h":{"r":["$","$2","h",{"children":[null,["$","$L16",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#060a13"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L18",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$12",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Desafios de código · Programação do Zero"}],["$","meta","1",{"name":"description","content":"Escolha a linguagem e a dificuldade, receba um problema e resolva programando. Testes gerados na hora, direto no navegador."}],["$","meta","2",{"name":"application-name","content":"Programação do Zero"}],["$","meta","3",{"property":"og:title","content":"Desafios de código · Programação do Zero"}],["$","meta","4",{"property":"og:description","content":"Escolha a linguagem e a dificuldade, receba um problema e resolva programando. Testes gerados na hora, direto no navegador."}],["$","meta","5",{"property":"og:site_name","content":"Programação do Zero"}],["$","meta","6",{"property":"og:locale","content":"pt_BR"}],["$","meta","7",{"property":"og:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","8",{"property":"og:image:type","content":"image/png"}],["$","meta","9",{"property":"og:image:width","content":"1200"}],["$","meta","10",{"property":"og:image:height","content":"630"}],["$","meta","11",{"property":"og:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","12",{"property":"og:type","content":"website"}],["$","meta","13",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","14",{"name":"twitter:title","content":"Desafios de código · Programação do Zero"}],["$","meta","15",{"name":"twitter:description","content":"Escolha a linguagem e a dificuldade, receba um problema e resolva programando. Testes gerados na hora, direto no navegador."}],["$","meta","16",{"name":"twitter:image","content":"https://rqstack.github.io/programacao-do-zero/opengraph-image.png?opengraph-image.1s02mtk2mitbi.png"}],["$","meta","17",{"name":"twitter:image:alt","content":"Logo da Programação do Zero: um zero de onde sai uma trilha azul até um ponto dourado."}],["$","meta","18",{"name":"twitter:image:type","content":"image/png"}],["$","meta","19",{"name":"twitter:image:width","content":"1200"}],["$","meta","20",{"name":"twitter:image:height","content":"630"}],["$","link","21",{"rel":"icon","href":"/programacao-do-zero/icon.svg?icon.3-y0e7v9k7rth.svg","sizes":"any","type":"image/svg+xml"}],["$","link","22",{"rel":"apple-touch-icon","href":"/programacao-do-zero/apple-icon.png?apple-icon.2g0dt5upmkjcz.png","sizes":"180x180","type":"image/png"}],["$","$L19","23",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@1a","v":null,"s":"$8"}},"a":"$@1b","u":"$@1c","b":"qn3yKvhYMq-_SZPtTVzXe"}
+13:null
+1c:true
+8:300
+8:C
+1b:0
+6:"$undefined"
+1a:"$undefined"
+14:"$undefined"
