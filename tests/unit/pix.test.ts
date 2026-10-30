@@ -47,13 +47,17 @@ function memoryStore(): DonationStore & { rows: Map<string, Donation> } {
     findByProviderId: async (p) => [...rows.values()].find((d) => d.providerId === p) ?? null,
     findByPixCode: async (c) => [...rows.values()].find((d) => d.pixCode === c) ?? null,
     countRecentByIp: async (ip, since) => [...rows.values()].filter((d) => d.ipHash === ip && d.createdAt >= since).length,
+    countRecent: async (since) => [...rows.values()].filter((d) => d.createdAt >= since).length,
     insert: async (d) => {
       if ([...rows.values()].some((x) => x.idempotencyKey === d.idempotencyKey)) throw new Error("duplicate");
       rows.set(d.id, { ...d });
       return { ...d };
     },
-    update: async (id, patch) => {
-      const next = { ...rows.get(id)!, ...patch };
+    // Igual ao banco: com onlyIf, só altera se o status ATUAL da linha estiver na lista.
+    update: async (id, patch, onlyIf) => {
+      const cur = rows.get(id);
+      if (!cur || (onlyIf && !onlyIf.includes(cur.status))) return null;
+      const next = { ...cur, ...patch };
       rows.set(id, next);
       return { ...next };
     },

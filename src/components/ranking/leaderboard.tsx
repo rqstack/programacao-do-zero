@@ -33,6 +33,13 @@ export function Leaderboard() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  // Calculado só no navegador: o HTML estático é gerado no dia do build e mostraria outro número
+  // (diferença entre servidor e navegador = erro de hidratação do React #418).
+  const [days, setDays] = useState<number | null>(null);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDays(daysUntilReset());
+  }, []);
 
   const load = useCallback(async (which: Tab) => {
     const supabase = getSupabase();
@@ -73,7 +80,6 @@ export function Leaderboard() {
     );
   }
 
-  const days = daysUntilReset();
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -92,7 +98,7 @@ export function Leaderboard() {
           ))}
         </div>
         <span className="text-sm text-muted">
-          {tab === "geral" ? "XP acumulado desde o primeiro dia." : `${tab === "amigos" ? "Você e quem você adicionou, XP da semana. " : ""}A liga recomeça em ${days} dia${days === 1 ? "" : "s"} (segunda-feira).`}
+          {tab === "geral" ? "XP acumulado desde o primeiro dia." : `${tab === "amigos" ? "Você e quem você adicionou, XP da semana. " : ""}${days === null ? "A liga recomeça na segunda-feira." : `A liga recomeça em ${days} dia${days === 1 ? "" : "s"} (segunda-feira).`}`}
         </span>
       </div>
 

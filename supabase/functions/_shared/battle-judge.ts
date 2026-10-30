@@ -34,6 +34,8 @@ const unb64 = (s: string | null | undefined) => {
   const bin = atob(s);
   return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
 };
+/** Tempo máximo de uma chamada ao Judge0 (o próprio Judge0 limita a execução a 20 s). */
+export const JUDGE0_TIMEOUT_MS = 30_000;
 const clip = (s: string, n = 600) => (s.length > n ? `${s.slice(0, n)}…` : s);
 
 export async function judgeSubmission(cfg: JudgeConfig, ch: BattleChallenge, lang: BattleLang, code: string, seed: number): Promise<JudgeResult> {
@@ -57,6 +59,8 @@ export async function judgeSubmission(cfg: JudgeConfig, ch: BattleChallenge, lan
     const res = await fetch(`${cfg.url.replace(/\/$/, "")}/submissions?base64_encoded=true&wait=true`, {
       method: "POST",
       headers,
+      // Judge0 travado não pode prender a função: vira "erro técnico" (não conta como erro do jogador).
+      signal: AbortSignal.timeout(JUDGE0_TIMEOUT_MS),
       body: JSON.stringify({
         language_id: info.judge0Id,
         source_code: b64(code),

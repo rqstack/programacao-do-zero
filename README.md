@@ -52,7 +52,7 @@ Uma plataforma gratuita para aprender programação passo a passo: aulas progres
 
 Next.js 16 (App Router, exportação estática) · React 19 · TypeScript estrito · Tailwind CSS 4 · Supabase (Auth, PostgreSQL, Edge Functions, pg_cron) · Judge0 (execução isolada de código) · Zod · GSAP · Vitest · PGlite · ESLint.
 
-O site é estático e hospedado de graça no GitHub Pages. O login e o ranking usam o plano gratuito do Supabase, com todas as regras de segurança no próprio banco (RLS e funções). Configuração passo a passo: [docs/CONFIGURACAO.md](docs/CONFIGURACAO.md).
+O site é estático e hospedado de graça no GitHub Pages. O login e o ranking usam o plano gratuito do Supabase, com todas as regras de segurança no próprio banco (RLS e funções). Configuração passo a passo: [docs/CONFIGURACAO.md](docs/CONFIGURACAO.md). Auditorias de segurança, testes executados e pendências: [docs/SEGURANCA.md](docs/SEGURANCA.md).
 
 ## Rodando localmente
 

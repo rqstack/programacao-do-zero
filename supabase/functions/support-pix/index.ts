@@ -108,8 +108,17 @@ const store: DonationStore = {
     if (error) throw error;
     return count ?? 0;
   },
+  countRecent: async (since) => {
+    const { count, error } = await table().select("id", { count: "exact", head: true }).gte("created_at", since);
+    if (error) throw error;
+    return count ?? 0;
+  },
   insert: async (d) => (await one(table().insert(toRow(d)).select("*").single()))!,
-  update: async (id, patch) => (await one(table().update(toRow(patch)).eq("id", id).select("*").single()))!,
+  update: async (id, patch, onlyIf) => {
+    let q = table().update(toRow(patch)).eq("id", id);
+    if (onlyIf) q = q.in("status", onlyIf);
+    return one(q.select("*").maybeSingle());
+  },
 };
 
 async function ipHash(req: Request): Promise<string> {
@@ -134,12 +143,17 @@ Deno.serve(async (req) => {
     } catch {
       // corpo inválido: tratado como aviso ignorado
     }
-    const r = await handleWebhook(
-      { store, client: syncpay, now: () => new Date(), webhookToken: Deno.env.get("SYNCPAY_WEBHOOK_TOKEN") ?? "" },
-      req.headers.get("Authorization"),
-      payload,
-    );
-    return json(req, r.status, r.body);
+    try {
+      const r = await handleWebhook(
+        { store, client: syncpay, now: () => new Date(), webhookToken: Deno.env.get("SYNCPAY_WEBHOOK_TOKEN") ?? "" },
+        req.headers.get("Authorization"),
+        payload,
+      );
+      return json(req, r.status, r.body);
+    } catch {
+      // Banco fora do ar: 500 sem detalhes; a Syncpay pode reenviar e a tela de doação confere sozinha.
+      return json(req, 500, { ok: false, message: "falha interna" });
+    }
   }
 
   if (!enabled) return json(req, 503, { error: "O apoio via Pix ainda não foi ativado." });

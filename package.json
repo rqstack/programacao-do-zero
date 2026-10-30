@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/fix-export-prefetch.mjs",
     "start": "npx serve out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

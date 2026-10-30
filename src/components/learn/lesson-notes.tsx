@@ -25,7 +25,6 @@ export function LessonNotes({ slug }: { slug: string }) {
   useEffect(() => {
     if (hydrated && !loaded.current) {
       loaded.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setText(saved);
     }
   }, [hydrated, saved]);

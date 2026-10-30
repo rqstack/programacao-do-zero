@@ -12,6 +12,10 @@
 export const PIX_MIN_CENTS = 500; // R$ 5,00 — mínimo definido pelo projeto
 export const PIX_LOCAL_EXPIRY_MIN = 30; // a Syncpay não documenta expiração; o site considera 30 min
 export const PIX_RATE_LIMIT_PER_HOUR = 5; // cobranças novas por pessoa (IP com hash) por hora
+// Teto geral por hora, somando todo mundo. Rede de segurança caso alguém forje o IP
+// (o cabeçalho x-forwarded-for pode vir do cliente) para escapar do limite por pessoa.
+export const PIX_GLOBAL_LIMIT_PER_HOUR = 60;
+export const SYNCPAY_TIMEOUT_MS = 10_000; // a Syncpay travada não pode prender a função
 
 export type DonationStatus = "aguardando" | "confirmado" | "expirado" | "falhou" | "estornado";
 
@@ -36,8 +40,14 @@ export interface DonationStore {
   findByProviderId(providerId: string): Promise<Donation | null>;
   findByPixCode(pixCode: string): Promise<Donation | null>;
   countRecentByIp(ipHash: string, sinceIso: string): Promise<number>;
+  countRecent(sinceIso: string): Promise<number>;
   insert(d: Donation): Promise<Donation>; // falha se a chave de idempotência já existir
-  update(id: string, patch: Partial<Donation>): Promise<Donation>;
+  /**
+   * Atualiza a linha. Com `onlyIf`, só muda se o status atual estiver na lista (operação
+   * atômica no banco) e devolve null se não mudou: evita que uma consulta antiga desfaça
+   * uma confirmação feita em paralelo.
+   */
+  update(id: string, patch: Partial<Donation>, onlyIf?: DonationStatus[]): Promise<Donation | null>;
 }
 
 export interface SyncpayConfig {
@@ -103,11 +113,22 @@ export class SyncpayClient {
     private readonly cfg: SyncpayConfig,
     private readonly fetcher: Fetch,
     private readonly now: () => number = Date.now,
+    private readonly timeoutMs: number = SYNCPAY_TIMEOUT_MS,
   ) {}
+
+  private call(url: string, init: RequestInit): Promise<Response> {
+    return this.fetcher(url, { ...init, signal: AbortSignal.timeout(this.timeoutMs) });
+  }
+
+  /** Token recusado: descarta o guardado para pedir outro na próxima chamada. */
+  private check(res: Response, what: string): void {
+    if (res.status === 401) this.token = null;
+    if (!res.ok) throw new Error(`${what} ${res.status}`);
+  }
 
   private async auth(): Promise<string> {
     if (this.token && this.token.until > this.now() + 60_000) return this.token.value;
-    const res = await this.fetcher(`${this.cfg.baseUrl}/auth-token`, {
+    const res = await this.call(`${this.cfg.baseUrl}/auth-token`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ client_id: this.cfg.clientId, client_secret: this.cfg.clientSecret }),
@@ -121,12 +142,12 @@ export class SyncpayClient {
 
   async createCharge(cents: number): Promise<{ identifier: string; pixCode: string }> {
     const token = await this.auth();
-    const res = await this.fetcher(`${this.cfg.baseUrl}/cash-in`, {
+    const res = await this.call(`${this.cfg.baseUrl}/cash-in`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ amount: Number((cents / 100).toFixed(2)), description: "Apoio voluntário — Programação do Zero" }),
     });
-    if (!res.ok) throw new Error(`cash-in ${res.status}`);
+    this.check(res, "cash-in");
     const data = (await res.json()) as { identifier?: string; pix_code?: string };
     if (!data.identifier || !data.pix_code) throw new Error("cash-in sem pix_code");
     return { identifier: data.identifier, pixCode: data.pix_code };
@@ -134,14 +155,18 @@ export class SyncpayClient {
 
   async getStatus(identifier: string): Promise<{ status: string; amountCents: number } | null> {
     const token = await this.auth();
-    const res = await this.fetcher(`${this.cfg.baseUrl}/transaction/${encodeURIComponent(identifier)}`, {
+    const res = await this.call(`${this.cfg.baseUrl}/transaction/${encodeURIComponent(identifier)}`, {
       headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
     });
     if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`transaction ${res.status}`);
-    const data = (await res.json()) as { data?: { status?: string; amount?: number } };
-    if (!data.data?.status || typeof data.data.amount !== "number") throw new Error("transaction sem status");
-    return { status: data.data.status, amountCents: Math.round(data.data.amount * 100) };
+    this.check(res, "transaction");
+    const data = (await res.json()) as { data?: { status?: unknown; amount?: unknown } };
+    const status = data.data?.status;
+    const raw = data.data?.amount;
+    // Valor como número (documentado) ou texto numérico estrito ("10.00"); qualquer outra coisa é erro.
+    const amount = typeof raw === "number" ? raw : typeof raw === "string" && /^\d{1,12}(\.\d{1,2})?$/.test(raw) ? Number(raw) : NaN;
+    if (typeof status !== "string" || !status || !Number.isFinite(amount)) throw new Error("transaction sem status");
+    return { status, amountCents: Math.round(amount * 100) };
   }
 }
 
@@ -163,6 +188,9 @@ export async function createDonation(
   const since = new Date(deps.now().getTime() - 3_600_000).toISOString();
   if ((await deps.store.countRecentByIp(input.ipHash, since)) >= PIX_RATE_LIMIT_PER_HOUR) {
     return { ok: false, status: 429, error: "Muitas cobranças geradas em pouco tempo. Tente de novo mais tarde." };
+  }
+  if ((await deps.store.countRecent(since)) >= PIX_GLOBAL_LIMIT_PER_HOUR) {
+    return { ok: false, status: 429, error: "Muitas cobranças geradas agora. Tente de novo mais tarde." };
   }
   let charge: { identifier: string; pixCode: string };
   try {
@@ -218,13 +246,16 @@ export async function refreshDonation(deps: { store: DonationStore; client: Sync
     patch.confirmedAt = now.toISOString();
   } else if (mapped === "falhou" && d.status !== "confirmado") patch.status = "falhou";
   else if (mapped === "estornado") patch.status = "estornado";
-  const updated = await deps.store.update(d.id, patch);
+  // Mudança de status só vale se ninguém mudou a linha desde a leitura; senão, prevalece o que está no banco.
+  const updated = patch.status ? await deps.store.update(d.id, patch, [d.status]) : await deps.store.update(d.id, patch);
+  if (!updated) return (await deps.store.findById(d.id)) ?? d;
   return expireIfDue(deps, updated, now);
 }
 
 async function expireIfDue(deps: { store: DonationStore }, d: Donation, now: Date): Promise<Donation> {
   if (d.status === "aguardando" && now.getTime() > new Date(d.expiresAt).getTime()) {
-    return deps.store.update(d.id, { status: "expirado" });
+    // Só expira o que ainda está aguardando no banco (nunca desfaz uma confirmação paralela).
+    return (await deps.store.update(d.id, { status: "expirado" }, ["aguardando"])) ?? (await deps.store.findById(d.id)) ?? d;
   }
   return d;
 }

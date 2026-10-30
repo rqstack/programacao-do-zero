@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { Check, Copy, HeartHandshake, Loader2, RotateCcw } from "lucide-react";
 import { Alert, Button, cx, Spinner } from "@/components/ui/primitives";
+import { pollDelay } from "@/lib/support/poll";
 
 const FN = `${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""}/functions/v1/support-pix`;
 const HEADERS = { "Content-Type": "application/json", apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "" };
@@ -40,6 +41,7 @@ export function SupportPix() {
   const [charge, setCharge] = useState<Charge | null>(null);
   const [qr, setQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [failures, setFailures] = useState(0);
   const keyRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -85,10 +87,16 @@ export function SupportPix() {
     }
     const t = window.setTimeout(async () => {
       const r = await call<Charge>({ method: "POST", body: JSON.stringify({ action: "status", id: charge.id }) });
-      if (r.ok) setCharge((c) => (c && c.id === r.data.id ? { ...c, ...r.data, pix_code: r.data.pix_code ?? c.pix_code } : c));
-    }, 5000);
+      if (r.ok) {
+        setFailures(0);
+        setCharge((c) => (c && c.id === r.data.id ? { ...c, ...r.data, pix_code: r.data.pix_code ?? c.pix_code } : c));
+      } else {
+        // Falhou (rede ou servidor): agenda outra consulta em vez de parar de acompanhar.
+        setFailures((n) => n + 1);
+      }
+    }, pollDelay(failures));
     return () => window.clearTimeout(t);
-  }, [charge]);
+  }, [charge, failures]);
 
   async function generate(e: React.FormEvent) {
     e.preventDefault();
