@@ -2,7 +2,13 @@
 
 Status: **ativo desde 25/10/2026**. Chave de API com permissões só de Consulta e Venda (sem Saque), secrets `SYNCPAY_CLIENT_ID`, `SYNCPAY_CLIENT_SECRET` e `PIX_IP_SALT` cadastrados e webhook "Recebimento - Cash in" apontando para a função. Receber Pix não exige IP liberado (a restrição de IP da Syncpay vale só para saques). Nenhum plano ou cartão foi contratado.
 
-> **Pendente (30/10/2026):** `SYNCPAY_WEBHOOK_TOKEN` **não está cadastrado** no Supabase (os logs da função mostram `webhook_token_configurado: false`), por isso todo aviso da Syncpay recebe 401. Enquanto isso, a doação só é confirmada pela tela de quem pagou (que consulta a Syncpay a cada 5 s). Passo a passo em "Cadastrar o token do webhook", abaixo.
+> **Status do webhook (verificado em 06/11/2026):**
+> - `SYNCPAY_WEBHOOK_TOKEN`: configurado
+> - `support-pix`: reconhecendo o token
+> - Última verificação: startup às 21:53:41 UTC
+> - `webhook_token_configurado`: true
+>
+> Ainda não confirmado: um aviso real da Syncpay aceito (aparece no primeiro Pix pago; ver o passo 4 de "Cadastrar o token do webhook" abaixo).
 
 ## O que a documentação oficial da Syncpay informa (consultada em out/2026)
 

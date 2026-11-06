@@ -51,7 +51,7 @@ Inventário existente: Lógica (15), HTML (8), CSS (9), JavaScript (12, inclui P
 `npx tsx scripts/seed-for-course.mts <slug>` gera o SQL; aplique no SQL Editor (ou MCP). Conferir com `select count(*) from xp_sources` = total do `npm run db:seed`.
 
 ## Próximo passo exato
-Ação do dono no painel: rotacionar o segredo do webhook na Syncpay (pelo Chrome, onde o copiar funciona) e salvar em SYNCPAY_WEBHOOK_TOKEN no Supabase. Depois, fazer um Pix de R$ 5 de teste e conferir a aba "Entregas" do webhook na Syncpay.
+Token do webhook: feito em 06/11/2026 (`SYNCPAY_WEBHOOK_TOKEN` configurado; startup das 21:53:41 UTC com `webhook_token_configurado: true`). Falta: teste seguro do webhook (docs/APOIO_PIX.md) e, se autorizado, um Pix de R$ 5 de teste conferindo a aba "Entregas" do webhook na Syncpay.
 
 ## Sessão 26/10/2026 (publicada com autorização)
 - ✅ Trilhas Python (8 aulas), C# (7) e AWS (7). Exemplos de Python e C# executados localmente (scripts/check-local-blocks.mts); WinForms/WPF, EF Core e comandos AWS marcados como não executados.

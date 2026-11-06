@@ -6,7 +6,7 @@ Feita com ferramentas gratuitas: Git, `npm audit`, testes do projeto (Vitest + P
 
 - **Nenhuma vulnerabilidade crítica ou alta encontrada.**
 - Nenhuma credencial privada no repositório nem no histórico (62 commits, todos os ramos).
-- Riscos médios: cadastro por e-mail ligado no Supabase sem uso no site; XP e conquistas dependem de correção no navegador (limitado pelo banco); webhook da Syncpay recusando avisos (segredo `SYNCPAY_WEBHOOK_TOKEN` ausente no Supabase).
+- Riscos médios: cadastro por e-mail ligado no Supabase sem uso no site; XP e conquistas dependem de correção no navegador (limitado pelo banco); webhook da Syncpay recusando avisos (segredo `SYNCPAY_WEBHOOK_TOKEN` ausente no Supabase; **resolvido em 06/11/2026**, ver seção J.5).
 
 ## B. Segredos e arquivos
 
@@ -58,6 +58,7 @@ Feito e verificado:
 - **Actions**: só ações da própria GitHub; token dos workflows só leitura.
 - **`support-pix` v4 publicada em 29/10/2026** (com autorização): registra nos logs privados só "configurado: sim/não" de cada segredo e, sem `PIX_IP_SALT`, usa um valor derivado de um segredo existente (nunca um padrão público). Depois da publicação: GET responde `enabled: true`; sem token, com token errado e com corpo falso de "pago" → 401.
 - **Webhook da Syncpay — causa confirmada**: os logs da v4 mostram `webhook_token_configurado: false`. O segredo `SYNCPAY_WEBHOOK_TOKEN` **não existe (ou está vazio)** no Supabase, então todo aviso real é recusado com 401. Os pagamentos continuam seguros: a confirmação só acontece consultando a Syncpay no servidor (a tela de doação faz isso sozinha), o webhook só acelera.
+  - **Atualização 06/11/2026:** segredo cadastrado; startup das 21:53:41 UTC com `webhook_token_configurado: true`.
 - **PIX_IP_SALT**: `ip_salt_configurado: true` (já existe; nada a fazer).
 
 ## H. Pendências que dependem de você (todas gratuitas)
@@ -135,7 +136,12 @@ Também: removida uma diretiva `eslint-disable` sem uso (lint agora sem avisos).
 
 ### J.5 Pendências que dependem de você (painéis, gratuitas)
 
-1. **`SYNCPAY_WEBHOOK_TOKEN` continua AUSENTE no Supabase** (logs da v4: `webhook_token_configurado: false`). Sem ele, todo aviso da Syncpay é recusado com 401. Passo a passo e teste seguro na seção H, item 2. Enquanto isso, doações só são confirmadas quando a tela de quem pagou está aberta consultando.
+1. ~~`SYNCPAY_WEBHOOK_TOKEN` ausente no Supabase.~~ **Resolvido em 06/11/2026:**
+   - `SYNCPAY_WEBHOOK_TOKEN`: configurado
+   - `support-pix`: reconhecendo o token
+   - Última verificação: startup às 21:53:41 UTC
+   - `webhook_token_configurado`: true
+   - Falta confirmar um aviso real aceito (primeiro Pix pago) e o teste seguro da seção H, item 2.
 2. **Desligar o provedor Email** (Supabase → Authentication → Providers). Também elimina o aviso do Advisor "Leaked Password Protection" (só vale para senha).
 3. **Conferir Authentication → URL Configuration** (seção H, item 5).
 4. **Teste com duas contas**: `docs/TESTE-DUAS-CONTAS.md`.
