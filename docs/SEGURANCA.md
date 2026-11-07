@@ -154,3 +154,58 @@ Também: removida uma diretiva `eslint-disable` sem uso (lint agora sem avisos).
 - **Prazo de expiração da cobrança na Syncpay**: não documentado; o site considera 30 min.
 - **Configurações de Auth no painel do Supabase** (provedores, URLs, limites de envio): a API disponível aqui não lê essas telas.
 - **Cabeçalhos de segurança (CSP, X-Frame-Options)**: o GitHub Pages não permite configurar; HSTS é do próprio GitHub.
+
+## K. Fechamento (06–07/11/2026)
+
+Nenhum pagamento real, nenhum valor de segredo lido ou impresso, nenhum dado de produção alterado (as 2 doações continuam `aguardando`).
+
+### K.1 Dependências (PRs do Dependabot)
+
+| PR | Mudança | Resultado |
+|---|---|---|
+| #6 | ESLint 9 → 10 | merged (CI verde) |
+| #1 | `actions/setup-node` 4.4.0 → 7.1.0 | merged depois do rebase (CI verde); hash conferido com a tag oficial |
+| #2 | `actions/checkout` 4.2.2 → 7.0.1 | merged depois do rebase (CI verde); hash conferido com a tag oficial |
+| #3 → #7 | grupo de atualizações menores (Next 16.4.5, Vitest 5.1, Tailwind, etc.) | o Dependabot trocou o #3 pelo #7; #7 merged (CI verde) |
+| #4 | `@types/node` 24 → 26 | merged depois do rebase (CI verde) |
+| #5 | TypeScript 5.9 → 7.0 | **aberto de propósito**: quebra lint (o typescript-eslint não suporta TS 7), testes e build (o TS 7 não tem a API JavaScript usada pelos scripts) |
+
+As falhas antigas de CI em #1, #2, #4 e #5 eram do bug do `PageProps` (corrigido em c04978e), não das atualizações.
+
+### K.2 Correções desta rodada
+
+| Gravidade | Problema | Correção |
+|---|---|---|
+| Média | `docs/BATALHA.md` mandava publicar com `supabase functions deploy` direto da pasta: isso enviaria o banco privado **com as soluções**. | Doc reescrita: publicar só o pacote do `bundle-battle-submit`. |
+| Média | A conferência do pacote da Batalha procurava só 4 trechos de código. | O script monta o banco com o mesmo corte, carrega e exige que os 29 desafios fiquem sem `solutions`; se sobrar alguma, apaga o pacote e falha. Testado nos dois sentidos. |
+| Baixa | `npm run deploy` não conferia segredos no pacote. | `scripts/check-bundle-secrets.mjs` roda antes da publicação: aceita só a chave anon, barra outros JWTs, `sb_secret_`, chaves privadas, tokens e `.map`. |
+| Baixa | 6 trilhas sem videoaula; 1 chave órfã na lista. | Ver K.5. |
+
+### K.3 Verificações (07/11/2026)
+
+- `main` limpo; `npm ci`, `next typegen`, `typecheck`, `lint`: ok. `npm test`: **346 passaram, 5 pulados** (os 5 dependem do banco privado da Batalha).
+- Build de produção (`/programacao-do-zero`): ok; links internos ok; pacote sem segredos e **0 source maps**.
+- `npm audit --omit=dev`: **0**. `npm audit` (inclui dev): 10 moderadas, todas do mesmo aviso do `minimatch` (GHSA-g3hv-75wg-m249, publicado em 30/10) dentro do ESLint. Só ferramenta de lint, só lê padrões do próprio projeto: sem risco para o site. A correção exige `minimatch` 11, que o ESLint 10 ainda não aceita; resolver quando o ESLint atualizar.
+- Histórico do Git inteiro: nenhuma chave, JWT, token ou chave privada; `battle-bank.ts` nunca foi commitado. `.env*` fora do Git (só o exemplo).
+- Banco: 18 tabelas com RLS; escrita direta só em `user_progress` (do próprio usuário) e colunas seguras de `profiles`; links de perfil e portfólio só `https://` (checado no banco); 0 funções definer sem `search_path`; 0 buckets.
+- Pix: GET `enabled: true`; webhook sem token e com token errado → 401 (com o token já cadastrado); pedido inválido recusado antes de chamar a Syncpay; CORS de origem desconhecida → GitHub Pages.
+- Batalha: pacote local = produção (mesmos 29 desafios, mesmo hash dos IDs); timeout de 30 s menor que a tolerância do banco (60 s), mantido.
+
+### K.4 Autenticação (somente leitura)
+
+- Provedores ligados: **Google** e **Email**. Desligados: anônimo, telefone, SAML e todos os outros. Cadastro aberto, e-mail exige confirmação.
+- Contas: 2, ambas Google; nenhuma por e-mail.
+- Site: login com Google em fluxo **PKCE** (o código de retorno não serve sem o verificador guardado no navegador de quem iniciou o login).
+- **Recomendação**: desligar o provedor Email (o site não usa; hoje dá para criar conta por e-mail pela API). Também some o aviso "Leaked Password Protection", que só vale para senha.
+- **Não conferido** (o painel não abriu na sessão do navegador do Claude): Site URL, Redirect URLs, duração de sessão, limites de envio e CAPTCHA. O endpoint de login não revela a lista de redirecionamento. Conferir em Authentication → URL Configuration: Site URL `https://rqstack.github.io/programacao-do-zero/` e Redirect URL `https://rqstack.github.io/programacao-do-zero/entrar/` (localhost só se você testa local; com PKCE o risco é baixo).
+
+### K.5 Videoaulas
+
+Estavam sem vídeo: Python, Modelagem de Dados, Testes e Depuração, C#, AWS, Deploy e Hospedagem, Carreira. Seis receberam playlist conferida (título e canal pelo oEmbed, conteúdo pelos títulos das aulas); Carreira ficou sem, por falta de curso adequado. As 14 playlists que já existiam responderam no oEmbed. Novo teste exige que cada chave da lista seja uma trilha.
+
+### K.6 Pendências reais
+
+1. Desligar o provedor Email e conferir URL Configuration (K.4). Painel, gratuito.
+2. Teste seguro do webhook com o token (seção H, item 2): só você tem o token.
+3. Prova definitiva do Pix: só com um Pix real (R$ 5, decisão sua).
+4. PR #5 (TypeScript 7): esperar suporte do typescript-eslint e do Next.
