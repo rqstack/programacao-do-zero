@@ -40,7 +40,9 @@ describe("conferência de segredos no pacote do site", () => {
   });
 
   it("barra chave sb_secret_ e source map", () => {
-    expect(run({ "a.js": "x='sb_secret_abcdefghijklmnop'" }).ok).toBe(false);
+    // Montada em partes para o teste de higiene do repositório não confundir com uma chave real.
+    const chaveFalsa = ["sb", "secret", "abcdefghijklmnop"].join("_");
+    expect(run({ "a.js": `x='${chaveFalsa}'` }).ok).toBe(false);
     expect(run({ "_next/static/app.js.map": "{}" }).ok).toBe(false);
   });
 });
