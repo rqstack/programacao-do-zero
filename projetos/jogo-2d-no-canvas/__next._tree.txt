@@ -1,0 +1,7 @@
+:HL["/programacao-do-zero/_next/static/chunks/3hch8tint6b6o.css","style"]
+:HL["/programacao-do-zero/_next/static/media/53897e768d329f66-s.p.3t6q91iet4nsy.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/programacao-do-zero/_next/static/media/ded494f396ddea9f-s.p.3j3x29wbycqkn.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+3:[["children",{"s":"__PAGE__","h":160}]]
+2:[["children",{"s":{"n":"slug","t":"d","k":"jogo-2d-no-canvas","s":[]},"h":65632,"c":"$Q3"}]]
+1:[["children",{"s":"projetos","h":131136,"c":"$Q2"}]]
+0:{"b":"yR9Y_hYhmZMKNYtQfSZ2A","t":{"t":{"s":"","h":131088,"c":"$Q1"}}}
