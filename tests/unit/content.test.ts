@@ -86,6 +86,12 @@ describe("videoaulas", () => {
       expect(new Set(list.map((v) => v.playlist)).size, slug).toBe(list.length);
     }
   });
+
+  it("cada chave da lista de vídeos é uma trilha que existe", async () => {
+    const { videosByCourse } = await import("@content/videos");
+    const slugs = new Set(courses.map((c) => c.slug));
+    for (const slug of Object.keys(videosByCourse)) expect(slugs.has(slug), slug).toBe(true);
+  });
 });
 
 describe("blocos SQL das aulas", () => {

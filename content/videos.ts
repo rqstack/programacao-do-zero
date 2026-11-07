@@ -2,7 +2,8 @@
  * Videoaulas gratuitas no YouTube, por trilha.
  *
  * Só entram cursos com todas as aulas publicadas há no máximo 1 ano (conferido em out/2026)
- * e com título e canal confirmados pelo oEmbed do YouTube. Trilhas sem curso recente ficam sem vídeos.
+ * e com título e canal confirmados pelo oEmbed do YouTube. Exceções (curso mais antigo que cobre
+ * bem a trilha) ficam marcadas em comentário. Trilha sem curso adequado fica sem vídeos.
  * São cursos de outros autores, abertos e gratuitos, indicados como complemento: o texto das
  * aulas deste site é próprio. Para trocar ou adicionar, confira o link antes.
  */
@@ -59,9 +60,28 @@ export const videosByCourse: Record<string, VideoCourse[]> = {
   "full-stack": [
     { playlist: "PL2Fdisxwzt_f69N5jAfypOOhjdW3yDFnw", title: "Curso Programador Web Moderno: Era da IA", channel: "Programação Web", lang: "pt" },
   ],
-  "jogos-com-canvas": [
-    { playlist: "PLYElE_rzEw_tjnJ_5gzRw0ZM5HRn7AIS0", title: "Vanilla JavaScript Game Development", channel: "Franks laboratory", lang: "en" },
+  // Adicionados em 06/11/2026 (título e canal conferidos pelo oEmbed; conteúdo conferido
+  // pelos títulos das aulas). Python e GH-200 seguem a regra de até 1 ano; os demais são
+  // exceções escolhidas por cobrirem o conteúdo da trilha quando não havia curso recente.
+  python: [
+    { playlist: "PLxNM4ef1Bpxg3T7lZyNVUmeJ4cQpWbST7", title: "Desenvolvendo Sistemas com Python do Zero em 2026", channel: "Portal Hugo Cursos", lang: "pt" },
   ],
+  "modelagem-de-dados": [
+    { playlist: "PLucm8g_ezqNoNHU8tjVeHmRGBFnjDIlxD", title: "Curso de Modelagem de Dados", channel: "Bóson Treinamentos", lang: "pt" },
+  ],
+  "testes-e-depuracao": [
+    { playlist: "PLbIBj8vQhvm0pgOkQu3YzOfpQLvWRKdAG", title: "Testes automatizados no Next.js com Vitest + Playwright", channel: "Otávio Miranda", lang: "pt" },
+  ],
+  csharp: [
+    { playlist: "PLEI5qdfLBErZuMSareAo-TLTFYU9hGDsR", title: "Curso de C# e .NET 8: Guia Completo do Básico ao Avançado", channel: "Antônio Rocha", lang: "pt" },
+  ],
+  aws: [
+    { playlist: "PLz3hnOImntAPoJZ2JAWtOzc34X1EI_ge7", title: "AWS Certified Cloud Practitioner: Treinamento Completo", channel: "Canal da Cloud", lang: "pt" },
+  ],
+  "deploy-e-hospedagem": [
+    { playlist: "PLahhVEj9XNTd5N_seZDoRXVIn6N1qAp-_", title: "GH-200: Automate your workflow with GitHub Actions", channel: "Microsoft Learn", lang: "en" },
+  ],
+  // carreira: sem playlist que cubra portfólio, GitHub, currículo e entrevistas para devs (conferido em 06/11/2026).
 };
 
 export function playlistUrl(id: string): string {
