@@ -16,6 +16,8 @@ if (existsSync(".next")) renameSync(".next", `.next-old-${Date.now()}`);
 const basePath = `/${repoName}`;
 run("npm run build", { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: basePath, MSYS_NO_PATHCONV: "1" } });
 run(`node scripts/check-links.mjs ${basePath}`, { env: { ...process.env, MSYS_NO_PATHCONV: "1" } });
+// Barra a publicação se o pacote tiver chave secreta ou source map.
+run("node scripts/check-bundle-secrets.mjs out");
 
 // O GitHub Pages ignora pastas que começam com "_" (como _next) sem este arquivo.
 writeFileSync("out/.nojekyll", "");
