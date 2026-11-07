@@ -94,13 +94,34 @@ Secrets opcionais da Edge Function (Supabase → Edge Functions → battle-submi
 
 ### Atualizar a Edge Function
 
-O banco privado precisa estar em `supabase/functions/_shared/battle-bank.ts`. Com a CLI do Supabase:
+O banco privado precisa estar em `supabase/functions/_shared/battle-bank.ts`.
 
-```bash
-npx supabase functions deploy battle-submit --no-verify-jwt --project-ref kaylnsleygeysszomudd
-```
+> **Nunca rode `supabase functions deploy battle-submit` direto da pasta do projeto.** A CLI envia
+> o `battle-bank.ts` como está, **com as soluções de referência** de todas as linguagens. Publique
+> sempre o pacote gerado pelo script, que corta as soluções e confere o resultado.
 
-(A função faz a própria autenticação; por isso `--no-verify-jwt`.)
+1. Gere o pacote numa pasta temporária, fora do repositório:
+
+   ```bash
+   T=$(mktemp -d)
+   npx tsx scripts/bundle-battle-submit.mts "$T/supabase/functions/battle-submit/index.ts"
+   ```
+
+   O script monta o banco com o mesmo corte, exige que os desafios fiquem sem soluções e, se
+   sobrar alguma, apaga o pacote e termina com erro. Saída esperada: `... — 29 desafios sem soluções`.
+   A referência em JavaScript continua no pacote: o servidor precisa dela para calcular as
+   respostas esperadas, e ela nunca sai da função.
+2. Publique **esse** pacote, apontando a CLI para a pasta temporária:
+
+   ```bash
+   npx supabase functions deploy battle-submit --no-verify-jwt --project-ref kaylnsleygeysszomudd --workdir "$T"
+   rm -rf "$T"
+   ```
+
+   As publicações anteriores enviaram o mesmo pacote pelo MCP do Supabase (entrada `index.js`).
+   O caminho com `--workdir` segue a documentação da CLI e ainda não foi usado neste projeto.
+
+A função faz a própria autenticação; por isso `--no-verify-jwt`.
 
 ## Como testar com duas contas reais
 

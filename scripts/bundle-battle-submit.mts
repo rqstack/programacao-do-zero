@@ -4,7 +4,10 @@
  * (npm run battle:validate) e não precisam ir para o servidor.
  * Uso: npx tsx scripts/bundle-battle-submit.mts <arquivo-de-saída>
  */
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { build, type Plugin } from "esbuild";
 import ts from "typescript";
 
@@ -49,6 +52,26 @@ await build({
   logLevel: "warning",
 });
 const bundle = readFileSync(out, "utf8");
-const vazou = /partition_point|sort\.SearchInts|bisect_left|System\.out/.test(bundle);
-console.log(`${out}: ${(bundle.length / 1024).toFixed(1)} KB${vazou ? " — ATENÇÃO: ainda há código de solução no pacote!" : " — sem soluções"}`);
-process.exit(vazou ? 1 : 0);
+// Prova de que nenhuma solução vai ao servidor: monta só o banco com o mesmo corte, carrega
+// o resultado e exige que todo desafio fique com `solutions` vazio. (A referência em JS
+// continua: o servidor precisa dela para calcular as respostas esperadas.)
+const tmp = mkdtempSync(path.join(tmpdir(), "pdz-banco-"));
+let semSolucao = 0;
+const comSolucao: string[] = [];
+try {
+  const banco = path.join(tmp, "banco.mjs");
+  await build({ entryPoints: ["supabase/functions/_shared/battle-bank.ts"], bundle: true, format: "esm", platform: "neutral", outfile: banco, plugins: [removerSolucoes], logLevel: "warning" });
+  const { battleBank } = (await import(pathToFileURL(banco).href)) as { battleBank: Array<{ id: string; solutions?: Record<string, unknown> }> };
+  for (const ch of battleBank) {
+    if (Object.keys(ch.solutions ?? {}).length === 0) semSolucao++;
+    else comSolucao.push(ch.id);
+  }
+} finally {
+  rmSync(tmp, { recursive: true, force: true });
+}
+const vazou = comSolucao.length > 0 || semSolucao === 0 || /partition_point|sort\.SearchInts|bisect_left|System\.out/.test(bundle);
+console.log(`${out}: ${(bundle.length / 1024).toFixed(1)} KB — ${semSolucao} desafios sem soluções${vazou ? ` — ATENÇÃO: há código de solução no pacote (${comSolucao.slice(0, 5).join(", ") || "padrão conhecido"})!` : ""}`);
+if (vazou) {
+  rmSync(out, { force: true }); // nunca deixa um pacote com soluções no disco
+  process.exit(1);
+}
